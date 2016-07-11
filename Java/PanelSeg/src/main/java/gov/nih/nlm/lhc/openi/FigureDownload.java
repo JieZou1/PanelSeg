@@ -1,4 +1,4 @@
-package gov.nih.nlm.ceb.openi;
+package gov.nih.nlm.lhc.openi;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,15 +31,17 @@ public class FigureDownload
 	 * @param	output-dir		Directory where the images are downloaded.
 	 * @param	image-prefix	Server name to be used as image prefix.
 	 */
-	public static void main(String args[]) throws Exception{
+	public static void main(String args[]) throws Exception
+	{
 		//Stop and print error msg if no agruments passed.
-		if(args.length < 3){
-			System.out.println("Usage: java -jar FigureDownload.jar <query-string> <output-dir> <image-prefix>");
+		if(args.length < 3)
+		{
+			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.ceb.openi.FigureDownload <query-string> <output-dir> <image-prefix>");
 			System.exit(0);
 		}
 		
 //		String queryString = "http://ceb-openi-alpha/iti/search?query=turmeric&it=xg";
-//		String outputDirPath  = "C:\Users\chachrask\Desktop\query-images";
+//		String outputDirPath  = "D:\\users\\jie\\\query-images";
 //		String imagePrefix = "http://ceb-openi-alpha";
 		
 		String queryString = args[0];
@@ -67,7 +69,8 @@ public class FigureDownload
                     new InputStreamReader(urlConn.getInputStream()));
 
 	        String decodedString;
-	        while ((decodedString = in.readLine()) != null) {
+	        while ((decodedString = in.readLine()) != null) 
+	        {
 	        	response.append(decodedString);
 	        }	        
 	        

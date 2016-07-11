@@ -1,4 +1,4 @@
-package gov.nih.nlm.ceb.openi;
+package gov.nih.nlm.lhc.openi;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;

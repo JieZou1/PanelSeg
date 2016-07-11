@@ -1,4 +1,4 @@
-package gov.nih.nlm.ceb.openi;
+package gov.nih.nlm.lhc.openi;
 
 /**
  * The base class for all panel segmentation algorithms. <p>

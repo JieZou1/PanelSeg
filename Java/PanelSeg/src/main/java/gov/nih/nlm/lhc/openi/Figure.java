@@ -1,4 +1,4 @@
-package gov.nih.nlm.ceb.openi;
+package gov.nih.nlm.lhc.openi;
 
 import java.util.ArrayList;
 import org.bytedeco.javacpp.opencv_core.*;
@@ -23,8 +23,8 @@ public class Figure
 	
 	/**
 	 * ctor, from a BGR image
-	 * image, imageGray, imageWidth and imageHeight are all initialized.
-	 * panels
+	 * image, imageGray, imageWidth and imageHeight are all initialized to the right values.
+	 * panels is also instantiated as an empty ArrayList.
 	 * @param img
 	 */
 	Figure(Mat img)

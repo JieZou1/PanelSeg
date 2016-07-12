@@ -1,9 +1,16 @@
 package gov.nih.nlm.lhc.openi;
 
 import java.awt.Rectangle;
+import java.io.*;
 import java.util.ArrayList;
 import org.w3c.dom.*;
+
 import javax.xml.parsers.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.commons.lang3.*;
 
 public class PanelSegEval 
@@ -12,9 +19,9 @@ public class PanelSegEval
 	 * Load Ground Truth Annotations of panel segmentation
 	 * @param xml_file
 	 * @return
-	 * @throws Exception
+	 * @throws Exception 
 	 */
-	static ArrayList<Panel> loadPanelSegGt(String gt_xml_file) throws Exception
+	static ArrayList<Panel> loadPanelSegGt(File gt_xml_file) throws Exception
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
@@ -45,6 +52,10 @@ public class PanelSegEval
 				
 				Panel panel = new Panel();
 				panel.panelRect = new Rectangle(x, y, width + 1, height + 1); //Looks like that iPhotoDraw uses [] for range instead of [)
+
+				if (panel.panelRect.width < 3 || panel.panelRect.height < 3)
+					throw new Exception("Load Annotation Error: Very small rectangle of " + text + ", in " + gt_xml_file +  "!");
+				
 				String[] words = text.split("\\s+");
 				panel.panelLabel = String.join(" ", ArrayUtils.remove(words, 0));
 				panels.add(panel);
@@ -58,8 +69,12 @@ public class PanelSegEval
 				int y = (int)(Double.parseDouble(attributes.getNamedItem("Y").getTextContent()));
 				int width = (int)(Double.parseDouble(attributes.getNamedItem("Width").getTextContent()));
 				int height = (int)(Double.parseDouble(attributes.getNamedItem("Height").getTextContent()));
-			
+
 				Rectangle labelRect = new Rectangle(x, y, width + 1, height + 1); //Looks like that iPhotoDraw uses [] for range instead of [)
+				
+				if (labelRect.width < 3 || labelRect.height < 3)
+					throw new Exception("Load Annotation Error: Very small rectangle of " + text + ", in " + gt_xml_file +  "!");
+				
 				labelRects.add(labelRect);
 				String[] words = text.split("\\s+"); 
 				labelNames.add(String.join(" ", ArrayUtils.remove(words, 0)));				
@@ -125,4 +140,78 @@ public class PanelSegEval
 		return panels;
 	}
 
+	/**
+	 * Fixing some annotation errors, including:
+	 * 1. Rect width and height <= 0 
+	 * 
+	 * @param gt_xml_file
+	 * @return
+	 * @throws Exception
+	 */
+	static void fixPanelSegGt(File gt_xml_file) throws Exception
+	{
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(gt_xml_file);
+
+		Node shapesNode = doc.getElementsByTagName("Shapes").item(0);
+		NodeList shapeNodes = doc.getElementsByTagName("Shape");
+		
+		for (int i = shapeNodes.getLength() - 1; i >= 0; i--)
+		{
+			Node shapeNode = shapeNodes.item(i);
+			Node blockTextNode = AlgorithmEx.getChildNode(shapeNode, "BlockText");
+			Node textNode = AlgorithmEx.getChildNode(blockTextNode, "Text");
+			String text = textNode.getTextContent().trim();
+			textNode.setTextContent(text);
+			
+			String textLower = text.toLowerCase();
+			
+			if (textLower.startsWith("panel"))
+			{	//It is a panel
+				Node dataNode = AlgorithmEx.getChildNode(shapeNode, "Data");
+				Node extentNode = AlgorithmEx.getChildNode(dataNode, "Extent");
+				NamedNodeMap attributes = extentNode.getAttributes();
+//				int x = (int)(Double.parseDouble(attributes.getNamedItem("X").getTextContent()));
+//				int y = (int)(Double.parseDouble(attributes.getNamedItem("Y").getTextContent()));
+				int width = (int)(Double.parseDouble(attributes.getNamedItem("Width").getTextContent()));
+				int height = (int)(Double.parseDouble(attributes.getNamedItem("Height").getTextContent()));
+				
+				if (width <= 0 || height <= 0)
+				{
+					System.out.println("Panel Removed: " + text + ", in " + gt_xml_file +  "!");
+					shapesNode.removeChild(shapeNode);
+				}
+			}
+			else if (textLower.startsWith("label"))
+			{	//It is a label
+				Node dataNode = AlgorithmEx.getChildNode(shapeNode, "Data");
+				Node extentNode = AlgorithmEx.getChildNode(dataNode, "Extent");
+				NamedNodeMap attributes = extentNode.getAttributes();
+//				int x = (int)(Double.parseDouble(attributes.getNamedItem("X").getTextContent()));
+//				int y = (int)(Double.parseDouble(attributes.getNamedItem("Y").getTextContent()));
+				int width = (int)(Double.parseDouble(attributes.getNamedItem("Width").getTextContent()));
+				int height = (int)(Double.parseDouble(attributes.getNamedItem("Height").getTextContent()));
+				
+				if (width <= 0 || height <= 0)
+				{
+					System.out.println("Panel Removed: " + text + ", in " + gt_xml_file +  "!");
+					shapesNode.removeChild(shapeNode);
+				}
+			}			
+			else 
+			{
+				throw new Exception("Load Annotation Error: Unknown annotation, " + text + ", in " + gt_xml_file +  "!");
+			}
+		}
+
+		// write the content into xml file
+	    TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	    javax.xml.transform.Transformer transformer = transformerFactory.newTransformer();
+	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+	    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");			
+	    DOMSource source = new DOMSource(doc);
+		StreamResult result = new StreamResult(gt_xml_file);
+		transformer.transform(source, result);
+	}
 }

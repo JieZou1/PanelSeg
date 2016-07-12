@@ -1,6 +1,11 @@
 package gov.nih.nlm.lhc.openi;
 
+import java.util.ArrayList;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.awt.*;
 import org.w3c.dom.*;
@@ -175,7 +180,61 @@ public class AlgorithmEx
 		}
 		return maxIndex;
 	}
+
+	/**
+	 * Collect all image files from the folder, currently the image file means filenames ended with ".jpg" and ".png".
+	 * @param folder
+	 * @return ArrayList of Paths of images.
+	 */
+	static ArrayList<Path> CollectImageFiles(Path folder)
+	{
+		ArrayList<Path> imagePaths = new ArrayList<Path>();
+		try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder)) 
+		{			
+			for (Path path : dirStrm)
+			{
+				String filename = path.toString();
+				if (!filename.endsWith(".jpg") && !filename.endsWith(".png")) continue;
+				
+				imagePaths.add(path);
+			}
+		}
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return imagePaths;
+	}
+
+	/**
+	 * Collect XML files from the folder, currently the XML file means the filenames ended with ".xml".
+	 * @param folder
+	 * @return ArrayList of Paths of images.
+	 */
+	static ArrayList<Path> CollectXmlFiles(Path folder)
+	{
+		ArrayList<Path> xmlPaths = new ArrayList<Path>();
+		try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder)) 
+		{			
+			for (Path path : dirStrm)
+			{
+				String filename = path.toString();
+				if (!filename.endsWith(".xml")) continue;
+				
+				xmlPaths.add(path);
+			}
+		}
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return xmlPaths;
+	}
+
 }
+
 
 class RectangleTopAscending implements Comparator<Rectangle>
 {

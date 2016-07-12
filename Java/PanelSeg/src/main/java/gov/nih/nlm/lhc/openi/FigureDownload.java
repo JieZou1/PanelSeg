@@ -36,7 +36,7 @@ public class FigureDownload
 		//Stop and print error msg if no agruments passed.
 		if(args.length < 3)
 		{
-			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.ceb.openi.FigureDownload <query-string> <output-dir> <image-prefix>");
+			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.lhc.openi.FigureDownload <query-string> <output-dir> <image-prefix>");
 			System.exit(0);
 		}
 		

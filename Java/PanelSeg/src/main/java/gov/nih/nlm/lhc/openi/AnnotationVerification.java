@@ -1,51 +1,88 @@
 package gov.nih.nlm.lhc.openi;
 
 import java.util.ArrayList;
-import java.io.IOException;
+
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.*;
 import java.nio.file.*;
 
 public class AnnotationVerification 
 {
+	Path annotationFolder;
+	ArrayList<Path> imagePaths;
+	
+	/**
+	 * ctor, set annotationFolder and then collect all imagefiles and save in imagePaths
+	 * @param annotationFolder
+	 */
+	AnnotationVerification(String annotationFolder)
+	{
+		this.annotationFolder = Paths.get(annotationFolder); 
+		imagePaths = AlgorithmEx.CollectImageFiles(this.annotationFolder);
+		System.out.println("Total number of image is: " + imagePaths.size());
+	}
+
+	/**
+	 * Entry function for verify the annotation
+	 */
+	void verify()
+	{
+		for (int i = 0; i < imagePaths.size(); i++)
+		{
+			Path imagePath = imagePaths.get(i);
+			File annotationFile = new File(FilenameUtils.removeExtension(imagePath.toString()) + "_data.xml");
+//			if (!annotationFile.endsWith("PMC544880_1471-2369-5-18-2_data.xml")) continue;
+
+			//Check whether annotation file exist or not.
+			if (checkForMissingAnnotationFile(annotationFile)) continue;
+			
+			//Load annotation
+			ArrayList<Panel> panels = null;
+			try {
+				panels = PanelSegEval.loadPanelSegGt(annotationFile);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//Check for panels which have empty Rectangle
+			if (checkForEmptyRect(panels)) continue;
+		}
+	}
+	
+	/**
+	 * Check whether the corresponding annotation XML exists or not.
+	 * @param imagePath
+	 * @return true if missing the annotation file.
+	 */
+	boolean checkForMissingAnnotationFile(File annotationFile)
+	{
+		if (!annotationFile.exists())
+		{
+			System.out.println("Missing Annotation File: " + annotationFile.toString());
+			return true;
+		}
+		return false;
+	}
+	
+	boolean checkForEmptyRect(ArrayList<Panel> panels)
+	{
+		
+		
+		return true;
+	}
+	
 	public static void main(String args[]) throws Exception
 	{
-		//Stop and print error msg if no agruments passed.
-		if(args.length != 1){
-			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.ceb.openi.AnnotationVerfication <annotation folder>");
+		//Stop and print error msg if no arguments passed.
+		if(args.length != 1)
+		{
+			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.lhc.openi.AnnotationVerfication <annotation folder>");
 			System.exit(0);
 		}
 		
-		ArrayList<String> gtXMLPaths = new ArrayList<String>();
-		try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(Paths.get(args[0]))) 
-		{			
-			for (Path path : dirStrm)
-			{
-				String filename = path.toString();
-				if (!filename.endsWith("_data.xml")) continue;
-				gtXMLPaths.add(filename);
-			}
-		}
-		catch (IOException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.println("Total number of annotation is: " + gtXMLPaths.size());
-		
-		for (int i = 0; i < gtXMLPaths.size(); i++)
-		{
-			String file = gtXMLPaths.get(i);
-			//if (!file.endsWith("PMC544880_1471-2369-5-18-2_data.xml")) continue;
-			try
-			{
-				PanelSegEval.loadPanelSegGt(file);
-			}
-			catch (Exception e) 
-			{
-				System.out.println("Error: " + e.getMessage());
-			}
-		}
-		
+		AnnotationVerification verification = new AnnotationVerification(args[0]);
+		verification.verify();
 	}
-
 }

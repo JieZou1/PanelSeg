@@ -85,3 +85,4 @@ class PanelLabelAscending implements Comparator<Panel>
 		else return -1;
 	}
 }
+

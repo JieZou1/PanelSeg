@@ -182,6 +182,40 @@ public class AlgorithmEx
 	}
 
 	/**
+	 * Convert java.awt.Rectangle to opencv_core.Rect
+	 * @param rectangle
+	 * @return
+	 */
+	static Rect Rectangle2Rect(Rectangle rectangle)
+	{
+		Rect rect = new Rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+		return rect;
+	}
+	
+	/**
+	 * Get a color, for drawing on Mat (image)
+	 * @param i
+	 * @return
+	 */
+	static Scalar getColor(int i)
+	{
+		Color colors[] = new Color[]
+				{
+						Color.BLUE,
+						Color.CYAN,
+						Color.GREEN,
+						Color.MAGENTA,
+						Color.ORANGE,
+						Color.PINK,
+						Color.RED,
+						Color.YELLOW,
+				};
+		Color color = colors[i%colors.length];
+		Scalar scalar = new Scalar(color.getBlue(), color.getGreen(), color.getRed(), 0);
+		return scalar;
+	}
+	
+	/**
 	 * Collect all image files from the folder, currently the image file means filenames ended with ".jpg" and ".png".
 	 * @param folder
 	 * @return ArrayList of Paths of images.

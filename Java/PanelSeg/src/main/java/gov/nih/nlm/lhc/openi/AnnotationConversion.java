@@ -1,39 +1,40 @@
 package gov.nih.nlm.lhc.openi;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.bytedeco.javacpp.opencv_core.Mat;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-public class AnnotationAutoFixing 
+public class AnnotationConversion 
 {
 	private Path annotationFolder;
 	private ArrayList<Path> annotationPaths;
 	
 	/**
-	 * ctor, set annotationFolder and then collect all imagefiles and save in imagePaths
+	 * ctor, set annotationFolder and then collect all annotation file paths
 	 * @param annotationFolder
 	 */
-	private AnnotationAutoFixing(String annotationFolder)
+	private AnnotationConversion(String annotationFolder)
 	{
 		this.annotationFolder = Paths.get(annotationFolder); 
 		annotationPaths = AlgorithmEx.CollectXmlFiles(this.annotationFolder);
 		System.out.println("Total number of XML files is: " + annotationPaths.size());
 	}
-	
-	/**
-	 * Entry function for fixing the annotation
-	 */
-	private void Fix()
+
+	private void convert()
 	{
 		for (int i = 0; i < annotationPaths.size(); i++)
 		{
@@ -43,26 +44,26 @@ public class AnnotationAutoFixing
 			File annotationFile = new File(xmlPath);
 			//Load annotation
 			try {
-				fixPanelSegGt(annotationFile);
+				convertPanelSegGt(annotationFile);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		}		
+		System.out.println("Completed!");
 	}
-
 	
 	public static void main(String args[]) throws Exception
 	{
 		//Stop and print error msg if no arguments passed.
 		if(args.length != 1)
 		{
-			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.lhc.openi.AnnotationAutoFixing <annotation folder>");
+			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.lhc.openi.AnnotationConversion <annotation folder>");
 			System.exit(0);
 		}
 		
-		AnnotationAutoFixing fixing = new AnnotationAutoFixing(args[0]);
-		fixing.Fix();
+		AnnotationConversion conversion = new AnnotationConversion(args[0]);
+		conversion.convert();
 	}
 
 	/**
@@ -73,16 +74,17 @@ public class AnnotationAutoFixing
 	 * @return
 	 * @throws Exception
 	 */
-	static private void fixPanelSegGt(File gt_xml_file) throws Exception
+	static private void convertPanelSegGt(File gt_xml_file) throws Exception
 	{
-		String imageFile = gt_xml_file.toString().replace("_data.xml", ".png");
+		String imageFile = gt_xml_file.toString().replace("_data.xml", ".jpg");
 		Mat image = opencv_imgcodecs.imread(imageFile);
+		int image_width = image.cols();
+		if (image_width <= 512) return;	//if the original image width is less than 512, the image is not resized, so we don't need to change bounding box annotations.
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document doc = builder.parse(gt_xml_file);
 
-		Node shapesNode = doc.getElementsByTagName("Shapes").item(0);
 		NodeList shapeNodes = doc.getElementsByTagName("Shape");
 		
 		for (int i = shapeNodes.getLength() - 1; i >= 0; i--)
@@ -108,37 +110,12 @@ public class AnnotationAutoFixing
 				double y = Double.parseDouble(yNode.getTextContent());
 				double w = Double.parseDouble(wNode.getTextContent());
 				double h = Double.parseDouble(hNode.getTextContent());
-				
-				if (w <= 0 || h <= 0)
-				{
-					System.out.println("Bounding Box Removed: " + text + ", in " + gt_xml_file +  "!");
-					shapesNode.removeChild(shapeNode);
-					continue;
-				}
-				if (x < 0)
-				{
-					w += x; /*We keep the original right*/ 		x = 0;
-					xNode.setTextContent(Double.toString(x)); wNode.setTextContent(Double.toString(w));
-					System.out.println("Negative X Modified: " + text + ", in " + gt_xml_file +  "!");
-				}
-				if (y < 0)
-				{
-					h += y; /*We keep the original bottom */	y = 0;
-					yNode.setTextContent(Double.toString(y)); hNode.setTextContent(Double.toString(h));
-					System.out.println("Negative Y Modified: " + text + ", in " + gt_xml_file +  "!");
-				}
-				if (x + w > image.cols())
-				{
-					w = image.cols() - x;
-					wNode.setTextContent(Double.toString(w));
-					System.out.println("Outside Right Modified: " + text + ", in " + gt_xml_file +  "!");
-				}
-				if (y + h > image.rows())
-				{
-					h = image.rows() - y;
-					hNode.setTextContent(Double.toString(h));
-					System.out.println("Outside Bottom Modified: " + text + ", in " + gt_xml_file +  "!");
-				}
+
+				double ratio = image_width / 512.0;
+				x *= ratio; xNode.setTextContent(Double.toString(x));
+				y *= ratio; yNode.setTextContent(Double.toString(y));
+				w *= ratio; wNode.setTextContent(Double.toString(w));
+				h *= ratio; hNode.setTextContent(Double.toString(h));
 			}
 			else 
 			{

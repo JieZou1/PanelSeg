@@ -13,16 +13,16 @@ import org.bytedeco.javacpp.opencv_imgproc;
 
 public class AnnotationVisualize 
 {
-	Path annotationFolder;
-	ArrayList<Path> imagePaths;
-	File styleFile;
-	Map<String, String> styles;
+	private Path annotationFolder;
+	private ArrayList<Path> imagePaths;
+	private File styleFile;
+	private Map<String, String> styles;
 	
 	/**
 	 * ctor, set annotationFolder and then collect all imagefiles and save in imagePaths
 	 * @param annotationFolder
 	 */
-	AnnotationVisualize(String annotationFolder)
+	private AnnotationVisualize(String annotationFolder)
 	{
 		this.annotationFolder = Paths.get(annotationFolder); 
 		imagePaths = AlgorithmEx.CollectImageFiles(this.annotationFolder);
@@ -35,7 +35,7 @@ public class AnnotationVisualize
 	/**
 	 * Read the style annotation from the file
 	 */
-	void loadStyleMap()
+	private void loadStyleMap()
 	{
 		styles = new HashMap<>();
 		
@@ -64,7 +64,7 @@ public class AnnotationVisualize
 	/**
 	 * Save the style annotation into the file
 	 */
-	void saveStyleMap()
+	private void saveStyleMap()
 	{
 		try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(styleFile))))
 		{
@@ -90,7 +90,7 @@ public class AnnotationVisualize
 	 * @param panels
 	 * @return
 	 */
-	Mat drawAnnotation(Mat img, ArrayList<Panel> panels)
+	private Mat drawAnnotation(Mat img, ArrayList<Panel> panels)
 	{
 		Mat imgAnnotated = new Mat(); 
 		opencv_core.copyMakeBorder(img, imgAnnotated, 0, 50, 0, 50, opencv_core.BORDER_CONSTANT, new Scalar());
@@ -131,7 +131,7 @@ public class AnnotationVisualize
 	/**
 	 * Entry function for verify the annotation
 	 */
-	void visualize()
+	private void visualize()
 	{
 		for (int i = 0; i < imagePaths.size();)
 		{

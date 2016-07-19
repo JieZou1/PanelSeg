@@ -15,14 +15,14 @@ import java.nio.file.*;
 
 public class AnnotationVerification 
 {
-	Path annotationFolder;
-	ArrayList<Path> imagePaths;
+	private Path annotationFolder;
+	private ArrayList<Path> imagePaths;
 	
 	/**
 	 * ctor, set annotationFolder and then collect all imagefiles and save in imagePaths
 	 * @param annotationFolder
 	 */
-	AnnotationVerification(String annotationFolder)
+	private AnnotationVerification(String annotationFolder)
 	{
 		this.annotationFolder = Paths.get(annotationFolder); 
 		imagePaths = AlgorithmEx.CollectImageFiles(this.annotationFolder);
@@ -32,7 +32,7 @@ public class AnnotationVerification
 	/**
 	 * Entry function for verify the annotation
 	 */
-	void verify()
+	private void verify()
 	{
 		for (int i = 0; i < imagePaths.size(); i++)
 		{
@@ -91,7 +91,7 @@ public class AnnotationVerification
 	 * @param imagePath
 	 * @return true if missing the annotation file.
 	 */
-	boolean checkForMissingAnnotationFile(File annotationFile)
+	private boolean checkForMissingAnnotationFile(File annotationFile)
 	{
 		if (!annotationFile.exists())
 		{
@@ -114,7 +114,7 @@ public class AnnotationVerification
 		verification.verify();
 	}
 
-	static void verifyPanelSegGt(File gt_xml_file) throws Exception
+	static private void verifyPanelSegGt(File gt_xml_file) throws Exception
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();

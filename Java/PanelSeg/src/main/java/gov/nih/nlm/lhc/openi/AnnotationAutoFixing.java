@@ -1,6 +1,8 @@
 package gov.nih.nlm.lhc.openi;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -63,6 +65,7 @@ public class AnnotationAutoFixing
 		
 		AnnotationAutoFixing fixing = new AnnotationAutoFixing(args[0]);
 		fixing.Fix();
+		System.out.println("Completed!");
 	}
 
 	/**
@@ -76,6 +79,8 @@ public class AnnotationAutoFixing
 	static private void fixPanelSegGt(File gt_xml_file) throws Exception
 	{
 		String imageFile = gt_xml_file.toString().replace("_data.xml", ".png");
+		if (!Files.exists(Paths.get(imageFile), LinkOption.NOFOLLOW_LINKS))
+				imageFile = gt_xml_file.toString().replace("_data.xml", ".jpg");
 		Mat image = opencv_imgcodecs.imread(imageFile);
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

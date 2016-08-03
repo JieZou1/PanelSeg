@@ -267,6 +267,30 @@ public class AlgorithmEx
 		return xmlPaths;
 	}
 
+	/**
+	 * Collect all image files from the folder, currently the image file means filenames ended with ".jpg" and ".png".
+	 * @param folder
+	 * @return ArrayList of Paths of images.
+	 */
+	static ArrayList<Path> CollectSubfolders(Path folder)
+	{
+		ArrayList<Path> folderPaths = new ArrayList<Path>();
+		try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder)) 
+		{			
+			for (Path path : dirStrm)
+			{
+				if (path.toFile().isDirectory())
+					folderPaths.add(path);
+			}
+		}
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return folderPaths;
+	}
+	
 }
 
 

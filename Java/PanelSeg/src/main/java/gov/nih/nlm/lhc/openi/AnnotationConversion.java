@@ -76,10 +76,18 @@ public class AnnotationConversion
 	 */
 	static private void convertPanelSegGt(File gt_xml_file) throws Exception
 	{
-		String imageFile = gt_xml_file.toString().replace("_data.xml", ".jpg");
-		Mat image = opencv_imgcodecs.imread(imageFile);
-		int image_width = image.cols();
-		if (image_width <= 512) return;	//if the original image width is less than 512, the image is not resized, so we don't need to change bounding box annotations.
+		String jpg_file = gt_xml_file.toString().replace("_data.xml", ".jpg");
+		Mat jpg_image = opencv_imgcodecs.imread(jpg_file);
+		int jpg_image_width = jpg_image.cols(); //int jpg_image_height = jpg_image.rows();
+
+		String png_file = gt_xml_file.toString().replace("_data.xml", ".png");
+		Mat png_image = opencv_imgcodecs.imread(png_file);
+		int png_image_width = png_image.cols(); //int png_image_height = png_image.rows();
+		
+		double ratio = (double)jpg_image_width / (double)png_image_width;
+		//double ratio_h = (double)jpg_image_height / (double)png_image_height;
+		
+		//if (jpg_image_width <= 512) return;	//if the original image width is less than 512, the image is not resized, so we don't need to change bounding box annotations.
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
@@ -111,7 +119,6 @@ public class AnnotationConversion
 				double w = Double.parseDouble(wNode.getTextContent());
 				double h = Double.parseDouble(hNode.getTextContent());
 
-				double ratio = image_width / 512.0;
 				x *= ratio; xNode.setTextContent(Double.toString(x));
 				y *= ratio; yNode.setTextContent(Double.toString(y));
 				w *= ratio; wNode.setTextContent(Double.toString(w));

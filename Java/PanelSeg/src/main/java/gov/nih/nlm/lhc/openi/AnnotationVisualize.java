@@ -29,36 +29,7 @@ public class AnnotationVisualize
 		System.out.println("Total number of image is: " + imagePaths.size());
 
 		styleFile = new File(annotationFolder, "style.txt"); 
-		loadStyleMap();
-	}
-	
-	/**
-	 * Read the style annotation from the file
-	 */
-	private void loadStyleMap()
-	{
-		styles = new HashMap<>();
-		
-		if(!styleFile.exists() || styleFile.isDirectory()) 
-		{	//No styles have been marked yet 
-			return;
-		}
-		
-		try (BufferedReader br = new BufferedReader(new FileReader(styleFile))) 
-		{
-		    String line;
-		    while ((line = br.readLine()) != null) 
-		    {
-		    	String[] words = line.split("\\s+");
-		    	styles.put(words[0], words[1]);
-		    }
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		styles = PanelSegEval.loadStyleMap(styleFile);
 	}
 	
 	/**
@@ -90,10 +61,10 @@ public class AnnotationVisualize
 	 * @param panels
 	 * @return
 	 */
-	private Mat drawAnnotation(Mat img, ArrayList<Panel> panels)
+	private Mat drawAnnotation(Mat img, ArrayList<Panel> panels, String style)
 	{
 		Mat imgAnnotated = new Mat(); 
-		opencv_core.copyMakeBorder(img, imgAnnotated, 0, 50, 0, 50, opencv_core.BORDER_CONSTANT, new Scalar());
+		opencv_core.copyMakeBorder(img, imgAnnotated, 0, 100, 0, 50, opencv_core.BORDER_CONSTANT, new Scalar());
 		
 		//Draw bounding box first
 		for (int i = 0; i < panels.size(); i++)
@@ -121,8 +92,14 @@ public class AnnotationVisualize
 			{
 				Rect label_rect = AlgorithmEx.Rectangle2Rect(panel.labelRect);
 				Point bottom_left = new Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 50);
-				opencv_imgproc.putText(imgAnnotated, panel.panelLabel, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 4, scalar, 3, 8, false);
+				opencv_imgproc.putText(imgAnnotated, panel.panelLabel, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 5, scalar, 3, 8, false);
 			}
+		}
+
+		{//Draw Style Annotation
+			Scalar scalar = AlgorithmEx.getColor(1);
+			Point bottom_left = new Point(0, img.rows() + 100);
+			opencv_imgproc.putText(imgAnnotated, style, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 2, scalar, 3, 8, false);
 		}
 		
 		return imgAnnotated;
@@ -141,7 +118,7 @@ public class AnnotationVisualize
 			String imageFile = imagePath.toString();
 			String xmlFile = FilenameUtils.removeExtension(imageFile) + "_data.xml";
 			
-			//if (!xmlFile.endsWith("PMC3025345_kcj-40-684-g002_data.xml")) {i++; continue; }
+			//if (!xmlFile.endsWith("PMC3083004_ZooKeys-072-023-g010_data.xml")) {i++; continue; }
 			
 			//Load annotation
 			File annotationFile = new File(xmlFile);
@@ -152,12 +129,12 @@ public class AnnotationVisualize
 				load_gt_error = true;
 			}
 			
-			Mat img = opencv_imgcodecs.imread(imageFile);
-			Mat imgAnnotated = load_gt_error ? img.clone() : drawAnnotation(img, panels);
-
 			String key = imagePath.getFileName().toString();
 			String style = styles.get(key);
 			
+			Mat img = opencv_imgcodecs.imread(imageFile);
+			Mat imgAnnotated = load_gt_error ? img.clone() : drawAnnotation(img, panels, style);
+
 			System.out.println();
 			System.out.println(Integer.toString(i+1) +  ": Visualize Annotation for " + imageFile);
 			System.out.println("The style is " + style);

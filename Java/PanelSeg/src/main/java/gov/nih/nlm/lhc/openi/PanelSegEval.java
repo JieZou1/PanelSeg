@@ -2,7 +2,8 @@ package gov.nih.nlm.lhc.openi;
 
 import java.awt.Rectangle;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
+
 import org.w3c.dom.*;
 
 import javax.xml.parsers.*;
@@ -137,4 +138,32 @@ public class PanelSegEval
 		return panels;
 	}
 
+	/**
+	 * Read the style annotation from the file
+	 */
+	static HashMap<String, String> loadStyleMap(File styleFile)
+	{
+		HashMap<String, String> styles = new HashMap<>();
+		
+		if(!styleFile.exists() || styleFile.isDirectory()) 
+		{	//No styles have been marked yet 
+			System.out.println("Not able to find style.txt!");
+			return null;
+		}
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(styleFile))) 
+		{
+		    String line;
+		    while ((line = br.readLine()) != null) 
+		    {
+		    	String[] words = line.split("\\s+");
+		    	styles.put(words[0], words[1]);
+		    }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return styles;
+	}
 }

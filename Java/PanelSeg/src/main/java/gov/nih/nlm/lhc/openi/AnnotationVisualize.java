@@ -105,6 +105,20 @@ public class AnnotationVisualize
 		return imgAnnotated;
 	}
 	
+	private void runiPhotoDraw(String filepath)
+	{
+		try {
+			Process process = new ProcessBuilder("C:\\Program Files (x86)\\iPhotoDraw\\iPhotoDraw.exe", filepath).start();
+			process.waitFor();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Entry function for verify the annotation
 	 */
@@ -141,6 +155,7 @@ public class AnnotationVisualize
 			
 			System.out.println("Press n, go to the next figure");
 			System.out.println("Press p, go to the previous figure");
+			System.out.println("Press c, run iPhotoDraw to manually modify the annotation");
 			System.out.println("Press 1, mark it as SINGLE-PANEL");
 			System.out.println("Press 2, mark it as MULTI-PANEL");
 			System.out.println("Press 3, mark it as STITCHED-MULTI-PANEL");
@@ -153,11 +168,21 @@ public class AnnotationVisualize
 				while (true)
 				{
 					c = opencv_highgui.waitKey();
-					if (c == (int)'n' || c == (int)'p' || c == (int)'1' || c == (int)'2' || c == (int)'3')	break;
+					if (c == (int)'n' || c == (int)'p' || c == (int)'c' || c == (int)'1' || c == (int)'2' || c == (int)'3')	break;
 				}
 				
-				if (c == (int)'n')	{	i++; break;	}
-				else if (c == (int)'p')	{	i--; break;	}
+				if (c == (int)'n')	{	i++; break;	}		//Move to the next one
+				else if (c == (int)'p')	{	i--; break;	}	//Move to the previous one
+				else if (c == (int)'c')						//Run iPhotoDraw to manually modify the annotation
+				{
+					runiPhotoDraw(imageFile);
+					try {	panels = PanelSegEval.loadPanelSegGt(annotationFile);			} 
+					catch (Exception e) {
+						System.out.println(e.getMessage());
+						load_gt_error = true;
+					}
+					imgAnnotated = load_gt_error ? img.clone() : drawAnnotation(img, panels, style);
+				}
 				else if (c == (int)'1' || c == (int)'2' || c == (int)'3')
 				{
 					if (c == (int)'1')

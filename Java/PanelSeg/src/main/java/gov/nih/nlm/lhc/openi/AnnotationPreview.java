@@ -1,11 +1,13 @@
 package gov.nih.nlm.lhc.openi;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgcodecs;
@@ -33,6 +35,15 @@ public class AnnotationPreview
 
 		File styleFile = new File(annotationFolder, "style.txt"); 
 		styles = PanelSegEval.loadStyleMap(styleFile);
+	
+		//Remove all file in preview folder
+		Path preview = this.annotationFolder.resolve("preview");
+		try {
+			FileUtils.cleanDirectory(preview.toFile());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -107,7 +118,7 @@ public class AnnotationPreview
 				load_gt_error = true;
 			}
 			
-			System.out.println(Integer.toString(i+1) +  ": Generate Annotation Preview for " + imageFile);
+			//System.out.println(Integer.toString(i+1) +  ": Generate Annotation Preview for " + imageFile);
 			
 			Mat img = opencv_imgcodecs.imread(imageFile);
 			String key = imagePath.getFileName().toString();

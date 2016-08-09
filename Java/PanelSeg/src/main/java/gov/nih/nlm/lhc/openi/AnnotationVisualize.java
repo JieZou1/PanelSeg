@@ -176,6 +176,7 @@ public class AnnotationVisualize
 				else if (c == (int)'c')						//Run iPhotoDraw to manually modify the annotation
 				{
 					runiPhotoDraw(imageFile);
+					load_gt_error = false;
 					try {	panels = PanelSegEval.loadPanelSegGt(annotationFile);			} 
 					catch (Exception e) {
 						System.out.println(e.getMessage());

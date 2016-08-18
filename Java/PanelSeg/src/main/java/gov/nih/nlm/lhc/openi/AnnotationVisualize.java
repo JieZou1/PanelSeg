@@ -218,6 +218,7 @@ public class AnnotationVisualize
 		if(args.length != 1)
 		{
 			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.lhc.openi.AnnotationVisualize <annotation folder>");
+			System.out.println("	This is a utility program to visualize through and modify the annotations.");
 			System.exit(0);
 		}
 		

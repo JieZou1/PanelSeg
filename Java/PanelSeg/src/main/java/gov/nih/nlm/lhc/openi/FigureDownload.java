@@ -37,6 +37,10 @@ public class FigureDownload
 		if(args.length < 3)
 		{
 			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.lhc.openi.FigureDownload <query-string> <output-dir> <image-prefix>");
+			System.out.println("	This is a utility program to download figure images through OpenI API.");
+			System.out.println("	Note: The downloaded image is the highest resolution images for OpenI web displaying purpose.");
+			System.out.println("			It is not the original image to be processed by PanelSeg. The original image is on Hadoop server.");
+			System.out.println("			The original image is on Hadoop server, and may be retrieved by CopyOriginalImage program");
 			System.exit(0);
 		}
 		

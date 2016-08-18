@@ -139,6 +139,7 @@ public class AnnotationPreview
 		if(args.length != 1)
 		{
 			System.out.println("Usage: java -cp PanelSeg.jar gov.nih.nlm.lhc.openi.AnnotationPreview <annotation folder>");
+			System.out.println("	This is a utility program to generate images with annotations superimposed on the original figure images.");
 			System.exit(0);
 		}
 		

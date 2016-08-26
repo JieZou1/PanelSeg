@@ -1,4 +1,4 @@
-package gov.nih.nlm.lhc.openi;
+package gov.nih.nlm.lhc.openi.panelseg;
 
 import java.awt.Rectangle;
 import java.util.Comparator;

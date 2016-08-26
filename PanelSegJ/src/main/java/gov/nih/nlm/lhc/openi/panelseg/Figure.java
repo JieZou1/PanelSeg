@@ -1,4 +1,4 @@
-package gov.nih.nlm.lhc.openi;
+package gov.nih.nlm.lhc.openi.panelseg;
 
 import java.util.ArrayList;
 import org.bytedeco.javacpp.opencv_core.*;

@@ -1,4 +1,4 @@
-package gov.nih.nlm.lhc.openi;
+package gov.nih.nlm.lhc.openi.panelseg;
 
 import java.io.*;
 import java.nio.file.*;
@@ -14,7 +14,7 @@ public class CopyOriginalImage
         //Stop and print error msg if no arguments passed.
         if(args.length != 2)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar gov.nih.nlm.lhc.openi.CopyOriginalImage <src imgLarge list> <dst imgOrignal folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar CopyOriginalImage <src imgLarge list> <dst imgOrignal folder>");
             System.out.println("	This is a utility program to copy original figure images from /hadoop/scratch folder on lhce-zol2 server.");
             System.out.println("	This program can run on lhce-zol2 server only.");
             System.out.println("	<src imgLarge list> is a text file, containing a list of figure images that we want to get.");
@@ -32,13 +32,15 @@ public class CopyOriginalImage
         copy.copy();
     }
 
-    Map<String, String> mapping;
-    String dstFolder;
-    ArrayList<String> srcList, dstList;
+    private Map<String, String> mapping;
+    private String dstFolder;
+    private ArrayList<String> srcList, dstList;
 
     /**
      * ctor, read in key-value pair mapping, src imgLarge list, and set dstFolder
-     * @param annotationFolder
+     *
+     * @param src_list_file
+     * @param dst_folder
      */
     private CopyOriginalImage(String src_list_file, String dst_folder)
     {
@@ -52,7 +54,7 @@ public class CopyOriginalImage
         };
 
         //load mapping files
-        mapping = new HashMap<String, String>();
+        mapping = new HashMap<>();
         for (int i = 0; i < mapping_files.length; i++)
         {
             String mapping_file = mapping_files[i];

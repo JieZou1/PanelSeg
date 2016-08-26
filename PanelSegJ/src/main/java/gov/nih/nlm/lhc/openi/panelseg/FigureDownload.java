@@ -1,4 +1,4 @@
-package gov.nih.nlm.lhc.openi;
+package gov.nih.nlm.lhc.openi.panelseg;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,7 +31,7 @@ public class FigureDownload
         //Stop and print error msg if no agruments passed.
         if(args.length < 3)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar gov.nih.nlm.lhc.openi.FigureDownload <query-string> <output-dir> <image-prefix>");
+            System.out.println("Usage: java -cp PanelSegJ.jar FigureDownload <query-string> <output-dir> <image-prefix>");
             System.out.println("	This is a utility program to download figure images through OpenI API.");
             System.out.println("	Note: The downloaded image is the highest resolution images for OpenI web displaying purpose.");
             System.out.println("	        It is not the original image to be processed by PanelSeg. The original image is on Hadoop server.");

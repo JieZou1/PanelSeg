@@ -1,40 +1,34 @@
-package gov.nih.nlm.lhc.openi;
+package gov.nih.nlm.lhc.openi.panelseg;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
  * Created by jzou on 8/25/2016.
  */
-public class AnnotationStatistics
+public class AnnotationStatisticsAll extends AnnotationAll
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar gov.nih.nlm.lhc.openi.AnnotationStatistics <data folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationStatisticsAll <data folder>");
             System.exit(0);
         }
 
-        AnnotationStatistics statistics = new AnnotationStatistics(args[0]);
+        AnnotationStatisticsAll statistics = new AnnotationStatisticsAll(args[0]);
         statistics.generateStatistics();
         System.out.println("Completed!");
     }
 
-    private Path dataFolder;
-    private ArrayList<Path> annotationFolders;
-
     /**
-     * ctor, set annotationFolder and then collect all imagefiles and save in imagePaths
-     * @param annotationFolder
+     * ctor, set dataFolder and then collect all annotationFolders
+     * @param dataFolder
      */
-    private AnnotationStatistics(String dataFolder)
+    private AnnotationStatisticsAll(String dataFolder)
     {
-        this.dataFolder = Paths.get(dataFolder);
-
-        annotationFolders = AlgorithmEx.CollectSubfolders(this.dataFolder);
+        super(dataFolder);
     }
 
     /**
@@ -44,7 +38,7 @@ public class AnnotationStatistics
     {
         int figureCount = 0, singleCount = 0, multiCount = 0; //Total figures, total single panel figures, total multi-panel figures.
         int panelCount = 0;
-        HashMap<String, Integer> figures = new HashMap<String, Integer>();
+        HashMap<String, Integer> figures = new HashMap<>();
 
         for (Path annotation_folder : annotationFolders)
         {
@@ -70,7 +64,7 @@ public class AnnotationStatistics
 
                 ArrayList<Panel> panels = null;
                 try {
-                    panels = PanelSegEval.loadPanelSegGt(xml_path.toFile());
+                    panels = AnnotationiPhotoDraw.loadPanelSeg(xml_path.toFile());
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

@@ -1,4 +1,4 @@
-package gov.nih.nlm.lhc.openi;
+package gov.nih.nlm.lhc.openi.panelseg;
 
 /**
  * The base class for all panel label recognition algorithms. <p>

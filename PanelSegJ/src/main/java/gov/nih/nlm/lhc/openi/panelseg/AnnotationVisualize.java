@@ -1,27 +1,25 @@
-package gov.nih.nlm.lhc.openi;
+package gov.nih.nlm.lhc.openi.panelseg;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
 import org.apache.commons.io.FilenameUtils;
-import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.*;
 import org.bytedeco.javacpp.opencv_highgui;
 import org.bytedeco.javacpp.opencv_imgcodecs;
-import org.bytedeco.javacpp.opencv_imgproc;
 
 /**
  * Created by jzou on 8/25/2016.
  */
-public class AnnotationVisualize
+public class AnnotationVisualize extends Annotation
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar gov.nih.nlm.lhc.openi.AnnotationVisualize <annotation folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationVisualize <annotation folder>");
             System.out.println("	This is a utility program to visualize through and modify the annotations.");
             System.exit(0);
         }
@@ -30,98 +28,19 @@ public class AnnotationVisualize
         visualizer.visualize();
     }
 
-    private Path annotationFolder;
-    private ArrayList<Path> imagePaths;
-    private File styleFile;
-    private Map<String, String> styles;
-
     /**
      * ctor, set annotationFolder and then collect all imagefiles and save in imagePaths
      * @param annotationFolder
      */
     private AnnotationVisualize(String annotationFolder)
     {
-        this.annotationFolder = Paths.get(annotationFolder);
-        imagePaths = AlgorithmEx.CollectImageFiles(this.annotationFolder);
-        System.out.println("Total number of image is: " + imagePaths.size());
-
-        styleFile = new File(annotationFolder, "style.txt");
-        styles = PanelSegEval.loadStyleMap(styleFile);
+        super(annotationFolder);
     }
 
     /**
-     * Save the style annotation into the file
+     * Run iPhotoDraw for manually modify the bounding box annotation
+     * @param filepath
      */
-    private void saveStyleMap()
-    {
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(styleFile))))
-        {
-            for (Map.Entry<String, String> entry : styles.entrySet())
-            {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                bw.write(key + "\t " + value);
-                bw.newLine();
-            }
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Draw annotation onto the image for visualization purpose
-     * @param img
-     * @param panels
-     * @return
-     */
-    private Mat drawAnnotation(Mat img, ArrayList<Panel> panels, String style)
-    {
-        Mat imgAnnotated = new Mat();
-        opencv_core.copyMakeBorder(img, imgAnnotated, 0, 100, 0, 50, opencv_core.BORDER_CONSTANT, new Scalar());
-
-        //Draw bounding box first
-        for (int i = 0; i < panels.size(); i++)
-        {
-            Panel panel = panels.get(i);
-            Scalar scalar = AlgorithmEx.getColor(i);
-
-            Rect panel_rect = AlgorithmEx.Rectangle2Rect(panel.panelRect);
-            opencv_imgproc.rectangle(imgAnnotated, panel_rect, scalar, 3, 8, 0);
-
-            if (panel.panelLabel.length() != 0)
-            {
-                Rect label_rect = AlgorithmEx.Rectangle2Rect(panel.labelRect);
-                opencv_imgproc.rectangle(imgAnnotated, label_rect, scalar, 1, 8, 0);
-            }
-        }
-
-        //Draw labels to make the text stand out.
-        for (int i = 0; i < panels.size(); i++)
-        {
-            Panel panel = panels.get(i);
-            Scalar scalar = AlgorithmEx.getColor(i);
-
-            if (panel.panelLabel.length() != 0)
-            {
-                Rect label_rect = AlgorithmEx.Rectangle2Rect(panel.labelRect);
-                Point bottom_left = new Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 50);
-                opencv_imgproc.putText(imgAnnotated, panel.panelLabel, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 5, scalar, 3, 8, false);
-            }
-        }
-
-        {//Draw Style Annotation
-            Scalar scalar = AlgorithmEx.getColor(1);
-            Point bottom_left = new Point(0, img.rows() + 100);
-            opencv_imgproc.putText(imgAnnotated, style, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 2, scalar, 3, 8, false);
-        }
-
-        return imgAnnotated;
-    }
-
     private void runiPhotoDraw(String filepath)
     {
         try {
@@ -137,10 +56,22 @@ public class AnnotationVisualize
     }
 
     /**
-     * Entry function for verify the annotation
+     * Entry function for verifying the annotation
      */
     private void visualize()
     {
+        if (styles == null)
+        {   //No styles are loaded, we set all of them as "SINGLE"
+            styles = new HashMap<>();
+            for (int i = 0; i < imagePaths.size(); i++)
+            {
+                Path imagePath = imagePaths.get(i);
+                String imageFile = imagePath.getFileName().toString();
+                styles.put(imageFile, "SINGLE");
+            }
+            saveStyleMap(this.stylePath, this.styles);
+        }
+
         for (int i = 0; i < imagePaths.size();)
         {
             if (i < 0 ) i = 0;	if (i >= imagePaths.size()) i = imagePaths.size()-1;
@@ -154,7 +85,10 @@ public class AnnotationVisualize
             //Load annotation
             File annotationFile = new File(xmlFile);
             ArrayList<Panel> panels = null; boolean load_gt_error = false;
-            try {	panels = PanelSegEval.loadPanelSegGt(annotationFile);			}
+            try
+            {
+                panels = AnnotationiPhotoDraw.loadPanelSeg(annotationFile);
+            }
             catch (Exception e) {
                 System.out.println(e.getMessage());
                 load_gt_error = true;
@@ -194,7 +128,7 @@ public class AnnotationVisualize
                 {
                     runiPhotoDraw(imageFile);
                     load_gt_error = false;
-                    try {	panels = PanelSegEval.loadPanelSegGt(annotationFile);			}
+                    try {	panels = AnnotationiPhotoDraw.loadPanelSeg(annotationFile);			}
                     catch (Exception e) {
                         System.out.println(e.getMessage());
                         load_gt_error = true;
@@ -221,7 +155,7 @@ public class AnnotationVisualize
                         styles.put(key, value);
                         System.out.println(key + " is Marked as STITCHED-MULTI-PANEL");
                     }
-                    saveStyleMap();
+                    saveStyleMap(this.stylePath, this.styles);
                     i++;
                     break;
                 }

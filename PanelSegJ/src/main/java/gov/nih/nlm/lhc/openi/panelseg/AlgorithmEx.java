@@ -1,4 +1,4 @@
-package gov.nih.nlm.lhc.openi;
+package gov.nih.nlm.lhc.openi.panelseg;
 
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
@@ -313,9 +313,9 @@ class RectangleTopAscending implements Comparator<Rectangle>
  * Comparator for sorting Panels in reverse order of labelScore.
  * @author Jie Zou
  */
-class LabelScoreDescending implements Comparator<Panel>
+class LabelScoreDescending implements Comparator<gov.nih.nlm.lhc.openi.panelseg.Panel>
 {
-    public int compare(Panel o1, Panel o2)
+    public int compare(gov.nih.nlm.lhc.openi.panelseg.Panel o1, gov.nih.nlm.lhc.openi.panelseg.Panel o2)
     {
         double diff = o2.labelScore - o1.labelScore;
         if (diff > 0) return 1;
@@ -328,9 +328,9 @@ class LabelScoreDescending implements Comparator<Panel>
  * Comparator for sorting Panels vertically based on the LabelRect.Left
  * @author Jie Zou
  */
-class LabelRectLeftAscending implements Comparator<Panel>
+class LabelRectLeftAscending implements Comparator<gov.nih.nlm.lhc.openi.panelseg.Panel>
 {
-    public int compare(Panel o1, Panel o2)
+    public int compare(gov.nih.nlm.lhc.openi.panelseg.Panel o1, gov.nih.nlm.lhc.openi.panelseg.Panel o2)
     {
         double diff = o1.labelRect.x - o2.labelRect.x;
         if (diff > 0) return 1;
@@ -344,9 +344,9 @@ class LabelRectLeftAscending implements Comparator<Panel>
  * Comparator for sorting Panels horizontally based on the LabelRect.Top
  * @author Jie Zou
  */
-class LabelRectTopAscending implements Comparator<Panel>
+class LabelRectTopAscending implements Comparator<gov.nih.nlm.lhc.openi.panelseg.Panel>
 {
-    public int compare(Panel o1, Panel o2)
+    public int compare(gov.nih.nlm.lhc.openi.panelseg.Panel o1, gov.nih.nlm.lhc.openi.panelseg.Panel o2)
     {
         double diff = o1.labelRect.y - o2.labelRect.y;
         if (diff > 0) return 1;
@@ -360,9 +360,9 @@ class LabelRectTopAscending implements Comparator<Panel>
  * Comparator for sorting Panels based on the panelLabel. The case is ignored.
  * @author Jie Zou
  */
-class PanelLabelAscending implements Comparator<Panel>
+class PanelLabelAscending implements Comparator<gov.nih.nlm.lhc.openi.panelseg.Panel>
 {
-    public int compare(Panel o1, Panel o2)
+    public int compare(gov.nih.nlm.lhc.openi.panelseg.Panel o1, gov.nih.nlm.lhc.openi.panelseg.Panel o2)
     {
         int diff = o1.panelLabel.toLowerCase().compareTo(o2.panelLabel.toLowerCase());
         if (diff > 0) return 1;

@@ -32,26 +32,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="FigureDownload.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/FigureDownload.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-14">
-              <caret line="23" column="18" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#2101#2109#0" expanded="true" />
-                <element signature="method#threadWait#0;class#FigureDownload#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="AlgorithmEx.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgorithmEx.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="558">
+            <state relative-caret-position="4026">
               <caret line="362" column="6" selection-start-line="362" selection-start-column="6" selection-end-line="362" selection-end-column="6" />
               <folding>
+                <element signature="imports" expanded="false" />
                 <element signature="method#main#0;class#AlgorithmEx#0" expanded="false" />
                 <element signature="method#convert#0;class#AlgorithmEx#0" expanded="false" />
                 <element signature="method#bufferdImg2Mat#0;class#AlgorithmEx#0" expanded="false" />
@@ -61,7 +48,6 @@
                 <element signature="method#findMaxIndex#0;class#AlgorithmEx#0" expanded="false" />
                 <element signature="method#Rectangle2Rect#0;class#AlgorithmEx#0" expanded="false" />
                 <element signature="method#getColor#0;class#AlgorithmEx#0" expanded="false" />
-                <element signature="e#6833#6839#0" expanded="true" />
                 <element signature="method#CollectXmlFiles#0;class#AlgorithmEx#0" expanded="false" />
                 <element signature="class#RectangleTopAscending#0" expanded="false" />
                 <element signature="class#LabelScoreDescending#0" expanded="false" />
@@ -73,11 +59,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AnnotationReOrganize.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationReOrganize.java">
+      <file leaf-file-name="AnnotationSortPanel.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationSortPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="286">
-              <caret line="45" column="5" selection-start-line="45" selection-start-column="5" selection-end-line="45" selection-end-column="5" />
+            <state relative-caret-position="839">
+              <caret line="73" column="48" selection-start-line="73" selection-start-column="48" selection-end-line="73" selection-end-column="48" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -85,37 +71,42 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AnnotationiPhotoDraw.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="AnnotationiPhotoDraw.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationiPhotoDraw.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-144">
-              <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+            <state relative-caret-position="184">
+              <caret line="21" column="8" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#4710#4719#0" expanded="true" />
+                <element signature="method#loadPanelSeg#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+                <element signature="method#createDocTemplate#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+                <element signature="method#AddRect#0;class#AnnotationiPhotoDraw#0" expanded="false" />
                 <element signature="method#saveDoc#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+                <element signature="method#savePanelSeg#0;class#AnnotationiPhotoDraw#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AnnotationVisualize.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AnnotationVisualize.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationVisualize.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="670">
-              <caret line="122" column="17" selection-start-line="122" selection-start-column="17" selection-end-line="122" selection-end-column="17" />
+            <state relative-caret-position="638">
+              <caret line="61" column="4" selection-start-line="61" selection-start-column="4" selection-end-line="61" selection-end-column="4" />
               <folding>
+                <element signature="method#main#0;class#AnnotationVisualize#0" expanded="false" />
                 <element signature="method#runiPhotoDraw#0;class#AnnotationVisualize#0" expanded="false" />
+                <element signature="method#visualize#0;class#AnnotationVisualize#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PanelSegEval.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegEval.java">
+      <file leaf-file-name="AnnotationAll.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationAll.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+            <state relative-caret-position="528">
+              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -124,10 +115,9 @@
       <file leaf-file-name="Annotation.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Annotation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="572">
+            <state relative-caret-position="338">
               <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
               <folding>
-                <element signature="imports" expanded="true" />
                 <element signature="method#drawAnnotation#0;class#Annotation#0" expanded="false" />
                 <element signature="method#loadStyleMap#0;class#Annotation#0" expanded="false" />
                 <element signature="method#saveStyleMap#0;class#Annotation#0" expanded="false" />
@@ -136,11 +126,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="AnnotationDuplicate.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationDuplicate.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="127">
+              <caret line="11" column="32" selection-start-line="11" selection-start-column="32" selection-end-line="11" selection-end-column="32" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="AnnotationPreview.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationPreview.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="67" column="49" selection-start-line="67" selection-start-column="49" selection-end-line="67" selection-end-column="49" />
+            <state relative-caret-position="206">
+              <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#AnnotationPreview#0;class#AnnotationPreview#0" expanded="false" />
@@ -149,27 +149,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AnnotationStatisticsAll.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationStatisticsAll.java">
+      <file leaf-file-name="AnnotationPreviewAll.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationPreviewAll.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="384">
-              <caret line="66" column="49" selection-start-line="66" selection-start-column="29" selection-end-line="66" selection-end-column="49" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="792">
+              <caret line="39" column="30" selection-start-line="39" selection-start-column="30" selection-end-line="39" selection-end-column="30" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CopyOriginalImage.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/CopyOriginalImage.java">
+      <file leaf-file-name="AnnotationStatisticsAll.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationStatisticsAll.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="946">
-              <caret line="45" column="4" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
+            <state relative-caret-position="1364">
+              <caret line="66" column="49" selection-start-line="66" selection-start-column="29" selection-end-line="66" selection-end-column="49" />
               <folding>
-                <element signature="method#CopyOriginalImage#0;class#CopyOriginalImage#0" expanded="false" />
-                <element signature="method#map#0;class#CopyOriginalImage#0" expanded="false" />
-                <element signature="method#copy#0;class#CopyOriginalImage#0" expanded="false" />
+                <element signature="e#837#838#0" expanded="false" />
+                <element signature="e#870#871#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -217,9 +214,11 @@
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/AnnotationRewrite.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationRewrite.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationiPhotoDraw.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationReOrganize.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationVisualize.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationPreview.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationSortLabels.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationiPhotoDraw.java" />
       </list>
     </option>
   </component>
@@ -236,8 +235,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="350" />
-    <option name="y" value="28" />
+    <option name="x" value="252" />
+    <option name="y" value="23" />
     <option name="width" value="2090" />
     <option name="height" value="1320" />
   </component>
@@ -266,8 +265,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -332,7 +329,9 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -348,15 +347,15 @@
       <recent name="gov.nih.nlm.lhc.openi" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.AnnotationReOrganize">
-    <configuration default="false" name="AnnotationReOrganize" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Application.AnnotationSortPanel">
+    <configuration default="false" name="AnnotationSortPanel" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
           <option name="PATTERN" value="gov.nih.nlm.lhc.openi.panelseg.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="MAIN_CLASS_NAME" value="gov.nih.nlm.lhc.openi.panelseg.AnnotationReOrganize" />
+      <option name="MAIN_CLASS_NAME" value="gov.nih.nlm.lhc.openi.panelseg.AnnotationSortPanel" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PROGRAM_PARAMETERS" value="D:\Users\jie\projects\PanelSeg\data\0" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
@@ -614,11 +613,11 @@
       <method />
     </configuration>
     <list size="1">
-      <item index="0" class="java.lang.String" itemvalue="Application.AnnotationReOrganize" />
+      <item index="0" class="java.lang.String" itemvalue="Application.AnnotationSortPanel" />
     </list>
     <recent_temporary>
       <list size="1">
-        <item index="0" class="java.lang.String" itemvalue="Application.AnnotationReOrganize" />
+        <item index="0" class="java.lang.String" itemvalue="Application.AnnotationSortPanel" />
       </list>
     </recent_temporary>
   </component>
@@ -639,7 +638,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="350" y="28" width="2090" height="1320" extended-state="1" />
+    <frame x="252" y="23" width="2090" height="1320" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -650,8 +649,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32782823" sideWeight="0.5019286" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32700247" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17309546" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32700247" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -665,8 +663,9 @@
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17309546" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -684,19 +683,13 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationVisualize.java</url>
-          <line>19</line>
-          <properties />
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationReOrganize.java</url>
+          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationSortPanel.java</url>
           <line>16</line>
           <properties />
           <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="8" />
+      <option name="time" value="12" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -705,14 +698,134 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/App.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/FigureDownload.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        <state relative-caret-position="242">
+          <caret line="23" column="18" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="method#threadWait#0;class#FigureDownload#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgorithmEx.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4026">
+          <caret line="362" column="6" selection-start-line="362" selection-start-column="6" selection-end-line="362" selection-end-column="6" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="method#main#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="method#convert#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="method#bufferdImg2Mat#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="method#mat2BufferdImg#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="method#getChildNode#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="method#cropImage#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="method#findMaxIndex#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="method#Rectangle2Rect#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="method#getColor#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="method#CollectXmlFiles#0;class#AlgorithmEx#0" expanded="false" />
+            <element signature="class#RectangleTopAscending#0" expanded="false" />
+            <element signature="class#LabelScoreDescending#0" expanded="false" />
+            <element signature="class#LabelRectLeftAscending#0" expanded="false" />
+            <element signature="class#LabelRectTopAscending#0" expanded="false" />
+            <element signature="class#PanelLabelAscending#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationSortPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="946">
+          <caret line="45" column="5" selection-start-line="45" selection-start-column="5" selection-end-line="45" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationiPhotoDraw.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="550">
+          <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#loadPanelSeg#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+            <element signature="method#createDocTemplate#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+            <element signature="method#AddRect#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+            <element signature="method#saveDoc#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+            <element signature="method#savePanelSeg#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationVisualize.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="method#main#0;class#AnnotationVisualize#0" expanded="false" />
+            <element signature="method#runiPhotoDraw#0;class#AnnotationVisualize#0" expanded="false" />
+            <element signature="method#visualize#0;class#AnnotationVisualize#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegEval.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Annotation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="682">
+          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
+          <folding>
+            <element signature="method#drawAnnotation#0;class#Annotation#0" expanded="false" />
+            <element signature="method#loadStyleMap#0;class#Annotation#0" expanded="false" />
+            <element signature="method#saveStyleMap#0;class#Annotation#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationPreview.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1232">
+          <caret line="67" column="49" selection-start-line="67" selection-start-column="49" selection-end-line="67" selection-end-column="49" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#AnnotationPreview#0;class#AnnotationPreview#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationStatisticsAll.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1364">
+          <caret line="66" column="49" selection-start-line="66" selection-start-column="29" selection-end-line="66" selection-end-column="49" />
+          <folding>
+            <element signature="e#837#838#0" expanded="false" />
+            <element signature="e#870#871#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/CopyOriginalImage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="946">
+          <caret line="45" column="4" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
+          <folding>
+            <element signature="method#CopyOriginalImage#0;class#CopyOriginalImage#0" expanded="false" />
+            <element signature="method#map#0;class#CopyOriginalImage#0" expanded="false" />
+            <element signature="method#copy#0;class#CopyOriginalImage#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/App.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgorithmEx.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -728,10 +841,7 @@
             <element signature="method#findMaxIndex#0;class#AlgorithmEx#0" expanded="false" />
             <element signature="method#Rectangle2Rect#0;class#AlgorithmEx#0" expanded="false" />
             <element signature="method#getColor#0;class#AlgorithmEx#0" expanded="false" />
-            <element signature="method#CollectImageFiles#0;class#AlgorithmEx#0" expanded="false" />
-            <element signature="e#6833#6839#0" expanded="true" />
             <element signature="method#CollectXmlFiles#0;class#AlgorithmEx#0" expanded="false" />
-            <element signature="e#7646#7652#0" expanded="false" />
             <element signature="class#RectangleTopAscending#0" expanded="false" />
             <element signature="class#LabelScoreDescending#0" expanded="false" />
             <element signature="class#LabelRectLeftAscending#0" expanded="false" />
@@ -748,19 +858,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/App.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/App.java" />
     <entry file="file://$PROJECT_DIR$/src/test/java/gov/nih/nlm/lhc/openi/panelseg/AppTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
           <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -768,7 +870,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="88">
           <caret line="4" column="50" selection-start-line="4" selection-start-column="50" selection-end-line="4" selection-end-column="50" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -792,9 +893,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="616">
           <caret line="28" column="19" selection-start-line="28" selection-start-column="19" selection-end-line="28" selection-end-column="19" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -803,34 +901,6 @@
         <state relative-caret-position="391">
           <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationAll.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="440">
-          <caret line="20" column="7" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationPreviewAll.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="660">
-          <caret line="33" column="28" selection-start-line="33" selection-start-column="28" selection-end-line="33" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationDuplicate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="127">
-          <caret line="11" column="32" selection-start-line="11" selection-start-column="32" selection-end-line="11" selection-end-column="32" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -848,11 +918,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/FigureDownload.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-14">
+        <state relative-caret-position="0">
           <caret line="23" column="18" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#2101#2109#0" expanded="true" />
+            <element signature="imports" expanded="false" />
             <element signature="method#threadWait#0;class#FigureDownload#0" expanded="false" />
           </folding>
         </state>
@@ -868,21 +937,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationStatisticsAll.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="384">
+        <state relative-caret-position="1364">
           <caret line="66" column="49" selection-start-line="66" selection-start-column="29" selection-end-line="66" selection-end-column="49" />
           <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationPreview.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="67" column="49" selection-start-line="67" selection-start-column="49" selection-end-line="67" selection-end-column="49" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#AnnotationPreview#0;class#AnnotationPreview#0" expanded="false" />
+            <element signature="e#837#838#0" expanded="false" />
+            <element signature="e#870#871#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -891,28 +950,15 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="110">
           <caret line="5" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Annotation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="572">
-          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#drawAnnotation#0;class#Annotation#0" expanded="false" />
-            <element signature="method#loadStyleMap#0;class#Annotation#0" expanded="false" />
-            <element signature="method#saveStyleMap#0;class#Annotation#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgorithmEx.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="558">
+        <state relative-caret-position="4026">
           <caret line="362" column="6" selection-start-line="362" selection-start-column="6" selection-end-line="362" selection-end-column="6" />
           <folding>
+            <element signature="imports" expanded="false" />
             <element signature="method#main#0;class#AlgorithmEx#0" expanded="false" />
             <element signature="method#convert#0;class#AlgorithmEx#0" expanded="false" />
             <element signature="method#bufferdImg2Mat#0;class#AlgorithmEx#0" expanded="false" />
@@ -922,7 +968,6 @@
             <element signature="method#findMaxIndex#0;class#AlgorithmEx#0" expanded="false" />
             <element signature="method#Rectangle2Rect#0;class#AlgorithmEx#0" expanded="false" />
             <element signature="method#getColor#0;class#AlgorithmEx#0" expanded="false" />
-            <element signature="e#6833#6839#0" expanded="true" />
             <element signature="method#CollectXmlFiles#0;class#AlgorithmEx#0" expanded="false" />
             <element signature="class#RectangleTopAscending#0" expanded="false" />
             <element signature="class#LabelScoreDescending#0" expanded="false" />
@@ -933,34 +978,102 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationiPhotoDraw.java">
+    <entry file="jar://$MAVEN_REPOSITORY$/org/bytedeco/javacpp-presets/opencv/3.1.0-1.2/opencv-3.1.0-1.2-sources.jar!/org/bytedeco/javacpp/opencv_highgui.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-144">
-          <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+        <state relative-caret-position="548">
+          <caret line="894" column="35" selection-start-line="894" selection-start-column="33" selection-end-line="894" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/commons-io/commons-io/2.5/commons-io-2.5.jar!/org/apache/commons/io/FilenameUtils.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="394">
+          <caret line="365" column="25" selection-start-line="365" selection-start-column="25" selection-end-line="365" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationAll.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="528">
+          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Annotation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="338">
+          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#4710#4719#0" expanded="true" />
-            <element signature="method#saveDoc#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+            <element signature="method#drawAnnotation#0;class#Annotation#0" expanded="false" />
+            <element signature="method#loadStyleMap#0;class#Annotation#0" expanded="false" />
+            <element signature="method#saveStyleMap#0;class#Annotation#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationReOrganize.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationDuplicate.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="45" column="5" selection-start-line="45" selection-start-column="5" selection-end-line="45" selection-end-column="5" />
+        <state relative-caret-position="127">
+          <caret line="11" column="32" selection-start-line="11" selection-start-column="32" selection-end-line="11" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationPreview.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="206">
+          <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#AnnotationPreview#0;class#AnnotationPreview#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationPreviewAll.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="792">
+          <caret line="39" column="30" selection-start-line="39" selection-start-column="30" selection-end-line="39" selection-end-column="30" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationVisualize.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="670">
-          <caret line="122" column="17" selection-start-line="122" selection-start-column="17" selection-end-line="122" selection-end-column="17" />
+        <state relative-caret-position="638">
+          <caret line="61" column="4" selection-start-line="61" selection-start-column="4" selection-end-line="61" selection-end-column="4" />
           <folding>
+            <element signature="method#main#0;class#AnnotationVisualize#0" expanded="false" />
             <element signature="method#runiPhotoDraw#0;class#AnnotationVisualize#0" expanded="false" />
+            <element signature="method#visualize#0;class#AnnotationVisualize#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationSortPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="839">
+          <caret line="73" column="48" selection-start-line="73" selection-start-column="48" selection-end-line="73" selection-end-column="48" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationiPhotoDraw.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="21" column="8" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#loadPanelSeg#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+            <element signature="method#createDocTemplate#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+            <element signature="method#AddRect#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+            <element signature="method#saveDoc#0;class#AnnotationiPhotoDraw#0" expanded="false" />
+            <element signature="method#savePanelSeg#0;class#AnnotationiPhotoDraw#0" expanded="false" />
           </folding>
         </state>
       </provider>

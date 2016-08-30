@@ -9,21 +9,21 @@ import java.util.ArrayList;
 /**
  * Created by jzou on 8/26/2016.
  */
-public class AnnotationReOrganize extends Annotation
+public class AnnotationSortPanel extends Annotation
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationReOrganize <annotation folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationSortPanel <annotation folder>");
             System.out.println("	This is a utility program to rewrite iPhotoDraw annotation.");
             System.out.println("	Make label annotation on top of panel annotation to manual modification more convenient.");
             System.out.println("	It will overwrite the existing iPhotoDraw annotation file. SO BE CAREFUL!!!");
             System.exit(0);
         }
 
-        AnnotationReOrganize rewrite = new AnnotationReOrganize(args[0]);
+        AnnotationSortPanel rewrite = new AnnotationSortPanel(args[0]);
         rewrite.rewrite();
         System.out.println("Completed!");
     }
@@ -35,7 +35,7 @@ public class AnnotationReOrganize extends Annotation
      *
      * @param annotationFolder
      */
-    protected AnnotationReOrganize(String annotationFolder) {
+    protected AnnotationSortPanel(String annotationFolder) {
         super(annotationFolder);
     }
 
@@ -46,6 +46,8 @@ public class AnnotationReOrganize extends Annotation
     {
         for (int i = 0; i < imagePaths.size(); i++)
         {
+            //if (i < 124) continue;
+
             Path imagePath = imagePaths.get(i);
             String imageFile = imagePath.toString();
             String xmlFile = FilenameUtils.removeExtension(imageFile) + "_data.xml";

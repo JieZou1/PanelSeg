@@ -65,7 +65,10 @@ public class AnnotationPreview extends Annotation
             //Load annotation
             File annotationFile = new File(xmlFile);
             ArrayList<Panel> panels = null; boolean load_gt_error = false;
-            try {	panels = AnnotationiPhotoDraw.loadPanelSeg(annotationFile);			}
+            try
+            {
+                panels = AnnotationiPhotoDraw.loadPanelSeg(annotationFile);
+            }
             catch (Exception e) {
                 System.out.println(e.getMessage());
                 load_gt_error = true;

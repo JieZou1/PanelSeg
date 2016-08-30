@@ -143,6 +143,11 @@ public class AnnotationiPhotoDraw
         return panels;
     }
 
+    /**
+     * Create an iPhotoDraw template without any rects yet
+     * @return
+     * @throws ParserConfigurationException
+     */
     private static Document createDocTemplate() throws ParserConfigurationException
     {
         // Create Document Template
@@ -202,6 +207,12 @@ public class AnnotationiPhotoDraw
         return doc;
     }
 
+    /**
+     * Add labeled rects to a iPhotoDraw template (document)
+     * @param doc
+     * @param name
+     * @param rectangle
+     */
     private static void AddRect(Document doc, String name, Rectangle rectangle)
     {
         Element shape_node = doc.createElement("Shape");
@@ -375,6 +386,12 @@ public class AnnotationiPhotoDraw
         transformer.transform(source, result);
     }
 
+    /**
+     * Save Panel segmentation into iPhotoDraw format.
+     * @param xml_file  iPhotoDraw formatted XML file
+     * @param panels    panels
+     * @throws Exception
+     */
     static void savePanelSeg(File xml_file, ArrayList<Panel> panels) throws Exception
     {
         //Create document template

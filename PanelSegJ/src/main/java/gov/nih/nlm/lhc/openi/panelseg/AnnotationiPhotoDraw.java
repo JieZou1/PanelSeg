@@ -97,7 +97,7 @@ public class AnnotationiPhotoDraw
         for (int i = 0; i < panels.size(); i++)
         {
             gov.nih.nlm.lhc.openi.panelseg.Panel panel = panels.get(i);
-            ArrayList<Integer> indexes = new ArrayList<Integer>();
+            ArrayList<Integer> indexes = new ArrayList<>();
             for (int j = 0; j < labelRects.size(); j++)
             {
                 String label_name = labelNames.get(j);
@@ -105,7 +105,9 @@ public class AnnotationiPhotoDraw
             }
 
             if (indexes.size() == 0)
-                throw new Exception("Load Annotation Error: Label annotation is not found for Panel " + panel.panelLabel + ", in " + xml_file +  "!");
+            {
+                System.out.println("LOAD ANNOTATION WARNING: Label annotation is not found for Panel " + panel.panelLabel + ", in " + xml_file + "!");
+            }
             else if (indexes.size() == 1)
             {	//Only one label rect is found, perfect
                 int index = indexes.get(0);

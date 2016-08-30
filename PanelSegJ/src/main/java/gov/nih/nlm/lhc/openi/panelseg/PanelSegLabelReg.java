@@ -6,7 +6,7 @@ package gov.nih.nlm.lhc.openi.panelseg;
  *
  * Created by jzou on 8/25/2016.
  */
-public abstract class PanelLabelReg extends PanelSeg
+public abstract class PanelSegLabelReg extends PanelSeg
 {
 
 }

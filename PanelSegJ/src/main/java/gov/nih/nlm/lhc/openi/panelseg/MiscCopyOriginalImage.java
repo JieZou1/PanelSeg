@@ -7,14 +7,14 @@ import java.util.*;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class CopyOriginalImage
+public class MiscCopyOriginalImage
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 2)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar CopyOriginalImage <src imgLarge list> <dst imgOrignal folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar MiscCopyOriginalImage <src imgLarge list> <dst imgOrignal folder>");
             System.out.println("	This is a utility program to copy original figure images from /hadoop/scratch folder on lhce-zol2 server.");
             System.out.println("	This program can run on lhce-zol2 server only.");
             System.out.println("	<src imgLarge list> is a text file, containing a list of figure images that we want to get.");
@@ -27,7 +27,7 @@ public class CopyOriginalImage
             System.exit(0);
         }
 
-        CopyOriginalImage copy = new CopyOriginalImage(args[0], args[1]);
+        MiscCopyOriginalImage copy = new MiscCopyOriginalImage(args[0], args[1]);
         copy.map(); //Mapping to find original file location from mapping
         copy.copy();
     }
@@ -42,7 +42,7 @@ public class CopyOriginalImage
      * @param src_list_file
      * @param dst_folder
      */
-    private CopyOriginalImage(String src_list_file, String dst_folder)
+    private MiscCopyOriginalImage(String src_list_file, String dst_folder)
     {
         dstFolder = dst_folder;
 

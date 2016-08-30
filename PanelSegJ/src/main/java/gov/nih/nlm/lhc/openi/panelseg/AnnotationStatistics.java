@@ -6,18 +6,18 @@ import java.util.*;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class AnnotationStatisticsAll extends AnnotationAll
+public class AnnotationStatistics extends AnnotationAll
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationStatisticsAll <data folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationStatistics <data folder>");
             System.exit(0);
         }
 
-        AnnotationStatisticsAll statistics = new AnnotationStatisticsAll(args[0]);
+        AnnotationStatistics statistics = new AnnotationStatistics(args[0]);
         statistics.generateStatistics();
         System.out.println("Completed!");
     }
@@ -26,7 +26,7 @@ public class AnnotationStatisticsAll extends AnnotationAll
      * ctor, set dataFolder and then collect all annotationFolders
      * @param dataFolder
      */
-    private AnnotationStatisticsAll(String dataFolder)
+    private AnnotationStatistics(String dataFolder)
     {
         super(dataFolder);
     }
@@ -62,7 +62,7 @@ public class AnnotationStatisticsAll extends AnnotationAll
                 }
                 else figures.put(filename, 1);
 
-                ArrayList<Panel> panels = null;
+                ArrayList<Panel> panels;
                 try {
                     panels = AnnotationiPhotoDraw.loadPanelSeg(xml_path.toFile());
                 } catch (Exception e) {

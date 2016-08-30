@@ -17,7 +17,7 @@ import net.sf.json.JSONSerializer;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class FigureDownload
+public class MiscFigureDownload
 {
     /**
      * @description Module to download the images for a given search query.
@@ -31,11 +31,11 @@ public class FigureDownload
         //Stop and print error msg if no agruments passed.
         if(args.length < 3)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar FigureDownload <query-string> <output-dir> <image-prefix>");
+            System.out.println("Usage: java -cp PanelSegJ.jar MiscFigureDownload <query-string> <output-dir> <image-prefix>");
             System.out.println("	This is a utility program to download figure images through OpenI API.");
             System.out.println("	Note: The downloaded image is the highest resolution images for OpenI web displaying purpose.");
             System.out.println("	        It is not the original image to be processed by PanelSeg. The original image is on Hadoop server.");
-            System.out.println("			The original image is on Hadoop server, and may be retrieved by CopyOriginalImage program");
+            System.out.println("			The original image is on Hadoop server, and may be retrieved by MiscCopyOriginalImage program");
             System.exit(0);
         }
 

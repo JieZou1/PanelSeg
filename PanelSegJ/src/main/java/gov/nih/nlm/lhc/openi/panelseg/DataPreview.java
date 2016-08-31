@@ -14,42 +14,34 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class AnnotationPreview extends Annotation
+public class DataPreview extends Data
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationPreview <annotation folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar DataPreview <annotation folder>");
             System.out.println("	This is a utility program to generate images with annotations superimposed on the original figure images.");
             System.exit(0);
         }
 
-        AnnotationPreview preview = new AnnotationPreview(args[0]);
+        DataPreview preview = new DataPreview(args[0]);
         preview.generatePreview();
         System.out.println("Completed!");
     }
 
     /**
-     * ctor, set annotationFolder and then collect all imagefiles
+     * ctor, set setFolder and then collect all imagefiles
      * It also clears the preview folder.
      * @param annotationFolder
      */
-    AnnotationPreview(String annotationFolder)
+    DataPreview(String annotationFolder)
     {
         super(annotationFolder);
 
-        Path preview = this.annotationFolder.resolve("preview");
-        if (!Files.exists(preview)) preview.toFile().mkdir();
-
-        //Remove all file in preview folder
-        try {
-            FileUtils.cleanDirectory(preview.toFile());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Path preview = this.setFolder.resolve("preview");
+        AlgMiscEx.createClearFolder(preview);
     }
 
     /**
@@ -70,14 +62,14 @@ public class AnnotationPreview extends Annotation
             ArrayList<Panel> panels = null; boolean load_gt_error = false;
             try
             {
-                panels = AnnotationiPhotoDraw.loadPanelSeg(annotationFile);
+                panels = iPhotoDraw.loadPanelSeg(annotationFile);
             }
             catch (Exception e) {
                 System.out.println(e.getMessage());
                 load_gt_error = true;
             }
 
-            //System.out.println(Integer.toString(i+1) +  ": Generate Annotation Preview for " + imageFile);
+            //System.out.println(Integer.toString(i+1) +  ": Generate Data Preview for " + imageFile);
 
             Mat img = opencv_imgcodecs.imread(imageFile);
             String key = imagePath.getFileName().toString();

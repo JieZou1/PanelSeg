@@ -15,8 +15,29 @@ import java.util.ArrayList;
  * Utility functions related to iPhotoDraw annotations
  * Created by jzou on 8/26/2016.
  */
-public class AnnotationiPhotoDraw
+public class iPhotoDraw
 {
+    /**
+     * return a child node of the parent node based on its tag
+     * @param parent
+     * @param tag
+     * @return
+     */
+    static Node getChildNode(Node parent, String tag)
+    {
+        String nodeName;
+        NodeList children = parent.getChildNodes();
+        for (int j = 0; j < children.getLength(); j++)
+        {
+            Node child = children.item(j);
+            nodeName = child.getNodeName();
+            if (tag != nodeName) continue;
+
+            return child;
+        }
+        return null;
+    }
+
     /**
      * Load iPhotoDraw Annotations of panel segmentation
      * @param xml_file
@@ -37,15 +58,15 @@ public class AnnotationiPhotoDraw
         for (int i = 0; i < shapeNodes.getLength(); i++)
         {
             Node shapeNode = shapeNodes.item(i);
-            Node blockTextNode = AlgorithmEx.getChildNode(shapeNode, "BlockText");
-            Node textNode = AlgorithmEx.getChildNode(blockTextNode, "Text");
+            Node blockTextNode = getChildNode(shapeNode, "BlockText");
+            Node textNode = getChildNode(blockTextNode, "Text");
             String text = textNode.getTextContent().trim();
             String textLower = text.toLowerCase();
 
             if (textLower.startsWith("panel"))
             {	//It is a panel
-                Node dataNode = AlgorithmEx.getChildNode(shapeNode, "Data");
-                Node extentNode = AlgorithmEx.getChildNode(dataNode, "Extent");
+                Node dataNode = getChildNode(shapeNode, "Data");
+                Node extentNode = getChildNode(dataNode, "Extent");
                 NamedNodeMap attributes = extentNode.getAttributes();
                 int x = (int)(Double.parseDouble(attributes.getNamedItem("X").getTextContent()) + 0.5);
                 int y = (int)(Double.parseDouble(attributes.getNamedItem("Y").getTextContent()) + 0.5);
@@ -60,8 +81,8 @@ public class AnnotationiPhotoDraw
             }
             else if (textLower.startsWith("label"))
             {	//It is a label
-                Node dataNode = AlgorithmEx.getChildNode(shapeNode, "Data");
-                Node extentNode = AlgorithmEx.getChildNode(dataNode, "Extent");
+                Node dataNode = getChildNode(shapeNode, "Data");
+                Node extentNode = getChildNode(dataNode, "Extent");
                 NamedNodeMap attributes = extentNode.getAttributes();
                 int x = (int)(Double.parseDouble(attributes.getNamedItem("X").getTextContent()) + 0.5);
                 int y = (int)(Double.parseDouble(attributes.getNamedItem("Y").getTextContent()) + 0.5);
@@ -75,7 +96,7 @@ public class AnnotationiPhotoDraw
             }
             else
             {
-                throw new Exception("Load Annotation Error: Unknown annotation, " + text + ", in " + xml_file +  "!");
+                throw new Exception("Load Data Error: Unknown annotation, " + text + ", in " + xml_file +  "!");
             }
         }
 
@@ -88,7 +109,7 @@ public class AnnotationiPhotoDraw
             {
                 gov.nih.nlm.lhc.openi.panelseg.Panel panel = panels.get(i);
                 if (panel.panelLabel.length() > 0)
-                    throw new Exception("Load Annotation Error: Unexpected annotation, " + panel.panelLabel + ", in " + xml_file +  "!");
+                    throw new Exception("Load Data Error: Unexpected annotation, " + panel.panelLabel + ", in " + xml_file +  "!");
             }
             return panels;
         }
@@ -140,7 +161,7 @@ public class AnnotationiPhotoDraw
         }
 
         if (labelNames.size() > 0 || labelRects.size() > 0) //All elements in labelNames and labelRects should have been removed.
-            throw new Exception("Load Annotation Error: Extra Label Boundingboxes found in " + xml_file + "!");
+            throw new Exception("Load Data Error: Extra Label Boundingboxes found in " + xml_file + "!");
 
         return panels;
     }

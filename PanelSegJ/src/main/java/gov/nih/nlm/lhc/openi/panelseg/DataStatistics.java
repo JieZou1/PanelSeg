@@ -6,27 +6,27 @@ import java.util.*;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class AnnotationStatistics extends AnnotationAll
+public class DataStatistics extends DataAll
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationStatistics <data folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar DataStatistics <data folder>");
             System.exit(0);
         }
 
-        AnnotationStatistics statistics = new AnnotationStatistics(args[0]);
+        DataStatistics statistics = new DataStatistics(args[0]);
         statistics.generateStatistics();
         System.out.println("Completed!");
     }
 
     /**
-     * ctor, set dataFolder and then collect all annotationFolders
+     * ctor, set dataFolder and then collect all setFolders
      * @param dataFolder
      */
-    private AnnotationStatistics(String dataFolder)
+    private DataStatistics(String dataFolder)
     {
         super(dataFolder);
     }
@@ -40,12 +40,12 @@ public class AnnotationStatistics extends AnnotationAll
         int panelCount = 0;
         HashMap<String, Integer> figures = new HashMap<>();
 
-        for (Path annotation_folder : annotationFolders)
+        for (Path annotation_folder : setFolders)
         {
             System.out.println("Check: " + annotation_folder);
-            ArrayList<Path> imagePaths = AlgorithmEx.CollectImageFiles(annotation_folder);
-            System.out.println("Total number of image is: " + imagePaths.size());
-            ArrayList<Path> xmlPaths = AlgorithmEx.CollectXmlFiles(annotation_folder);
+            ArrayList<Path> imagePaths = AlgMiscEx.CollectImageFiles(annotation_folder);
+            System.out.println("Total number of imageColor is: " + imagePaths.size());
+            ArrayList<Path> xmlPaths = AlgMiscEx.CollectXmlFiles(annotation_folder);
             System.out.println("Total number of XML files is: " + xmlPaths.size());
 
             int figure_count = 0, single_count = 0, multi_count = 0;
@@ -64,7 +64,7 @@ public class AnnotationStatistics extends AnnotationAll
 
                 ArrayList<Panel> panels;
                 try {
-                    panels = AnnotationiPhotoDraw.loadPanelSeg(xml_path.toFile());
+                    panels = iPhotoDraw.loadPanelSeg(xml_path.toFile());
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

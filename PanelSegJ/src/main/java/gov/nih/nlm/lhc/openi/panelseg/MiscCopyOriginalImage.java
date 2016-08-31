@@ -21,9 +21,9 @@ public class MiscCopyOriginalImage
             System.out.println("	<dst imgOrignal folder> is a folder, where we want to save the retrieved original figure images.");
             System.out.println("	The program looks for the following mapping files:");
             System.out.println("	PMC: /hadoop/scratch/openi-v3.0/input-lists/feature-extraction/openi-v3.0-figures.txt");
-            System.out.println("	HMD image list: /hadoop/scratch/hmd/input-lists/feature-extraction/hmd-feature-extraction-list.txt");
+            System.out.println("	HMD imageColor list: /hadoop/scratch/hmd/input-lists/feature-extraction/hmd-feature-extraction-list.txt");
             System.out.println("	CXR: /hadoop/storage/radiology/input-lists/feature-extraction/radiology-images.txt");
-            System.out.println("	USC: /hadoop/storage/allcopied-usc/input-lists/feature-extraction/usc-image-list.txt");
+            System.out.println("	USC: /hadoop/storage/allcopied-usc/input-lists/feature-extraction/usc-imageColor-list.txt");
             System.exit(0);
         }
 
@@ -48,9 +48,9 @@ public class MiscCopyOriginalImage
 
         String[] mapping_files = new String[] {
                 "/hadoop/scratch/openi-v3.0/input-lists/feature-extraction/openi-v3.0-figures.txt", //PMC
-                "/hadoop/scratch/hmd/input-lists/feature-extraction/hmd-feature-extraction-list.txt", //HMD image list"
+                "/hadoop/scratch/hmd/input-lists/feature-extraction/hmd-feature-extraction-list.txt", //HMD imageColor list"
                 "/hadoop/storage/radiology/input-lists/feature-extraction/radiology-images.txt", //CXR
-                "/hadoop/storage/allcopied-usc/input-lists/feature-extraction/usc-image-list.txt" //USC
+                "/hadoop/storage/allcopied-usc/input-lists/feature-extraction/usc-imageColor-list.txt" //USC
         };
 
         //load mapping files

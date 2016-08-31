@@ -7,36 +7,36 @@ import java.nio.file.*;
 import java.util.*;
 
 /**
- * The base class for all annotation related operations on one data set. <p>
+ * The base class for all related operations on one set in data folder. <p>
  * This class is not intended to be instantiated, so we make it abstract.
  *
  * Created by jzou on 8/26/2016.
  */
-public abstract class Annotation
+public abstract class Data
 {
-    protected Path annotationFolder;        //Annotation folder of a set
-    protected ArrayList<Path> imagePaths;   //The image file path of the set
+    protected Path setFolder;        //Data folder of a set
+    protected ArrayList<Path> imagePaths;   //The imageColor file path of the set
     protected Path stylePath;               //The style file path
     protected Map<String, String> styles;   //The styles of the figures
 
     /**
-     * Ctor, set annotationFolder and then collect all imagePaths
+     * Ctor, set setFolder and then collect all imagePaths
      * It also load the style annotation into styles.
-     * If style.txt is not found in the annotationFolder, styles is set to null.
-     * @param annotationFolder
+     * If style.txt is not found in the setFolder, styles is set to null.
+     * @param setFolder
      */
-    protected Annotation(String annotationFolder)
+    protected Data(String setFolder)
     {
-        this.annotationFolder = Paths.get(annotationFolder);
-        imagePaths = AlgorithmEx.CollectImageFiles(this.annotationFolder);
-        System.out.println("Total number of image is: " + imagePaths.size());
+        this.setFolder = Paths.get(setFolder);
+        imagePaths = AlgMiscEx.CollectImageFiles(this.setFolder);
+        System.out.println("Total number of imageColor is: " + imagePaths.size());
 
-        stylePath = Paths.get(annotationFolder, "style.txt");
-        styles = Annotation.loadStyleMap(stylePath);
+        stylePath = Paths.get(setFolder, "style.txt");
+        styles = Data.loadStyleMap(stylePath);
     }
 
     /**
-     * Draw annotation onto the image for viewing and saving purpose
+     * Draw annotation onto the imageColor for viewing and saving purpose
      * @param img
      * @param panels
      * @return
@@ -50,14 +50,14 @@ public abstract class Annotation
         for (int i = 0; i < panels.size(); i++)
         {
             Panel panel = panels.get(i);
-            opencv_core.Scalar scalar = AlgorithmEx.getColor(i);
+            opencv_core.Scalar scalar = AlgOpenCVEx.getColor(i);
 
-            opencv_core.Rect panel_rect = AlgorithmEx.Rectangle2Rect(panel.panelRect);
+            opencv_core.Rect panel_rect = AlgOpenCVEx.Rectangle2Rect(panel.panelRect);
             opencv_imgproc.rectangle(imgAnnotated, panel_rect, scalar, 3, 8, 0);
 
             if (panel.panelLabel.length() != 0)
             {
-                opencv_core.Rect label_rect = AlgorithmEx.Rectangle2Rect(panel.labelRect);
+                opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
                 opencv_imgproc.rectangle(imgAnnotated, label_rect, scalar, 1, 8, 0);
             }
         }
@@ -66,18 +66,18 @@ public abstract class Annotation
         for (int i = 0; i < panels.size(); i++)
         {
             Panel panel = panels.get(i);
-            opencv_core.Scalar scalar = AlgorithmEx.getColor(i);
+            opencv_core.Scalar scalar = AlgOpenCVEx.getColor(i);
 
             if (panel.panelLabel.length() != 0)
             {
-                opencv_core.Rect label_rect = AlgorithmEx.Rectangle2Rect(panel.labelRect);
+                opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
                 opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 50);
                 opencv_imgproc.putText(imgAnnotated, panel.panelLabel, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 5, scalar, 3, 8, false);
             }
         }
 
-        {//Draw Style Annotation
-            opencv_core.Scalar scalar = AlgorithmEx.getColor(1);
+        {//Draw Style Data
+            opencv_core.Scalar scalar = AlgOpenCVEx.getColor(1);
             opencv_core.Point bottom_left = new opencv_core.Point(0, img.rows() + 100);
             opencv_imgproc.putText(imgAnnotated, style, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 2, scalar, 3, 8, false);
         }
@@ -90,7 +90,7 @@ public abstract class Annotation
      * If the styleFile does not exist, return null.
      *
      * @param stylePath The filepath
-     * @return image file name string and style annotation in HashMap<string, string>
+     * @return imageColor file name string and style annotation in HashMap<string, string>
      */
     static HashMap<String, String> loadStyleMap(Path stylePath)
     {

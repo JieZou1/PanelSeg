@@ -10,19 +10,19 @@ import java.util.ArrayList;
  *
  * Created by jzou on 8/26/2016.
  */
-public abstract class AnnotationAll
+public abstract class DataAll
 {
     protected Path dataFolder;
-    protected ArrayList<Path> annotationFolders;
+    protected ArrayList<Path> setFolders;
 
     /**
-     * ctor, set dataFolder and then collect all annotationFolders
+     * ctor, set dataFolder and then collect all setFolders
      * @param dataFolder
      */
-    protected AnnotationAll(String dataFolder)
+    protected DataAll(String dataFolder)
     {
         this.dataFolder = Paths.get(dataFolder);
-        annotationFolders = AlgorithmEx.CollectSubfolders(this.dataFolder);
+        setFolders = AlgMiscEx.CollectSubfolders(this.dataFolder);
     }
 
 }

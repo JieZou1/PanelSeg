@@ -7,26 +7,26 @@ import java.util.*;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class AnnotationSamplePartition extends AnnotationAll
+public class DataSamplePartition extends DataAll
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationSamplePartition");
+            System.out.println("Usage: java -cp PanelSegJ.jar DataSamplePartition");
             System.out.println("    This utility program partitions all samples into training and evaluation set");
             System.out.println("    Evaluation set contains 1000 randomly selected sample and the remaining are training set");
             System.exit(0);
         }
 
         String dataFolder = "\\Users\\jie\\projects\\PanelSeg\\data\\";
-        AnnotationSamplePartition miscSamplePartition = new AnnotationSamplePartition(dataFolder);
+        DataSamplePartition miscSamplePartition = new DataSamplePartition(dataFolder);
         miscSamplePartition.partition();
         System.out.println("Completed!");
     }
 
-    private AnnotationSamplePartition(String dataFolder)
+    private DataSamplePartition(String dataFolder)
     {
         super(dataFolder);
     }
@@ -36,10 +36,10 @@ public class AnnotationSamplePartition extends AnnotationAll
         List<Path> all = new ArrayList<>();
 
         //Collect all samples
-        for (int i = 0; i < annotationFolders.size(); i++)
+        for (int i = 0; i < setFolders.size(); i++)
         {
-            Path folder = annotationFolders.get(i);
-            List images = AlgorithmEx.CollectImageFiles(folder);
+            Path folder = setFolders.get(i);
+            List images = AlgMiscEx.CollectImageFiles(folder);
             all.addAll(images);
         }
         //Save all sample list

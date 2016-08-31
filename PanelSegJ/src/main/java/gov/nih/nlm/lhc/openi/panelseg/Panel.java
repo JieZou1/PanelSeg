@@ -1,5 +1,7 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import org.bytedeco.javacpp.opencv_core;
+
 import java.awt.Rectangle;
 import java.util.Comparator;
 
@@ -21,5 +23,8 @@ public class Panel
     //Not essential, but useful info about the panel.
     double labelScore;		//The confidence of the panel label
     double[] labelProbs;	//The posterior probabilities of all possible classes. Mostly used to find an optimal label set.
+
+    opencv_core.Mat labelPatch;  //The label patches cropped from the original image
+    opencv_core.Mat labelGrayNormPatch;  //The label patches cropped from the gray image and normalized to standard size
 }
 

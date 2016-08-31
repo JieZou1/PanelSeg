@@ -12,27 +12,27 @@ import org.bytedeco.javacpp.opencv_imgcodecs;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class AnnotationVisualize extends Annotation
+public class DataVisualize extends Data
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationVisualize <annotation folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar DataVisualize <annotation folder>");
             System.out.println("	This is a utility program to visualize through and modify the annotations.");
             System.exit(0);
         }
 
-        AnnotationVisualize visualizer = new AnnotationVisualize(args[0]);
+        DataVisualize visualizer = new DataVisualize(args[0]);
         visualizer.visualize();
     }
 
     /**
-     * ctor, set annotationFolder and then collect all imagefiles and save in imagePaths
+     * ctor, set setFolder and then collect all imagefiles and save in imagePaths
      * @param annotationFolder
      */
-    private AnnotationVisualize(String annotationFolder)
+    private DataVisualize(String annotationFolder)
     {
         super(annotationFolder);
     }
@@ -87,7 +87,7 @@ public class AnnotationVisualize extends Annotation
             ArrayList<Panel> panels = null; boolean load_gt_error = false;
             try
             {
-                panels = AnnotationiPhotoDraw.loadPanelSeg(annotationFile);
+                panels = iPhotoDraw.loadPanelSeg(annotationFile);
             }
             catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -101,7 +101,7 @@ public class AnnotationVisualize extends Annotation
             Mat imgAnnotated = load_gt_error ? img.clone() : drawAnnotation(img, panels, style);
 
             System.out.println();
-            System.out.println(Integer.toString(i+1) +  ": Visualize Annotation for " + imageFile);
+            System.out.println(Integer.toString(i+1) +  ": Visualize Data for " + imageFile);
             System.out.println("The style is " + style);
 
             System.out.println("Press n, go to the next figure");
@@ -114,7 +114,7 @@ public class AnnotationVisualize extends Annotation
             while (true)
             {
                 opencv_highgui.imshow("Image", img);
-                opencv_highgui.imshow("Annotation", imgAnnotated);
+                opencv_highgui.imshow("Data", imgAnnotated);
                 int c;
                 while (true)
                 {
@@ -128,7 +128,7 @@ public class AnnotationVisualize extends Annotation
                 {
                     runiPhotoDraw(imageFile);
                     load_gt_error = false;
-                    try {	panels = AnnotationiPhotoDraw.loadPanelSeg(annotationFile);			}
+                    try {	panels = iPhotoDraw.loadPanelSeg(annotationFile);			}
                     catch (Exception e) {
                         System.out.println(e.getMessage());
                         load_gt_error = true;

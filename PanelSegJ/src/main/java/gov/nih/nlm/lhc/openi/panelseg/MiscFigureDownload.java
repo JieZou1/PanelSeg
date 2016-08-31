@@ -24,18 +24,18 @@ public class MiscFigureDownload
      * @param	args
      *          query-string	The server url including the query term and other filters.
      *          output-dir		Directory where the images are downloaded.
-     *          image-prefix	Server name to be used as image prefix.
+     *          imageColor-prefix	Server name to be used as imageColor prefix.
      */
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no agruments passed.
         if(args.length < 3)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar MiscFigureDownload <query-string> <output-dir> <image-prefix>");
+            System.out.println("Usage: java -cp PanelSegJ.jar MiscFigureDownload <query-string> <output-dir> <imageColor-prefix>");
             System.out.println("	This is a utility program to download figure images through OpenI API.");
-            System.out.println("	Note: The downloaded image is the highest resolution images for OpenI web displaying purpose.");
-            System.out.println("	        It is not the original image to be processed by PanelSeg. The original image is on Hadoop server.");
-            System.out.println("			The original image is on Hadoop server, and may be retrieved by MiscCopyOriginalImage program");
+            System.out.println("	Note: The downloaded imageColor is the highest resolution images for OpenI web displaying purpose.");
+            System.out.println("	        It is not the original imageColor to be processed by PanelSeg. The original imageColor is on Hadoop server.");
+            System.out.println("			The original imageColor is on Hadoop server, and may be retrieved by MiscCopyOriginalImage program");
             System.exit(0);
         }
 
@@ -47,7 +47,7 @@ public class MiscFigureDownload
         String outputDirPath  = args[1];
         String imagePrefix = args[2];
 
-        //Variables to store the JSON pagination params and image urls.
+        //Variables to store the JSON pagination params and imageColor urls.
         int m = 0, n = 0, total = 100;
         HashSet<String> imageSet = new HashSet<String>();
 
@@ -99,7 +99,7 @@ public class MiscFigureDownload
         System.out.println("Total results: " + imageSet.size());
 
 
-        System.out.println("Using image prefix: " + imagePrefix);
+        System.out.println("Using imageColor prefix: " + imagePrefix);
         System.out.println("Output directory to save images: " + outputDirPath);
 
         int counter = 0;

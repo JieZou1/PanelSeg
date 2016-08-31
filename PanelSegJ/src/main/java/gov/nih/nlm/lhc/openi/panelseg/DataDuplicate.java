@@ -1,36 +1,32 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.*;
-import java.lang.reflect.Array;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
  * Created by jzou on 8/25/2016.
  */
-public class AnnotationDuplicate extends AnnotationAll
+public class DataDuplicate extends DataAll
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationDuplicate");
+            System.out.println("Usage: java -cp PanelSegJ.jar DataDuplicate");
             System.out.println("    This utility program checks the annotation folders to find all duplicated figures");
             System.out.println("    Since the Figures are downloaded based on keywords search in several sets, duplication is possible");
             System.exit(0);
         }
 
         String dataFolder = "\\Users\\jie\\projects\\PanelSeg\\data\\";
-        AnnotationDuplicate duplicate = new AnnotationDuplicate(dataFolder);
+        DataDuplicate duplicate = new DataDuplicate(dataFolder);
         duplicate.findDuplicate();
         System.out.println("Completed!");
     }
 
-    private AnnotationDuplicate(String dataFolder)
+    private DataDuplicate(String dataFolder)
     {
         super(dataFolder);
     }
@@ -39,10 +35,10 @@ public class AnnotationDuplicate extends AnnotationAll
     {
         HashMap<String, ArrayList<Path>> collection = new HashMap<>();
 
-        for (int i = 0; i < annotationFolders.size(); i++)
+        for (int i = 0; i < setFolders.size(); i++)
         {
-            Path folder = annotationFolders.get(i);
-            ArrayList<Path> images = AlgorithmEx.CollectImageFiles(folder);
+            Path folder = setFolders.get(i);
+            ArrayList<Path> images = AlgMiscEx.CollectImageFiles(folder);
 
             for (int j = 0; j < images.size(); j++)
             {

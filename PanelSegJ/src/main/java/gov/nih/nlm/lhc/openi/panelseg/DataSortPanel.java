@@ -9,33 +9,33 @@ import java.util.ArrayList;
 /**
  * Created by jzou on 8/26/2016.
  */
-public class AnnotationSortPanel extends Annotation
+public class DataSortPanel extends Data
 {
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar AnnotationSortPanel <annotation folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar DataSortPanel <annotation folder>");
             System.out.println("	This is a utility program to rewrite iPhotoDraw annotation.");
             System.out.println("	Make label annotation on top of panel annotation to manual modification more convenient.");
             System.out.println("	It will overwrite the existing iPhotoDraw annotation file. SO BE CAREFUL!!!");
             System.exit(0);
         }
 
-        AnnotationSortPanel rewrite = new AnnotationSortPanel(args[0]);
+        DataSortPanel rewrite = new DataSortPanel(args[0]);
         rewrite.rewrite();
         System.out.println("Completed!");
     }
 
     /**
-     * Ctor, set annotationFolder and then collect all imagePaths
+     * Ctor, set setFolder and then collect all imagePaths
      * It also load the style annotation into styles.
-     * If style.txt is not found in the annotationFolder, styles is set to null.
+     * If style.txt is not found in the setFolder, styles is set to null.
      *
      * @param annotationFolder
      */
-    protected AnnotationSortPanel(String annotationFolder) {
+    protected DataSortPanel(String annotationFolder) {
         super(annotationFolder);
     }
 
@@ -59,19 +59,19 @@ public class AnnotationSortPanel extends Annotation
             ArrayList<Panel> panels = null; boolean load_gt_error = false;
             try
             {
-                panels = AnnotationiPhotoDraw.loadPanelSeg(annotationFile);
+                panels = iPhotoDraw.loadPanelSeg(annotationFile);
             }
             catch (Exception e) {
                 System.out.println(e.getMessage());
                 load_gt_error = true;
             }
 
-            //System.out.println(Integer.toString(i+1) +  ": Rewrite Annotation for " + imageFile);
+            //System.out.println(Integer.toString(i+1) +  ": Rewrite Data for " + imageFile);
             if (!load_gt_error)
             {
                 try
                 {
-                    AnnotationiPhotoDraw.savePanelSeg(annotationFile, panels);
+                    iPhotoDraw.savePanelSeg(annotationFile, panels);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

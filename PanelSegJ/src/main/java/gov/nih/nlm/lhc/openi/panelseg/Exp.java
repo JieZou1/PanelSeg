@@ -48,7 +48,7 @@ public class Exp {
             e.printStackTrace();
         }
 
-        System.out.println("Total number of imageColor is: " + imagePaths.size());
+        System.out.println("Total number of image is: " + imagePaths.size());
 
         AlgMiscEx.createClearFolder(this.targetFolder);
     }

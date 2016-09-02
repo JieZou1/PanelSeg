@@ -24,7 +24,7 @@ public class ExpLabelPreview extends Exp {
         System.out.println("Completed!");
     }
 
-    private enum PreviewType {ORIGINAL, NORM64};
+    private enum PreviewType {ORIGINAL, NORM64}
 
     /**
      * Ctor, set targetFolder and then collect all imagePaths

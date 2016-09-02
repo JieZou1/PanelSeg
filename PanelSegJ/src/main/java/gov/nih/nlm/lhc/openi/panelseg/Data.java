@@ -50,15 +50,15 @@ public abstract class Data
         for (int i = 0; i < panels.size(); i++)
         {
             Panel panel = panels.get(i);
-            opencv_core.Scalar scalar = AlgOpenCVEx.getColor(i);
+            opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
 
             opencv_core.Rect panel_rect = AlgOpenCVEx.Rectangle2Rect(panel.panelRect);
-            opencv_imgproc.rectangle(imgAnnotated, panel_rect, scalar, 3, 8, 0);
+            opencv_imgproc.rectangle(imgAnnotated, panel_rect, color, 3, 8, 0);
 
             if (panel.panelLabel.length() != 0)
             {
                 opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
-                opencv_imgproc.rectangle(imgAnnotated, label_rect, scalar, 1, 8, 0);
+                opencv_imgproc.rectangle(imgAnnotated, label_rect, color, 1, 8, 0);
             }
         }
 
@@ -66,13 +66,13 @@ public abstract class Data
         for (int i = 0; i < panels.size(); i++)
         {
             Panel panel = panels.get(i);
-            opencv_core.Scalar scalar = AlgOpenCVEx.getColor(i);
+            opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
 
             if (panel.panelLabel.length() != 0)
             {
                 opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
                 opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 50);
-                opencv_imgproc.putText(imgAnnotated, panel.panelLabel, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 5, scalar, 3, 8, false);
+                opencv_imgproc.putText(imgAnnotated, panel.panelLabel, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 5, color, 3, 8, false);
             }
         }
 

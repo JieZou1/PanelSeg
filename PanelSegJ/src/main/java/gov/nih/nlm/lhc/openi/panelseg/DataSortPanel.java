@@ -17,14 +17,14 @@ public class DataSortPanel extends Data
         if(args.length != 1)
         {
             System.out.println("Usage: java -cp PanelSegJ.jar DataSortPanel <annotation folder>");
-            System.out.println("	This is a utility program to rewrite iPhotoDraw annotation.");
-            System.out.println("	Make label annotation on top of panel annotation to manual modification more convenient.");
+            System.out.println("	This is a utility program to sort iPhotoDraw annotation.");
+            System.out.println("	Make label annotation on top of panel annotation to make manual modification more convenient.");
             System.out.println("	It will overwrite the existing iPhotoDraw annotation file. SO BE CAREFUL!!!");
             System.exit(0);
         }
 
         DataSortPanel rewrite = new DataSortPanel(args[0]);
-        rewrite.rewrite();
+        rewrite.sort();
         System.out.println("Completed!");
     }
 
@@ -40,14 +40,12 @@ public class DataSortPanel extends Data
     }
 
     /**
-     * Entry function for rewrite annotation
+     * Entry function for sort annotation
      */
-    void rewrite()
+    void sort()
     {
         for (int i = 0; i < imagePaths.size(); i++)
         {
-            //if (i < 124) continue;
-
             Path imagePath = imagePaths.get(i);
             String imageFile = imagePath.toString();
             String xmlFile = FilenameUtils.removeExtension(imageFile) + "_data.xml";

@@ -93,7 +93,7 @@ public class Figure
      */
     void cropLabelPatches()
     {
-        //Pad the original image, such that after expanding the label rects, we still could crop the image.
+        //Pad the original image, such that we could be sure the patch is cropped.
         int padding = 150;
         opencv_core.Mat imgPadded = new opencv_core.Mat();
         opencv_core.copyMakeBorder(imageColor, imgPadded, padding, padding, padding, padding, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
@@ -101,7 +101,7 @@ public class Figure
         for (Panel panel : panels) {
             if (panel.labelRect == null || panel.labelRect.isEmpty()) continue;
 
-            //Make it square and then expand 10% in each direction
+            //Make it square
             int x = panel.labelRect.x, y = panel.labelRect.y, w = panel.labelRect.width, h = panel.labelRect.height;
             if (w > h) {
                 int h_new = w;
@@ -116,10 +116,10 @@ public class Figure
             }
 
             //Expand 15% in each direction
-            x -= (int) (w * 0.15 + 0.5);
-            w = (int) (w * 1.3 + 0.5);
-            y -= (int) (h * 0.15 + 0.5);
-            h = (int) (h * 1.3 + 0.5);
+//            x -= (int) (w * 0.15 + 0.5);
+//            w = (int) (w * 1.3 + 0.5);
+//            y -= (int) (h * 0.15 + 0.5);
+//            h = (int) (h * 1.3 + 0.5);
 
             x += padding; y += padding;
 
@@ -141,7 +141,7 @@ public class Figure
         for (Panel panel : panels) {
             if (panel.labelRect == null || panel.labelRect.isEmpty()) continue;
 
-            //Make it square and then expand 10% in each direction
+            //Make it square
             int x = panel.labelRect.x, y = panel.labelRect.y, w = panel.labelRect.width, h = panel.labelRect.height;
             if (w > h) {
                 int h_new = w;
@@ -156,10 +156,10 @@ public class Figure
             }
 
             //Expand 15% in each direction
-            x -= (int) (w * 0.15 + 0.5);
-            w = (int) (w * 1.3 + 0.5);
-            y -= (int) (h * 0.15 + 0.5);
-            h = (int) (h * 1.3 + 0.5);
+//            x -= (int) (w * 0.15 + 0.5);
+//            w = (int) (w * 1.3 + 0.5);
+//            y -= (int) (h * 0.15 + 0.5);
+//            h = (int) (h * 1.3 + 0.5);
 
             x += padding; y += padding;
 

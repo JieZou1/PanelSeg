@@ -122,7 +122,8 @@ public class iPhotoDraw
             for (int j = 0; j < labelRects.size(); j++)
             {
                 String label_name = labelNames.get(j);
-                if (panel.panelLabel.toLowerCase().equals(label_name.toLowerCase()))	indexes.add(j);
+                //if (panel.panelLabel.toLowerCase().equals(label_name.toLowerCase()))	indexes.add(j);
+                if (panel.panelLabel.equals(label_name))	indexes.add(j);
             }
 
             if (indexes.size() == 0)
@@ -161,7 +162,7 @@ public class iPhotoDraw
         }
 
         if (labelNames.size() > 0 || labelRects.size() > 0) //All elements in labelNames and labelRects should have been removed.
-            throw new Exception("Load Data Error: Extra Label Boundingboxes found in " + xml_file + "!");
+            throw new Exception("Load Data Error: Extra Label Bounding boxes found in " + xml_file + "!");
 
         return panels;
     }

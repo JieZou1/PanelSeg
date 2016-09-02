@@ -12,7 +12,7 @@ public class DataPreviewAll extends DataAll
         //Stop and print error msg if no arguments passed.
         if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar DataPreviewAll <data folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar gov.nih.nlm.lhc.openi.panelseg.DataPreviewAll <data folder>");
             System.out.println("	This is a utility program to generate images with annotations superimposed on the original figure images.");
             System.exit(0);
         }

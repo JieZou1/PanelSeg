@@ -60,27 +60,31 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
     static private int groupThreshold = 2;
     static private boolean useMeanShiftGrouping = false;
 
-    static private double minimumLabelSize = 12.0;	//We assume the smallest label patch is 12x12.
-
     private HOGDescriptor hog;
     private float[][] svmModels;
 
     protected ArrayList<ArrayList<Panel>> hogDetectionResult; //The HOG method detection result of all labelSetsToDetect
 
+    /**
+     * Constructor, load all SVM models, and initialize the HOGDescriptor
+     */
     public PanelSegLabelRegHog()
     {
         int n = labelSetsHOG.length;		svmModels = new float[n][];
         for (int i = 0; i < n; i++)
         {
-            String classString = "gov.nih.nlm.iti.figure.PanelSegLabelRegHoGModel_" + labelSetsHOG[i];
-            try {
-                Class<?> cls = Class.forName(classString);
-                Field field = cls.getField("svmModel");
-                svmModels[i] = (float[])field.get(null);
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            if (labelSetsHOG[i].equals("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"))
+                svmModels[i] = PanelSegLabelRegHoGModels.svmModel;
+
+//            String classString = "gov.nih.nlm.lhc.openi.panelseg.PanelSegLabelRegHogModel_" + labelSetsHOG[i];
+//            try {
+//                Class<?> cls = Class.forName(classString);
+//                Field field = cls.getField("svmModel");
+//                svmModels[i] = (float[])field.get(null);
+//            } catch (Exception e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
         }
 
         hog = new HOGDescriptor(winSize_64, blockSize, blockStride, cellSize, nbins);
@@ -110,7 +114,7 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
         for (int i = 0; i < n; i++) hogDetectionResult.add(null);
 
         //Resize the image.
-        double scale = 64.0 / minimumLabelSize; //check statistics.txt to decide this scaling factor.
+        double scale = 64.0 / labelMinSize; //check statistics.txt to decide this scaling factor.
         int _width = (int)(figure.imageWidth * scale + 0.5), _height = (int)(figure.imageHeight * scale + 0.5);
         opencv_core.Size newSize = new opencv_core.Size(_width, _height);
         opencv_core.Mat imgScaled = new opencv_core.Mat(); resize(figure.imageGray, imgScaled, newSize);

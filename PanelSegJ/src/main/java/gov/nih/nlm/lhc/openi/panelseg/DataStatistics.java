@@ -38,13 +38,14 @@ public final class DataStatistics extends DataAll
     {
         int figureCount = 0, singleCount = 0, multiCount = 0; //Total figures, total single panel figures, total multi-panel figures.
         int panelCount = 0;
+        int labelMinSize = Integer.MAX_VALUE, labelMaxSize = Integer.MIN_VALUE;
         HashMap<String, Integer> figures = new HashMap<>();
 
         for (Path annotation_folder : setFolders)
         {
             System.out.println("Check: " + annotation_folder);
             ArrayList<Path> imagePaths = AlgMiscEx.collectImageFiles(annotation_folder);
-            System.out.println("Total number of imageColor is: " + imagePaths.size());
+            System.out.println("Total number of images is: " + imagePaths.size());
             ArrayList<Path> xmlPaths = AlgMiscEx.collectXmlFiles(annotation_folder);
             System.out.println("Total number of XML files is: " + xmlPaths.size());
 
@@ -78,6 +79,17 @@ public final class DataStatistics extends DataAll
                 else multi_count++;
 
                 panel_count += panels.size();
+
+                //Find minimum and maximum label size
+                for (Panel panel : panels) {
+                    if (panel.labelRect == null || panel.labelRect.isEmpty()) continue;
+                    int labelWidth = panel.labelRect.width;
+                    int labelHeight = panel.labelRect.height;
+                    int labelSize = Math.max(labelWidth, labelHeight);
+
+                    if (labelSize < labelMinSize) labelMinSize = labelSize;
+                    if (labelSize > labelMaxSize) labelMaxSize = labelSize;
+                }
             }
             System.out.println("Total number of figures is: " + figure_count);
             System.out.println("Total number of single-panel figures is: " + single_count);
@@ -97,6 +109,8 @@ public final class DataStatistics extends DataAll
         System.out.println("Overall Total number of multi-panel figures is: " + multiCount);
         System.out.println("Overall Total number of panels is: " + panelCount);
 
+        System.out.println("Minimum Label Size is: " + labelMinSize);
+        System.out.println("Maximum Label Size is: " + labelMaxSize);
 
     }
 

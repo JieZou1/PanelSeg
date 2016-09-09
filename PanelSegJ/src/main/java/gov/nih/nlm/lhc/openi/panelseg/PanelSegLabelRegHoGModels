@@ -1,6 +1,6 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
-final class PanelSegLabelRegHoGModel_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789
+final class PanelSegLabelRegHoGModels
 {
     public static float[] svmModel =
             {

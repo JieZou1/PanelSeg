@@ -12,7 +12,25 @@ import java.lang.reflect.Field;
  */
 public class PanelSegLabelRegHog extends PanelSegLabelReg
 {
-    static String[] labelSetsHOG = {"A", "ad", "BDEFPpR", "bhKk", "CceGOoQ", "fIiJjLlrTt", "gqSs", "HMmNn" };
+    static final String[] labelSetsHOG = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"};
+//    static final String[] labelSetsHOG = {
+//        "A", "a", "B", "bh", "CceG", "D", "d", "E", "F", "f", "gq", "H", "IiJjlrt", "Kk", "L", "Mm", "Nn", "OoQ", "Pp", "R", "Ss", "T", "UuVvWw", "XxYyZz"
+//    };
+    /**
+     * Mapping a Label Char to the LabelSet.
+     * @param c
+     * @return
+     */
+    static String getLabelSetName(char c)
+    {
+        String cStr = Character.toString(c);
+        for (String name : labelSetsHOG)
+        {
+            if (name.indexOf(cStr) >= 0) return name;
+        }
+        return null;
+    }
+
 
     //The HoG parameters used in both training and testing
     static protected opencv_core.Size winSize_64 = new opencv_core.Size(64, 64);

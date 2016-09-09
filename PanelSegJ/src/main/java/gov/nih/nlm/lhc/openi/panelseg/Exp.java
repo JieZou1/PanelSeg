@@ -20,19 +20,24 @@ import java.util.List;
  * Created by jzou on 8/30/2016.
  */
 public class Exp {
+    public enum LabelPreviewType {ORIGINAL, NORM64}
+
     protected Path listFile;        //The list file containing the samples to be experimented with
     protected Path targetFolder;    //The folder for saving the result
 
     protected List<Path> imagePaths;    //The paths to sample images.
 
+    protected Exp() {}
+
     /**
      * Ctor, set targetFolder and then collect all imagePaths
-     * It also clean the targetFolder
+     * It also clean the targetFolder, if clearTargetFolder is set to true
      *
      * @param listFile
      * @param targetFolder
+     * @param clearTargetFolder
      */
-    protected Exp(String listFile, String targetFolder) {
+    protected Exp(String listFile, String targetFolder, boolean clearTargetFolder) {
         this.targetFolder = Paths.get(targetFolder);
         this.listFile = Paths.get(listFile);
 
@@ -50,7 +55,8 @@ public class Exp {
 
         System.out.println("Total number of image is: " + imagePaths.size());
 
-        AlgMiscEx.createClearFolder(this.targetFolder);
+        if (clearTargetFolder)
+            AlgMiscEx.createClearFolder(this.targetFolder);
     }
 
 }

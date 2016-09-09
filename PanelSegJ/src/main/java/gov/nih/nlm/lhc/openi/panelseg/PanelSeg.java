@@ -12,7 +12,8 @@ public abstract class PanelSeg
     static final char[] labelChars = {
             'a', 'A', 'b', 'B', 'c', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H',
             'i', 'I', 'j', 'J', 'k', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'p', 'q', 'Q',
-            'r', 'R', 's', 't', 'T', 'u', 'v', 'w', 'x', 'y', 'z'
+            'r', 'R', 's', 't', 'T', 'u', 'v', 'w', 'x', 'y', 'z',
+            '1', '2', '3', '4', '5', '6', '7', '8', '9'
     };
 
     /**

@@ -8,20 +8,22 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 /**
- * Created by jzou on 8/30/2016.
+ * Generate positive patches for training of HOG+SVM method for Label Detection
+ * Negative patches are collected by Bootstrapping
+ *
+ * Created by jzou on 9/8/2016.
  */
-public class ExpLabelPreview extends Exp {
+public class ExpLabelDetectHogPos extends Exp {
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
         if (args.length != 2) {
             System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectHogPos <Sample List File> <target folder>");
-            System.out.println("	This is a utility program to generate preview of label patches.");
-            System.out.println("	It can also be used for generate positive training samples for label detection.");
+            System.out.println("	This is a utility program to generate positive training samples for label detection.");
             System.exit(0);
         }
 
-        ExpLabelPreview preview = new ExpLabelPreview(args[0], args[1]);
-        preview.generatePreview();
+        ExpLabelDetectHogPos generator = new ExpLabelDetectHogPos(args[0], args[1]);
+        generator.generate();
         System.out.println("Completed!");
     }
 
@@ -32,31 +34,21 @@ public class ExpLabelPreview extends Exp {
      * @param trainListFile
      * @param targetFolder
      */
-    ExpLabelPreview(String trainListFile, String targetFolder) {
-        super(trainListFile, targetFolder, true);
+    ExpLabelDetectHogPos(String trainListFile, String targetFolder) {
+        super(trainListFile, targetFolder, false);
     }
 
     /**
-     * Entry function for generating label preview
+     * Entry function for generating positive samples
      */
-    void generatePreview()
-    {
-        generatePreview(LabelPreviewType.ORIGINAL);
-        generatePreview(LabelPreviewType.NORM64);
-    }
-
-    /**
-     * Generate original label preview
-     */
-    void generatePreview(LabelPreviewType type)
+    void generate()
     {
         //Clean up all the folders
-        Path typeFolder = this.targetFolder.resolve(type.toString());
-        AlgMiscEx.createClearFolder(typeFolder);
-        for (char c : PanelSeg.labelChars)
+        Path posFolder = this.targetFolder;
+        for (String name : PanelSegLabelRegHog.labelSetsHOG)
         {
-            String name = PanelSeg.getLabelCharFolderName(c);
-            Path folder = typeFolder.resolve(name);
+            Path folder = posFolder.resolve(name);
+            folder = folder.resolve("pos");
             AlgMiscEx.createClearFolder(folder);
         }
 
@@ -75,19 +67,19 @@ public class ExpLabelPreview extends Exp {
             }
 
             Figure figure = new Figure(imagePath, panels);
-            switch (type)
-            {
-                case ORIGINAL: figure.cropLabelPatches(); break;
-                case NORM64: figure.cropLabelGrayNormPatches(64, 64); break;
-            }
+            figure.cropLabelGrayNormPatches(64, 64);
 
             for (Panel panel : figure.panels)
             {
                 if (panel.labelRect == null) continue; //No label rect
                 if (panel.panelLabel.length() != 1) continue; //Label has more than 1 char, we ignore for now.
 
-                String name = PanelSeg.getLabelCharFolderName(panel.panelLabel.charAt(0));
-                Path folder = typeFolder.resolve(name);
+                String name = PanelSegLabelRegHog.getLabelSetName(panel.panelLabel.charAt(0));
+//                if (name == null)
+//                {
+//                    System.out.println(panel.panelLabel); continue;
+//                }
+                Path folder = posFolder.resolve(name).resolve("pos");
 
                 String[] folderWords = imageFile.split("\\\\");
                 name = folderWords[folderWords.length - 2] + "-" + folderWords[folderWords.length - 1] + "-";
@@ -95,14 +87,10 @@ public class ExpLabelPreview extends Exp {
 
                 Path file = folder.resolve(name);
 
-                switch (type)
-                {
-                    case ORIGINAL: opencv_imgcodecs.imwrite(file.toString(), panel.labelPatch); break;
-                    case NORM64: opencv_imgcodecs.imwrite(file.toString(), panel.labelGrayNormPatch); break;
-                }
-
+                opencv_imgcodecs.imwrite(file.toString(), panel.labelGrayNormPatch);
             }
 
         }
     }
+
 }

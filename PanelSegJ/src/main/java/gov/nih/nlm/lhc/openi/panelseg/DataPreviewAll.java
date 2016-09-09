@@ -5,7 +5,7 @@ import java.nio.file.Path;
 /**
  * Created by jzou on 8/26/2016.
  */
-public class DataPreviewAll extends DataAll
+public final class DataPreviewAll extends DataAll
 {
     public static void main(String args[]) throws Exception
     {

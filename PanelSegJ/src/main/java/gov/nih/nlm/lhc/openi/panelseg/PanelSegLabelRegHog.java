@@ -1,9 +1,15 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import org.bytedeco.javacpp.DoublePointer;
+import org.bytedeco.javacpp.FloatPointer;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_objdetect.HOGDescriptor;
 
+import java.awt.*;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+
+import static org.bytedeco.javacpp.opencv_imgproc.resize;
 
 /**
  * Treat Label Recognition as Object Detection using HoG method
@@ -59,6 +65,8 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
     private HOGDescriptor hog;
     private float[][] svmModels;
 
+    protected ArrayList<ArrayList<Panel>> hogDetectionResult; //The HOG method detection result of all labelSetsToDetect
+
     public PanelSegLabelRegHog()
     {
         int n = labelSetsHOG.length;		svmModels = new float[n][];
@@ -77,6 +85,135 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
 
         hog = new HOGDescriptor(winSize_64, blockSize, blockStride, cellSize, nbins);
         //hog = new HOGDescriptor(winSize_32, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma, _histogramNormType, _L2HysThreshold, gammaCorrection, nlevels, _signedGradient)
+    }
+
+    /**
+     * Extract HoG descriptors from gray patch
+     * @param grayPatch
+     * @return
+     */
+    public float[] featureExtraction(opencv_core.Mat grayPatch)
+    {
+        FloatPointer descriptors = new FloatPointer();
+        hog.compute(grayPatch, descriptors);
+        //hog.compute(grayPatch, descriptors, winStride, padding, null);
+
+        int n = (int)hog.getDescriptorSize();
+        float[] features = new float[n];		descriptors.get(features);
+        return features;
+    }
+
+    protected void HoGDetect()
+    {
+        int n = labelSetsHOG.length;
+        hogDetectionResult = new ArrayList<>();
+        for (int i = 0; i < n; i++) hogDetectionResult.add(null);
+
+        //Resize the image.
+        double scale = 64.0 / minimumLabelSize; //check statistics.txt to decide this scaling factor.
+        int _width = (int)(figure.imageWidth * scale + 0.5), _height = (int)(figure.imageHeight * scale + 0.5);
+        opencv_core.Size newSize = new opencv_core.Size(_width, _height);
+        opencv_core.Mat imgScaled = new opencv_core.Mat(); resize(figure.imageGray, imgScaled, newSize);
+
+        for (int i = 0; i < n; i++)
+        {
+            String panelLabelSet = labelSetsHOG[i];
+            float[] svmModel = svmModels[i];
+            double minSize = labelMinSize * scale;
+            double maxSize = labelMaxSize * scale;
+
+            hog.setSVMDetector(new opencv_core.Mat(new FloatPointer(svmModel)));
+
+            //Search on scaled image
+            ArrayList<Panel> candidates1 = DetectMultiScale(imgScaled, maxSize, minSize, panelLabelSet, false);
+            //ArrayList<Panel> candidates2 = DetectMultiScale(imgeScaledInverted, maxSize, minSize, panelLabelSet, true);
+
+            ArrayList<Panel> candidates = new ArrayList<>();
+            if (candidates1 != null) candidates.addAll(candidates1);
+            //if (candidates2 != null) candidates.addAll(candidates2);
+
+            if (candidates.size() > 0)
+            {
+                candidates = RemoveOverlappedCandidates(candidates);
+
+                //Scale back to the original size, and save the result to hogDetectionResult
+                ArrayList<Panel> segmentationResult = new ArrayList<>();
+                for (int j = 0; j < candidates.size(); j++)
+                {
+                    Panel segInfo = candidates.get(j);
+                    Rectangle rect = segInfo.labelRect;
+                    Rectangle orig_rect = new Rectangle((int)(rect.x / scale + .5), (int)(rect.y / scale + .5), (int)(rect.width / scale + .5), (int)(rect.height / scale + .5));
+                    segInfo.labelRect = orig_rect;
+                    segmentationResult.add(segInfo);
+                }
+                hogDetectionResult.set(i, segmentationResult);
+            }
+        }
+    }
+
+    private ArrayList<Panel> DetectMultiScale(opencv_core.Mat img, double maxSize, double minSize, String panelLabelSet, Boolean inverted)
+    {
+        ArrayList<Panel> candidates = new ArrayList<>();
+
+        opencv_core.RectVector rectVector = new opencv_core.RectVector();			DoublePointer dp = new DoublePointer();
+        //hog.detectMultiScale(img, rectVector, dp);
+        hog.detectMultiScale(img, rectVector, dp, hitThreshold, winStride, padding, scale0, groupThreshold, useMeanShiftGrouping);
+
+        if (rectVector == null || rectVector.size() == 0) return null;
+
+        double[] scores = new double[(int)rectVector.size()]; dp.get(scores);
+        for (int k = 0; k < rectVector.size(); k++)
+        {
+            opencv_core.Rect labelRect = rectVector.get(k);
+            if (labelRect.width() > maxSize || labelRect.height() > maxSize) continue;
+            if (labelRect.width() < minSize || labelRect.height() < minSize) continue;
+
+            int centerX = labelRect.x() + labelRect.width() / 2;
+            int centerY = labelRect.y() + labelRect.height() / 2;
+            if (centerX <= 0 || centerX >= img.cols()) continue;
+            if (centerY <= 0 || centerY >= img.rows()) continue; //We ignore cases, where the detected patch is half outside the image.
+
+            Panel segInfo = new Panel();
+            segInfo.labelRect = new Rectangle(labelRect.x(), labelRect.y(), labelRect.width(), labelRect.height());
+            segInfo.panelLabel = panelLabelSet;
+            //segInfo.labelInverted = inverted;
+            segInfo.labelScore = scores[k];
+
+            candidates.add(segInfo);
+        }
+        return candidates;
+    }
+
+    /**
+     * The simplest method to merge label detection results saved in hogDetectionResult to panels (where the segmentation results are saved) <p>
+     * This method simply combine all detected results
+     */
+    protected void mergeDetectedLabelsSimple()
+    {
+        figure.panels = new ArrayList<>(); //Reset
+        if (hogDetectionResult == null) return;
+
+        for (int i = 0; i < hogDetectionResult.size(); i++)
+        {
+            ArrayList<Panel> result = hogDetectionResult.get(i);
+            if (result == null) continue;
+            for (int j = 0; j < result.size(); j++)
+                figure.panels.add(result.get(j));
+        }
+    }
+
+    /**
+     * The main entrance function to perform segmentation.
+     * Call getResult* functions to retrieve result in different format.
+     */
+    public void segment(opencv_core.Mat image)
+    {
+        figure = new Figure(image); //Common initializations for all segmentation method.
+
+        HoGDetect();		//HoG Detection, detected patches are stored in hogDetectionResult
+
+        //Merge all hogDetectionResult to segmentationResult
+        mergeDetectedLabelsSimple();
     }
 
 }

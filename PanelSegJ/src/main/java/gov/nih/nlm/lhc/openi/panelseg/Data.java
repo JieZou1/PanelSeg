@@ -28,7 +28,7 @@ public abstract class Data
     protected Data(String setFolder)
     {
         this.setFolder = Paths.get(setFolder);
-        imagePaths = AlgMiscEx.CollectImageFiles(this.setFolder);
+        imagePaths = AlgMiscEx.collectImageFiles(this.setFolder);
         System.out.println("Total number of imageColor is: " + imagePaths.size());
 
         stylePath = Paths.get(setFolder, "style.txt");

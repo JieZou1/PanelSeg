@@ -31,11 +31,11 @@ public class AlgMiscEx
     }
 
     /**
-     * Collect all imageColor files from the folder, currently the imageColor file means filenames ended with ".jpg" and ".png".
+     * Collect all imageColor files from the folder, currently the imageColor file means filenames ended with ".jpg", ".bmp", and ".png".
      * @param folder
      * @return ArrayList of Paths of images.
      */
-    static ArrayList<Path> CollectImageFiles(Path folder)
+    static ArrayList<Path> collectImageFiles(Path folder)
     {
         ArrayList<Path> imagePaths = new ArrayList<Path>();
         try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder))
@@ -43,7 +43,7 @@ public class AlgMiscEx
             for (Path path : dirStrm)
             {
                 String filename = path.toString();
-                if (!filename.endsWith(".jpg") && !filename.endsWith(".png")) continue;
+                if (!filename.endsWith(".jpg") && !filename.endsWith(".png") && !filename.endsWith(".bmp")) continue;
 
                 imagePaths.add(path);
             }
@@ -61,7 +61,7 @@ public class AlgMiscEx
      * @param folder
      * @return ArrayList of Paths of images.
      */
-    static ArrayList<Path> CollectXmlFiles(Path folder)
+    static ArrayList<Path> collectXmlFiles(Path folder)
     {
         ArrayList<Path> xmlPaths = new ArrayList<Path>();
         try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder))
@@ -87,7 +87,7 @@ public class AlgMiscEx
      * @param folder
      * @return ArrayList of Paths of images.
      */
-    static ArrayList<Path> CollectSubfolders(Path folder)
+    static ArrayList<Path> collectSubfolders(Path folder)
     {
         ArrayList<Path> folderPaths = new ArrayList<Path>();
         try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder))

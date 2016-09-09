@@ -39,7 +39,7 @@ public class DataSamplePartition extends DataAll
         for (int i = 0; i < setFolders.size(); i++)
         {
             Path folder = setFolders.get(i);
-            List images = AlgMiscEx.CollectImageFiles(folder);
+            List images = AlgMiscEx.collectImageFiles(folder);
             all.addAll(images);
         }
         //Save all sample list

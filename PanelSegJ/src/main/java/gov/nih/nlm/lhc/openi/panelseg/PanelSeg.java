@@ -1,5 +1,7 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import org.bytedeco.javacpp.opencv_core;
+
 /**
  * The base class for all panel segmentation algorithms. <p>
  * This class is not intended to be instantiated, so we make it abstract.
@@ -38,4 +40,13 @@ public abstract class PanelSeg
 
         return Character.isUpperCase(labelChar) ? labelChar + "_" : Character.toString(labelChar);
     }
+
+    //Below info is collected from LabelStatistics.txt
+    static final int labelMinSize = 10;	//The minimum side length of panel labels
+    static final int labelMaxSize = 70;	//The maximum side length of panel labels
+
+    protected Figure figure;
+
+    public abstract void segment(opencv_core.Mat image);
+
 }

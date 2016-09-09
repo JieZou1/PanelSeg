@@ -10,7 +10,7 @@ import java.util.ArrayList;
 /**
  * Created by jzou on 8/30/2016.
  */
-public class ExpLabelPreview extends Exp {
+final class ExpLabelPreview extends Exp {
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
         if (args.length != 2) {

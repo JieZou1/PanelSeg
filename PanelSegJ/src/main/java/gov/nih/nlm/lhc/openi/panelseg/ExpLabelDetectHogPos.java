@@ -13,7 +13,7 @@ import java.util.ArrayList;
  *
  * Created by jzou on 9/8/2016.
  */
-public class ExpLabelDetectHogPos extends Exp {
+final class ExpLabelDetectHogPos extends Exp {
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
         if (args.length != 2) {

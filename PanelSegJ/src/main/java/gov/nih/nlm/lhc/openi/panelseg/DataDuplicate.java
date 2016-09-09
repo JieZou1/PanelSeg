@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class DataDuplicate extends DataAll
+public final class DataDuplicate extends DataAll
 {
     public static void main(String args[]) throws Exception
     {
@@ -38,7 +38,7 @@ public class DataDuplicate extends DataAll
         for (int i = 0; i < setFolders.size(); i++)
         {
             Path folder = setFolders.get(i);
-            ArrayList<Path> images = AlgMiscEx.CollectImageFiles(folder);
+            ArrayList<Path> images = AlgMiscEx.collectImageFiles(folder);
 
             for (int j = 0; j < images.size(); j++)
             {

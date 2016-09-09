@@ -6,7 +6,7 @@ import java.util.*;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class DataStatistics extends DataAll
+public final class DataStatistics extends DataAll
 {
     public static void main(String args[]) throws Exception
     {
@@ -43,9 +43,9 @@ public class DataStatistics extends DataAll
         for (Path annotation_folder : setFolders)
         {
             System.out.println("Check: " + annotation_folder);
-            ArrayList<Path> imagePaths = AlgMiscEx.CollectImageFiles(annotation_folder);
+            ArrayList<Path> imagePaths = AlgMiscEx.collectImageFiles(annotation_folder);
             System.out.println("Total number of imageColor is: " + imagePaths.size());
-            ArrayList<Path> xmlPaths = AlgMiscEx.CollectXmlFiles(annotation_folder);
+            ArrayList<Path> xmlPaths = AlgMiscEx.collectXmlFiles(annotation_folder);
             System.out.println("Total number of XML files is: " + xmlPaths.size());
 
             int figure_count = 0, single_count = 0, multi_count = 0;

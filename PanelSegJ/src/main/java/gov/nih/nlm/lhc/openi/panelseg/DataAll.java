@@ -22,7 +22,7 @@ public abstract class DataAll
     protected DataAll(String dataFolder)
     {
         this.dataFolder = Paths.get(dataFolder);
-        setFolders = AlgMiscEx.CollectSubfolders(this.dataFolder);
+        setFolders = AlgMiscEx.collectSubfolders(this.dataFolder);
     }
 
 }

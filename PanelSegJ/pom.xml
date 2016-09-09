@@ -46,5 +46,11 @@
       <version>2.4</version>
       <classifier>jdk15</classifier>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/tw.edu.ntu.csie/libsvm -->
+    <dependency>
+      <groupId>tw.edu.ntu.csie</groupId>
+      <artifactId>libsvm</artifactId>
+      <version>3.17</version>
+    </dependency>
   </dependencies>
 </project>

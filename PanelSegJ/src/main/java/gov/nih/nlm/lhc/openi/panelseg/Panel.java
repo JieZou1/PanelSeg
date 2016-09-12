@@ -26,5 +26,6 @@ public class Panel
 
     opencv_core.Mat labelPatch;  //The label patches cropped from the original image
     opencv_core.Mat labelGrayNormPatch;  //The label patches cropped from the gray image and normalized to standard size
+
 }
 

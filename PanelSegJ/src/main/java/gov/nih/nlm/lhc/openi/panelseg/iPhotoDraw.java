@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * Utility functions related to iPhotoDraw annotations
  * Created by jzou on 8/26/2016.
  */
-public class iPhotoDraw
+class iPhotoDraw
 {
     /**
      * return a child node of the parent node based on its tag

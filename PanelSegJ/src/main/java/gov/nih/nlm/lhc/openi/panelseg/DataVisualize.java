@@ -12,7 +12,7 @@ import org.bytedeco.javacpp.opencv_imgcodecs;
 /**
  * Created by jzou on 8/25/2016.
  */
-public final class DataVisualize extends Data
+final class DataVisualize extends Data
 {
     public static void main(String args[]) throws Exception
     {

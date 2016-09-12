@@ -19,7 +19,7 @@ import java.util.List;
  *
  * Created by jzou on 8/30/2016.
  */
-public class Exp {
+abstract class Exp {
     public enum LabelPreviewType {ORIGINAL, NORM64}
 
     protected Path listFile;        //The list file containing the samples to be experimented with
@@ -59,4 +59,21 @@ public class Exp {
             AlgMiscEx.createClearFolder(this.targetFolder);
     }
 
+    abstract void generate(int k); //The method for handling processing of 1 sample, mostly for implementing multi-threading processing in Fork/Join framework
+
+    /**
+     * Helper function for generating panel label patch filenames for saving to disks.
+     * The panel label patch filename is in the format of "<set>-<figure filename>-<labelRect>.png".
+     * @param figureFile
+     * @param panel
+     * @return
+     */
+    protected String getLabelPatchFilename(String figureFile, Panel panel)
+    {
+        String[] folderWords = figureFile.split("\\\\");
+        String name = folderWords[folderWords.length - 2] + "-" + folderWords[folderWords.length - 1] + "-";
+        name += panel.labelRect.toString() + ".png";
+
+        return name;
+    }
 }

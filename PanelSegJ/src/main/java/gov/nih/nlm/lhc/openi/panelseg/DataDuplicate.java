@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by jzou on 8/25/2016.
  */
-public final class DataDuplicate extends DataAll
+final class DataDuplicate extends DataAll
 {
     public static void main(String args[]) throws Exception
     {

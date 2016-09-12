@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * Created by jzou on 8/26/2016.
  */
-public final class DataSortPanel extends Data
+final class DataSortPanel extends Data
 {
     public static void main(String args[]) throws Exception
     {

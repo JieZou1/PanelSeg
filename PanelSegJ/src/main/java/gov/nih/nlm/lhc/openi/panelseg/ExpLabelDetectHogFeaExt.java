@@ -44,44 +44,46 @@ final class ExpLabelDetectHogFeaExt extends Exp
      */
     void generate()
     {
-        //Clean up all the folders
-        Path posFolder = this.targetFolder;
-        for (String name : PanelSegLabelRegHog.labelSetsHOG)
+        for (int i = 0; i < PanelSegLabelRegHog.labelSetsHOG.length; i++) generate(i);
+    }
+
+    void generate(int i)
+    {
+        String name = PanelSegLabelRegHog.labelSetsHOG[i];
+
+        Path folder = targetFolder.resolve(name);
+        Path folderPos = folder.resolve("pos");
+        Path folderNeg = folder.resolve("neg");
+        Path folderModel = folder.resolve("model");
+
+        List<Path> posPatches = AlgMiscEx.collectImageFiles(folderPos);
+        List<Path> negPatches = AlgMiscEx.collectImageFiles(folderNeg);
+
+        Path file = folderModel.resolve("train.txt");
+        double[] targets = new double[posPatches.size() + negPatches.size()];
+        float[][] features = new float[posPatches.size() + negPatches.size()][];
+
+        PanelSegLabelRegHog hog = new PanelSegLabelRegHog();
+
+        int k = 0;
+        for (Path path : posPatches)
         {
-            Path folder = posFolder.resolve(name);
-            Path folderPos = folder.resolve("pos");
-            Path folderNeg = folder.resolve("neg");
-            Path folderModel = folder.resolve("model");
-
-            List<Path> posPatches = AlgMiscEx.collectImageFiles(folderPos);
-            List<Path> negPatches = AlgMiscEx.collectImageFiles(folderNeg);
-
-            Path file = folderModel.resolve("train.txt");
-            double[] targets = new double[posPatches.size() + negPatches.size()];
-            float[][] features = new float[posPatches.size() + negPatches.size()][];
-
-            PanelSegLabelRegHog hog = new PanelSegLabelRegHog();
-
-            int k = 0;
-            for (Path path : posPatches)
-            {
-                opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
-                float[] feature = hog.featureExtraction(gray);
-                features[k] = feature;
-                targets[k] = 1.0;
-                k++;
-            }
-            for (Path path : negPatches)
-            {
-                opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
-                float[] feature = hog.featureExtraction(gray);
-                features[k] = feature;
-                targets[k] = 0.0;
-                k++;
-            }
-
-            LibSvmEx.SaveInLibSVMFormat(file.toString(), targets, features);
+            opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
+            float[] feature = hog.featureExtraction(gray);
+            features[k] = feature;
+            targets[k] = 1.0;
+            k++;
         }
+        for (Path path : negPatches)
+        {
+            opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
+            float[] feature = hog.featureExtraction(gray);
+            features[k] = feature;
+            targets[k] = 0.0;
+            k++;
+        }
+
+        LibSvmEx.SaveInLibSVMFormat(file.toString(), targets, features);
     }
 
 }

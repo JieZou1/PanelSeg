@@ -14,7 +14,7 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class DataPreview extends Data
+final class DataPreview extends Data
 {
     public static void main(String args[]) throws Exception
     {

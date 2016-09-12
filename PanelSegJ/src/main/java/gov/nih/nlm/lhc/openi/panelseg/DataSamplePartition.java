@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class DataSamplePartition extends DataAll
+final class DataSamplePartition extends DataAll
 {
     public static void main(String args[]) throws Exception
     {

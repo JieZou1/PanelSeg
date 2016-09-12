@@ -12,7 +12,7 @@ import java.util.*;
  *
  * Created by jzou on 8/26/2016.
  */
-public abstract class Data
+abstract class Data
 {
     protected Path setFolder;        //Data folder of a set
     protected ArrayList<Path> imagePaths;   //The imageColor file path of the set

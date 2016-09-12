@@ -35,116 +35,16 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Exp.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Exp.java">
+      <file leaf-file-name="ExpLabelPreview.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelPreview.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="263">
-              <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ExpLabelDetectHogBootstrap.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogBootstrap.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+            <state relative-caret-position="556">
+              <caret line="64" column="7" selection-start-line="64" selection-start-column="7" selection-end-line="64" selection-end-column="7" />
               <folding>
-                <element signature="e#1339#1340#0" expanded="true" />
-                <element signature="e#1396#1397#0" expanded="true" />
+                <element signature="e#1349#1350#0" expanded="true" />
+                <element signature="e#1406#1407#0" expanded="true" />
+                <element signature="method#generate#0;class#ExpLabelPreview#0" expanded="false" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ExpLabelDetectHogPos.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogPos.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="857">
-              <caret line="90" column="0" selection-start-line="81" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PanelSegLabelRegHog.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHog.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="245">
-              <caret line="76" column="31" selection-start-line="76" selection-start-column="31" selection-end-line="76" selection-end-column="31" />
-              <folding>
-                <element signature="method#getLabelSetName#0;class#PanelSegLabelRegHog#0" expanded="false" />
-                <element signature="method#featureExtraction#0;class#PanelSegLabelRegHog#0" expanded="false" />
-                <element signature="method#DetectMultiScale#0;class#PanelSegLabelRegHog#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Figure.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Figure.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="373">
-              <caret line="26" column="4" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="15" />
-              <folding>
-                <element signature="docComment;method#Figure#0;class#Figure#0" expanded="false" />
-                <element signature="docComment;method#Figure#1;class#Figure#0" expanded="false" />
-                <element signature="method#Figure#1;class#Figure#0" expanded="false" />
-                <element signature="docComment;method#Figure#2;class#Figure#0" expanded="false" />
-                <element signature="method#Figure#2;class#Figure#0" expanded="false" />
-                <element signature="method#Figure#3;class#Figure#0" expanded="false" />
-                <element signature="method#cropLabelPatches#0;class#Figure#0" expanded="false" />
-                <element signature="e#3964#3994#0" expanded="false" />
-                <element signature="method#cropLabelGrayNormPatches#0;class#Figure#0" expanded="false" />
-                <element signature="e#5422#5452#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PanelSegLabelReg.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelReg.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="219">
-              <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PanelSegLabelRegHoGModels" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHoGModels">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="44">
-              <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Data.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Data.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="841">
-              <caret line="78" column="13" selection-start-line="78" selection-start-column="13" selection-end-line="78" selection-end-column="13" />
-              <folding>
-                <element signature="method#drawAnnotation#1;class#Data#0" expanded="false" />
-                <element signature="method#loadStyleMap#0;class#Data#0" expanded="false" />
-                <element signature="method#saveStyleMap#0;class#Data#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DataPreview.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreview.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="813">
-              <caret line="76" column="67" selection-start-line="76" selection-start-column="67" selection-end-line="76" selection-end-column="67" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -152,11 +52,116 @@
       <file leaf-file-name="PanelSeg.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+            <state relative-caret-position="863">
+              <caret line="100" column="4" selection-start-line="100" selection-start-column="4" selection-end-line="100" selection-end-column="4" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#getLabelCharFolderName#0;class#PanelSeg#0" expanded="false" />
+                <element signature="method#segment#2;class#PanelSeg#0" expanded="false" />
+                <element signature="method#segment#3;class#PanelSeg#0" expanded="false" />
+                <element signature="method#getSegmentationResultInMat#0;class#PanelSeg#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Exp.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Exp.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="527">
+              <caret line="41" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Panel.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Panel.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="352">
+              <caret line="19" column="11" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PanelSegLabelRegHog.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHog.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="242">
+              <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
+              <folding>
+                <element signature="method#getLabelSetName#0;class#PanelSegLabelRegHog#0" expanded="false" />
+                <element signature="method#PanelSegLabelRegHog#0;class#PanelSegLabelRegHog#0" expanded="false" />
+                <element signature="method#featureExtraction#0;class#PanelSegLabelRegHog#0" expanded="false" />
+                <element signature="method#HoGDetect#0;class#PanelSegLabelRegHog#0" expanded="false" />
+                <element signature="method#DetectMultiScale#0;class#PanelSegLabelRegHog#0" expanded="false" />
+                <element signature="method#mergeDetectedLabelsSimple#0;class#PanelSegLabelRegHog#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ExpLabelDetectHogBootstrap.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogBootstrap.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="209">
+              <caret line="65" column="12" selection-start-line="65" selection-start-column="12" selection-end-line="65" selection-end-column="12" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1883#1884#0" expanded="true" />
+                <element signature="e#1954#1955#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ExpLabelDetectHogFeaExt.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogFeaExt.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="858">
+              <caret line="39" column="5" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="5" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1262#1263#0" expanded="true" />
+                <element signature="e#1319#1320#0" expanded="true" />
+                <element signature="e#1384#1385#0" expanded="true" />
+                <element signature="e#1477#1478#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ExpTask.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpTask.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="220">
+              <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ExpLabelDetectHogPos.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogPos.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="377">
+              <caret line="65" column="13" selection-start-line="65" selection-start-column="13" selection-end-line="65" selection-end-column="13" />
+              <folding>
+                <element signature="e#1748#1749#0" expanded="true" />
+                <element signature="e#1819#1820#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ExpLabelDetectionHogSvm2SingleVec.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectionHogSvm2SingleVec.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="373">
+              <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -180,14 +185,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationReOrganize.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationVisualize.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationSortLabels.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationDuplicate.java" />
-        <option value="$PROJECT_DIR$/duplicates.txt" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationiPhotoDraw.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationStatistics.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegPreview.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationPreview.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Annotation.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AnnotationLabelPreview.java" />
@@ -198,39 +195,47 @@
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgorithmSortEx.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgorithmMatEx.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgorithmOpenCVEx.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataAll.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSamplePartition.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgorithmMiscEx.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgorithmComparatorEx.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgComparatorEx.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreview.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Panel.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/iPhotoDraw.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSortPanelAll.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Figure.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelHogFeaExt.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelHogPos.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelHog.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHog.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Exp.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataDuplicate.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreviewAll.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSortPanel.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataVisualize.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgMiscEx.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LibSvmEx.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Data.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataAll.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataDuplicate.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreview.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSamplePartition.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSortPanel.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSortPanelAll.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataStatistics.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataVisualize.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Figure.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/iPhotoDraw.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/MiscCopyOriginalImage.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/MiscFigureDownload.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegEval.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelReg.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreviewAll.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgMiscEx.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgOpenCVEx.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHoGModels" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelRegHogModels.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHogModels.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Panel.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHog.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogBootstrapTask.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpTask.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogFeaExt.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogPos.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Exp.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectionHogSvm2SingleVec.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelPreview.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelReg.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataStatistics.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Data.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHog.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogPos.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogBootstrap.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHoGModels" />
       </list>
     </option>
   </component>
@@ -247,9 +252,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="156" />
-    <option name="y" value="1" />
-    <option name="width" value="2007" />
+    <option name="x" value="169" />
+    <option name="y" value="8" />
+    <option name="width" value="2212" />
     <option name="height" value="1289" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -355,7 +360,7 @@
       <recent name="gov.nih.nlm.lhc.openi" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.ExpLabelDetectHogBootstrap">
+  <component name="RunManager" selected="Application.ExpLabelDetectHogPos">
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
@@ -609,7 +614,7 @@
       </extension>
       <option name="MAIN_CLASS_NAME" value="gov.nih.nlm.lhc.openi.panelseg.ExpLabelPreview" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="\Users\jie\projects\PanelSeg\Exp\train.txt \Users\jie\projects\PanelSeg\Exp\LabelHog\Train" />
+      <option name="PROGRAM_PARAMETERS" value="\Users\jie\projects\PanelSeg\Exp\train.txt \Users\jie\projects\PanelSeg\Exp\LabelPreview\train" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -749,7 +754,7 @@
       </extension>
       <option name="MAIN_CLASS_NAME" value="gov.nih.nlm.lhc.openi.panelseg.ExpLabelDetectionHogSvm2SingleVec" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="\Users\jie\projects\PanelSeg\Exp\train.txt \Users\jie\projects\PanelSeg\Exp\LabelHog\Detection" />
+      <option name="PROGRAM_PARAMETERS" value="\Users\jie\projects\PanelSeg\Exp\LabelHog\Detection" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -769,7 +774,7 @@
       </extension>
       <option name="MAIN_CLASS_NAME" value="gov.nih.nlm.lhc.openi.panelseg.ExpLabelDetectHogBootstrap" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="\Users\jie\projects\PanelSeg\Exp\train.txt \Users\jie\projects\PanelSeg\Exp\LabelHog\Detection" />
+      <option name="PROGRAM_PARAMETERS" value="\Users\jie\projects\PanelSeg\Exp\train.txt \Users\jie\projects\PanelSeg\Exp\LabelPreview\train" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -809,23 +814,23 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="156" y="1" width="2007" height="1289" extended-state="1" />
+    <frame x="169" y="8" width="2212" height="1289" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32627118" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32627118" sideWeight="0.49704143" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32760474" sideWeight="0.5019286" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32627118" sideWeight="0.5029586" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31101695" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1727775" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13141593" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32975295" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1652436" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15619308" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32627118" sideWeight="0.49807137" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -872,54 +877,35 @@
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSamplePartition.java</url>
-          <line>35</line>
-          <properties />
-          <option name="timeStamp" value="19" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <condition expression="name.equalsIgnoreCase(&quot;1&quot;)" language="JAVA" />
-          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelPreview.java</url>
-          <line>89</line>
-          <properties />
-          <option name="timeStamp" value="33" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogPos.java</url>
-          <line>46</line>
-          <properties />
-          <option name="timeStamp" value="34" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogFeaExt.java</url>
-          <line>47</line>
-          <properties />
-          <option name="timeStamp" value="35" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectionHogSvm2SingleVec.java</url>
-          <line>21</line>
-          <properties />
-          <option name="timeStamp" value="37" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogBootstrap.java</url>
           <line>27</line>
           <properties />
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogBootstrap.java</url>
-          <line>55</line>
+          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHog.java</url>
+          <line>160</line>
           <properties />
-          <option name="timeStamp" value="40" />
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHog.java</url>
+          <line>158</line>
+          <properties />
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelPreview.java</url>
+          <line>14</line>
+          <properties />
+          <option name="timeStamp" value="46" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="41" />
+      <option name="time" value="48" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="file" language="JAVA" />
+        <watch expression="rectVector.size()" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>
@@ -928,43 +914,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Data.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="682">
-          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-          <folding>
-            <element signature="method#loadStyleMap#0;class#Data#0" expanded="false" />
-            <element signature="method#saveStyleMap#0;class#Data#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreview.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1232">
-          <caret line="67" column="49" selection-start-line="67" selection-start-column="49" selection-end-line="67" selection-end-column="49" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataStatistics.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1364">
-          <caret line="66" column="49" selection-start-line="66" selection-start-column="29" selection-end-line="66" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/MiscCopyOriginalImage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="946">
-          <caret line="45" column="4" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/App.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgComparatorEx.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -980,20 +929,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/App.java" />
-    <entry file="file://$PROJECT_DIR$/src/test/java/gov/nih/nlm/lhc/openi/panelseg/AppTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/MiscFigureDownload.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="23" column="18" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/bytedeco/javacpp-presets/opencv/3.1.0-1.2/opencv-3.1.0-1.2-sources.jar!/org/bytedeco/javacpp/opencv_highgui.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="548">
@@ -1020,16 +955,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSamplePartition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="41" column="35" selection-start-line="41" selection-start-column="35" selection-end-line="41" selection-end-column="35" />
-          <folding>
-            <element signature="method#writeList#0;class#DataSamplePartition#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgComparatorEx.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="110">
@@ -1037,35 +962,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgOpenCVEx.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-322">
-          <caret line="52" column="7" selection-start-line="52" selection-start-column="7" selection-end-line="52" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/MiscCopyOriginalImage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="19" column="9" selection-start-line="19" selection-start-column="9" selection-end-line="19" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/bytedeco/javacpp-presets/opencv/3.1.0-1.2/opencv-3.1.0-1.2-sources.jar!/org/bytedeco/javacpp/opencv_imgcodecs.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="394">
           <caret line="76" column="4" selection-start-line="76" selection-start-column="4" selection-end-line="76" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSortPanelAll.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="15" column="95" selection-start-line="15" selection-start-column="95" selection-end-line="15" selection-end-column="95" />
-          <folding>
-            <element signature="e#1108#1109#0" expanded="false" />
-            <element signature="e#1141#1142#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1085,50 +985,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataAll.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataDuplicate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreviewAll.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSortPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
-          <folding>
-            <element signature="method#sort#0;class#DataSortPanel#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegEval.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="945">
@@ -1137,71 +993,67 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgMiscEx.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataAll.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="426">
-          <caret line="48" column="13" selection-start-line="48" selection-start-column="13" selection-end-line="48" selection-end-column="13" />
+        <state relative-caret-position="220">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreview.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="16" column="6" selection-start-line="16" selection-start-column="6" selection-end-line="16" selection-end-column="6" />
           <folding>
-            <element signature="method#findMaxIndex#0;class#AlgMiscEx#0" expanded="false" />
-            <element signature="method#collectXmlFiles#0;class#AlgMiscEx#0" expanded="false" />
-            <element signature="method#collectSubfolders#0;class#AlgMiscEx#0" expanded="false" />
+            <element signature="method#generatePreview#0;class#DataPreview#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LibSvmEx.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSamplePartition.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+        <state relative-caret-position="154">
+          <caret line="9" column="5" selection-start-line="9" selection-start-column="5" selection-end-line="9" selection-end-column="5" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#SaveInLibSVMFormat#0;class#LibSvmEx#0" expanded="false" />
-            <element signature="method#getSV#0;class#LibSvmEx#0" expanded="false" />
-            <element signature="method#float2SvmNode#0;class#LibSvmEx#0" expanded="false" />
-            <element signature="method#getRho#0;class#LibSvmEx#0" expanded="false" />
-            <element signature="method#getNrClass#0;class#LibSvmEx#0" expanded="false" />
-            <element signature="method#getSvCoef#0;class#LibSvmEx#0" expanded="false" />
+            <element signature="method#partition#0;class#DataSamplePartition#0" expanded="false" />
+            <element signature="method#writeList#0;class#DataSamplePartition#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogFeaExt.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSortPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1262#1263#0" expanded="true" />
-            <element signature="e#1319#1320#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectionHogSvm2SingleVec.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
+        <state relative-caret-position="154">
           <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="method#sort#0;class#DataSortPanel#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelPreview.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataSortPanelAll.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+        <state relative-caret-position="154">
+          <caret line="7" column="6" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataStatistics.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
           <folding>
-            <element signature="method#main#0;class#ExpLabelPreview#0" expanded="false" />
-            <element signature="method#generatePreview#1;class#ExpLabelPreview#0" expanded="false" />
+            <element signature="method#generateStatistics#0;class#DataStatistics#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/iPhotoDraw.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="384">
-          <caret line="46" column="59" selection-start-line="46" selection-start-column="59" selection-end-line="46" selection-end-column="59" />
+        <state relative-caret-position="176">
+          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding>
             <element signature="method#getChildNode#0;class#iPhotoDraw#0" expanded="false" />
             <element signature="method#createDocTemplate#0;class#iPhotoDraw#0" expanded="false" />
@@ -1212,35 +1064,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataStatistics.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegEval.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="75" column="11" selection-start-line="75" selection-start-column="11" selection-end-line="75" selection-end-column="11" />
+        <state relative-caret-position="198">
+          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataVisualize.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LibSvmEx.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="970">
-          <caret line="64" column="33" selection-start-line="64" selection-start-column="33" selection-end-line="64" selection-end-column="33" />
-          <folding />
+        <state relative-caret-position="-661">
+          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+          <folding>
+            <element signature="method#SaveInLibSVMFormat#0;class#LibSvmEx#0" expanded="false" />
+            <element signature="method#getSV#0;class#LibSvmEx#0" expanded="false" />
+            <element signature="method#float2SvmNode#0;class#LibSvmEx#0" expanded="false" />
+            <element signature="method#getRho#0;class#LibSvmEx#0" expanded="false" />
+            <element signature="method#getNrClass#0;class#LibSvmEx#0" expanded="false" />
+            <element signature="method#getSvCoef#0;class#LibSvmEx#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreview.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/MiscCopyOriginalImage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="813">
-          <caret line="76" column="67" selection-start-line="76" selection-start-column="67" selection-end-line="76" selection-end-column="67" />
+        <state relative-caret-position="22">
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding>
+            <element signature="method#MiscCopyOriginalImage#0;class#MiscCopyOriginalImage#0" expanded="false" />
+            <element signature="method#map#0;class#MiscCopyOriginalImage#0" expanded="false" />
+            <element signature="method#copy#0;class#MiscCopyOriginalImage#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataPreviewAll.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="9" column="16" selection-start-line="9" selection-start-column="16" selection-end-line="9" selection-end-column="16" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Data.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="841">
-          <caret line="78" column="13" selection-start-line="78" selection-start-column="13" selection-end-line="78" selection-end-column="13" />
+        <state relative-caret-position="220">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
+            <element signature="method#drawAnnotation#0;class#Data#0" expanded="false" />
             <element signature="method#drawAnnotation#1;class#Data#0" expanded="false" />
             <element signature="method#loadStyleMap#0;class#Data#0" expanded="false" />
             <element signature="method#saveStyleMap#0;class#Data#0" expanded="false" />
@@ -1248,97 +1120,240 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogPos.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataDuplicate.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="857">
-          <caret line="90" column="0" selection-start-line="81" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
+        <state relative-caret-position="154">
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Panel.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgMiscEx.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="27" column="20" selection-start-line="27" selection-start-column="20" selection-end-line="27" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Exp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+        <state relative-caret-position="242">
+          <caret line="17" column="6" selection-start-line="17" selection-start-column="6" selection-end-line="17" selection-end-column="6" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#getLabelCharFolderName#0;class#PanelSeg#0" expanded="false" />
+            <element signature="method#findMaxIndex#0;class#AlgMiscEx#0" expanded="false" />
+            <element signature="docComment;method#collectImageFiles#0;class#AlgMiscEx#0" expanded="false" />
+            <element signature="method#collectImageFiles#0;class#AlgMiscEx#0" expanded="false" />
+            <element signature="method#collectXmlFiles#0;class#AlgMiscEx#0" expanded="false" />
+            <element signature="method#collectSubfolders#0;class#AlgMiscEx#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogBootstrap.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/AlgOpenCVEx.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
-          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding>
-            <element signature="e#1339#1340#0" expanded="true" />
-            <element signature="e#1396#1397#0" expanded="true" />
-          </folding>
+          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelReg.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/gov/nih/nlm/lhc/openi/panelseg/AppTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="198">
+          <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Figure.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/MiscFigureDownload.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="373">
-          <caret line="26" column="4" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="15" />
-          <folding>
-            <element signature="docComment;method#Figure#0;class#Figure#0" expanded="false" />
-            <element signature="docComment;method#Figure#1;class#Figure#0" expanded="false" />
-            <element signature="method#Figure#1;class#Figure#0" expanded="false" />
-            <element signature="docComment;method#Figure#2;class#Figure#0" expanded="false" />
-            <element signature="method#Figure#2;class#Figure#0" expanded="false" />
-            <element signature="method#Figure#3;class#Figure#0" expanded="false" />
-            <element signature="method#cropLabelPatches#0;class#Figure#0" expanded="false" />
-            <element signature="e#3964#3994#0" expanded="false" />
-            <element signature="method#cropLabelGrayNormPatches#0;class#Figure#0" expanded="false" />
-            <element signature="e#5422#5452#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="220">
+          <caret line="28" column="19" selection-start-line="28" selection-start-column="19" selection-end-line="28" selection-end-column="19" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHoGModels">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="44">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <caret line="2" column="92" selection-start-line="2" selection-start-column="30" selection-end-line="2" selection-end-column="92" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHogModels.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="5" column="14" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/bytedeco/javacpp/1.2/javacpp-1.2.jar!/org/bytedeco/javacpp/Loader.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="266" column="0" selection-start-line="266" selection-start-column="0" selection-end-line="266" selection-end-column="0" />
+          <folding>
+            <element signature="e#9145#9146#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/bytedeco/javacpp-presets/opencv/3.1.0-1.2/opencv-3.1.0-1.2-sources.jar!/org/bytedeco/javacpp/opencv_objdetect.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="762" column="0" selection-start-line="762" selection-start-column="0" selection-end-line="762" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/bytedeco/javacpp-presets/opencv/3.1.0-1.2/opencv-3.1.0-1.2-sources.jar!/org/bytedeco/javacpp/opencv_core.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14616" column="0" selection-start-line="14616" selection-start-column="0" selection-end-line="14616" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Figure.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="50" column="0" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+          <folding>
+            <element signature="docComment;method#Figure#0;class#Figure#0" expanded="false" />
+            <element signature="e#1646#1647#0" expanded="true" />
+            <element signature="docComment;method#Figure#1;class#Figure#0" expanded="false" />
+            <element signature="method#Figure#1;class#Figure#0" expanded="false" />
+            <element signature="docComment;method#Figure#2;class#Figure#0" expanded="false" />
+            <element signature="method#Figure#2;class#Figure#0" expanded="false" />
+            <element signature="method#Figure#3;class#Figure#0" expanded="false" />
+            <element signature="method#cropLabelPatches#0;class#Figure#0" expanded="false" />
+            <element signature="e#3957#3987#0" expanded="false" />
+            <element signature="method#cropLabelGrayNormPatches#0;class#Figure#0" expanded="false" />
+            <element signature="e#5415#5445#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelReg.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="496">
+          <caret line="42" column="17" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataVisualize.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="385">
+          <caret line="104" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="863">
+          <caret line="100" column="4" selection-start-line="100" selection-start-column="4" selection-end-line="100" selection-end-column="4" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#getLabelCharFolderName#0;class#PanelSeg#0" expanded="false" />
+            <element signature="method#segment#2;class#PanelSeg#0" expanded="false" />
+            <element signature="method#segment#3;class#PanelSeg#0" expanded="false" />
+            <element signature="method#getSegmentationResultInMat#0;class#PanelSeg#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Panel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="352">
+          <caret line="19" column="11" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHog.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="76" column="31" selection-start-line="76" selection-start-column="31" selection-end-line="76" selection-end-column="31" />
+        <state relative-caret-position="242">
+          <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
           <folding>
             <element signature="method#getLabelSetName#0;class#PanelSegLabelRegHog#0" expanded="false" />
+            <element signature="method#PanelSegLabelRegHog#0;class#PanelSegLabelRegHog#0" expanded="false" />
             <element signature="method#featureExtraction#0;class#PanelSegLabelRegHog#0" expanded="false" />
+            <element signature="method#HoGDetect#0;class#PanelSegLabelRegHog#0" expanded="false" />
             <element signature="method#DetectMultiScale#0;class#PanelSegLabelRegHog#0" expanded="false" />
+            <element signature="method#mergeDetectedLabelsSimple#0;class#PanelSegLabelRegHog#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Exp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="41" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogFeaExt.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="858">
+          <caret line="39" column="5" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1262#1263#0" expanded="true" />
+            <element signature="e#1319#1320#0" expanded="true" />
+            <element signature="e#1384#1385#0" expanded="true" />
+            <element signature="e#1477#1478#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectionHogSvm2SingleVec.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelPreview.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="556">
+          <caret line="64" column="7" selection-start-line="64" selection-start-column="7" selection-end-line="64" selection-end-column="7" />
+          <folding>
+            <element signature="e#1349#1350#0" expanded="true" />
+            <element signature="e#1406#1407#0" expanded="true" />
+            <element signature="method#generate#0;class#ExpLabelPreview#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogPos.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="377">
+          <caret line="65" column="13" selection-start-line="65" selection-start-column="13" selection-end-line="65" selection-end-column="13" />
+          <folding>
+            <element signature="e#1748#1749#0" expanded="true" />
+            <element signature="e#1819#1820#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelDetectHogBootstrap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="65" column="12" selection-start-line="65" selection-start-column="12" selection-end-line="65" selection-end-column="12" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1883#1884#0" expanded="true" />
+            <element signature="e#1954#1955#0" expanded="true" />
           </folding>
         </state>
       </provider>

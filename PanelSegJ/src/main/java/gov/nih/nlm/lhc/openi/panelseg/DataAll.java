@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *
  * Created by jzou on 8/26/2016.
  */
-public abstract class DataAll
+abstract class DataAll
 {
     protected Path dataFolder;
     protected ArrayList<Path> setFolders;

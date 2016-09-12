@@ -5,7 +5,7 @@ import java.nio.file.Path;
 /**
  * Created by jzou on 9/2/2016.
  */
-public class DataSortPanelAll extends DataAll
+final class DataSortPanelAll extends DataAll
 {
     public static void main(String args[]) throws Exception
     {

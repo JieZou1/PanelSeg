@@ -26,26 +26,23 @@ final class ExpLabelDetectHogBootstrap extends Exp
         }
 
         ExpLabelDetectHogBootstrap generator = new ExpLabelDetectHogBootstrap(args[0], args[1]);
-        generator.generate();
+        //generator.generateSingle();
+        generator.generateMulti(10);
         System.out.println("Completed!");
     }
 
+    private PanelSegLabelRegHog hog;
+
     /**
      * Ctor, set targetFolder and then collect all imagePaths
-     * It also clean the targetFolder
+     * It also clean the targetFolder, and initialize the hog of PanelSegLabelRegHog type
      *
      * @param trainListFile
      * @param targetFolder
      */
     ExpLabelDetectHogBootstrap(String trainListFile, String targetFolder) {
         super(trainListFile, targetFolder, false);
-    }
 
-    /**
-     * Entry function
-     */
-    void generate()
-    {
         for (String name : PanelSegLabelRegHog.labelSetsHOG)
         {
             Path folder = this.targetFolder.resolve(name);
@@ -53,43 +50,52 @@ final class ExpLabelDetectHogBootstrap extends Exp
             AlgMiscEx.createClearFolder(folder);
         }
 
-        PanelSegLabelRegHog hog = new PanelSegLabelRegHog();
+        hog = new PanelSegLabelRegHog();
+    }
 
-        for (int k = 0; k < imagePaths.size(); k++) {
-            Path imagePath = imagePaths.get(k);
-            String imageFile = imagePath.toString();
+    /**
+     * Entry function
+     */
+    void generateSingle()
+    {
+        for (int k = 0; k < imagePaths.size(); k++) generate(k);
+    }
 
-            hog.segment(imageFile);
+    void generateMulti(int seqThreshold)
+    {
+        ExpTask task = new ExpTask(this, 0, imagePaths.size(), seqThreshold);
+        task.invoke();
+    }
 
-            //Save detected patches
-            for (int i = 0; i < hog.hogDetectionResult.size(); i++)
+    void generate(int k)
+    {
+        Path imagePath = imagePaths.get(k);
+        String imageFile = imagePath.toString();
+        System.out.println(Integer.toString(k+1) +  ": processing " + imageFile);
+
+        hog.segment(imageFile);
+
+        //Save detected patches
+        for (int i = 0; i < hog.hogDetectionResult.size(); i++)
+        {
+            ArrayList<Panel> segmentationResult = hog.hogDetectionResult.get(i);
+            if (segmentationResult == null) continue;
+
+            for (int j = 0; j < segmentationResult.size(); j++)
             {
-                ArrayList<Panel> segmentationResult = hog.hogDetectionResult.get(i);
-                if (segmentationResult == null) continue;
+                if (j == 3) break; //We just save the top 3 patches for training, in order to avoiding collecting a very large training set at the beginning.
 
-                for (int j = 0; j < segmentationResult.size(); j++)
-                {
-                    if (j == 3) break; //We just save the top 3 patches for training, in order to avoiding collecting a very large training set at the beginning.
+                Panel panel = segmentationResult.get(j);
+                Rectangle rectangle = panel.labelRect;
 
-                    Panel panel = segmentationResult.get(j);
-                    Rectangle rectangle = panel.labelRect;
+                opencv_core.Mat patch = AlgOpenCVEx.cropImage(hog.figure.imageGray, rectangle);
+                panel.labelGrayNormPatch = new opencv_core.Mat();
+                resize(patch, panel.labelGrayNormPatch, new opencv_core.Size(64, 64)); //Resize to 64x64 for easy browsing the results
 
-                    opencv_core.Mat patch = AlgOpenCVEx.cropImage(hog.figure.imageGray, rectangle);
-                    resize(patch, panel.labelGrayNormPatch, new opencv_core.Size(64, 64)); //Resize to 64x64 for easy browsing the results
-
-                    Path folder = targetFolder.resolve(panel.panelLabel).resolve("detected");
-
-                    String[] folderWords = imageFile.split("\\\\");
-                    String name = folderWords[folderWords.length - 2] + "-" + folderWords[folderWords.length - 1] + "-";
-                    name += panel.labelRect.toString() + ".png";
-
-                    Path file = folder.resolve(name);
-
-                    opencv_imgcodecs.imwrite(file.toString(), panel.labelGrayNormPatch);
-                }
+                Path folder = targetFolder.resolve(panel.panelLabel).resolve("detected");
+                Path file = folder.resolve(getLabelPatchFilename(imageFile, panel));
+                opencv_imgcodecs.imwrite(file.toString(), panel.labelGrayNormPatch);
             }
-
         }
-
     }
 }

@@ -6,7 +6,6 @@ import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_objdetect.HOGDescriptor;
 
 import java.awt.*;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import static org.bytedeco.javacpp.opencv_imgproc.resize;
@@ -16,7 +15,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
  *
  * Created by jzou on 8/31/2016.
  */
-public class PanelSegLabelRegHog extends PanelSegLabelReg
+class PanelSegLabelRegHog extends PanelSegLabelReg
 {
     static final String[] labelSetsHOG = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"};
 //    static final String[] labelSetsHOG = {
@@ -37,29 +36,6 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
         return null;
     }
 
-
-    //The HoG parameters used in both training and testing
-    static protected opencv_core.Size winSize_64 = new opencv_core.Size(64, 64);
-    //static private Size winSize_32 = new Size(32, 32); //The size of the training label patches
-    static private opencv_core.Size blockSize = new opencv_core.Size(16, 16);
-    static private opencv_core.Size blockStride = new opencv_core.Size(8, 8);
-    static private opencv_core.Size cellSize = new opencv_core.Size(8, 8);
-    static private int nbins = 9;
-//  static private int derivAperture = 1;
-//  static private double winSigma = -1;
-//  static private double L2HysThreshold = 0.2;
-//  static private boolean gammaCorrection = true;
-//  static private int nLevels = 64;
-
-    //The HoG parameters used in testing only.
-    static private double hitThreshold = 0;			//Threshold for the distance between features and SVM classifying plane.
-    static private opencv_core.Size winStride = new opencv_core.Size(8, 8); //Sliding window step, It must be a multiple of block stride
-    static private opencv_core.Size padding = new opencv_core.Size(0, 0);	//Adds a certain amount of extra pixels on each side of the input image
-    //static private Size padding = new Size(32, 32);	//Adds a certain amount of extra pixels on each side of the input image
-    static private double scale0 = 1.05;			//Coefficient of the detection window increase
-    static private int groupThreshold = 2;
-    static private boolean useMeanShiftGrouping = false;
-
     private HOGDescriptor hog;
     private float[][] svmModels;
 
@@ -74,7 +50,7 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
         for (int i = 0; i < n; i++)
         {
             if (labelSetsHOG[i].equals("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"))
-                svmModels[i] = PanelSegLabelRegHoGModels.svmModel;
+                svmModels[i] = PanelSegLabelRegHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel;
 
 //            String classString = "gov.nih.nlm.lhc.openi.panelseg.PanelSegLabelRegHogModel_" + labelSetsHOG[i];
 //            try {
@@ -86,6 +62,18 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
 //                e.printStackTrace();
 //            }
         }
+
+        opencv_core.Size winSize_64 = new opencv_core.Size(64, 64);
+        //static private Size winSize_32 = new Size(32, 32); //The size of the training label patches
+        opencv_core.Size blockSize = new opencv_core.Size(16, 16);
+        opencv_core.Size blockStride = new opencv_core.Size(8, 8);
+        opencv_core.Size cellSize = new opencv_core.Size(8, 8);
+        int nbins = 9;
+//      int derivAperture = 1;
+//      double winSigma = -1;
+//      double L2HysThreshold = 0.2;
+//      boolean gammaCorrection = true;
+//      int nLevels = 64;
 
         hog = new HOGDescriptor(winSize_64, blockSize, blockStride, cellSize, nbins);
         //hog = new HOGDescriptor(winSize_32, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma, _histogramNormType, _L2HysThreshold, gammaCorrection, nlevels, _signedGradient)
@@ -121,12 +109,11 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
 
         for (int i = 0; i < n; i++)
         {
+            hog.setSVMDetector(new opencv_core.Mat(new FloatPointer(svmModels[i])));
+
             String panelLabelSet = labelSetsHOG[i];
-            float[] svmModel = svmModels[i];
             double minSize = labelMinSize * scale;
             double maxSize = labelMaxSize * scale;
-
-            hog.setSVMDetector(new opencv_core.Mat(new FloatPointer(svmModel)));
 
             //Search on scaled image
             ArrayList<Panel> candidates1 = DetectMultiScale(imgScaled, maxSize, minSize, panelLabelSet, false);
@@ -158,6 +145,14 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
     private ArrayList<Panel> DetectMultiScale(opencv_core.Mat img, double maxSize, double minSize, String panelLabelSet, Boolean inverted)
     {
         ArrayList<Panel> candidates = new ArrayList<>();
+
+        double hitThreshold = 0;			//Threshold for the distance between features and SVM classifying plane.
+        opencv_core.Size winStride = new opencv_core.Size(8, 8); //Sliding window step, It must be a multiple of block stride
+        opencv_core.Size padding = new opencv_core.Size(0, 0);	//Adds a certain amount of extra pixels on each side of the input image
+        //Size padding = new Size(32, 32);	//Adds a certain amount of extra pixels on each side of the input image
+        double scale0 = 1.05;			//Coefficient of the detection window increase
+        int groupThreshold = 2;
+        boolean useMeanShiftGrouping = false;
 
         opencv_core.RectVector rectVector = new opencv_core.RectVector();			DoublePointer dp = new DoublePointer();
         //hog.detectMultiScale(img, rectVector, dp);
@@ -210,7 +205,7 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
      * The main entrance function to perform segmentation.
      * Call getResult* functions to retrieve result in different format.
      */
-    public void segment(opencv_core.Mat image)
+    void segment(opencv_core.Mat image)
     {
         figure = new Figure(image); //Common initializations for all segmentation method.
 
@@ -220,4 +215,6 @@ public class PanelSegLabelRegHog extends PanelSegLabelReg
         mergeDetectedLabelsSimple();
     }
 
+
 }
+

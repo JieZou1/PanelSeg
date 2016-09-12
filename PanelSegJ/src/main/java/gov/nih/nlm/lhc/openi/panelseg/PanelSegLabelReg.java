@@ -9,7 +9,7 @@ import java.util.ArrayList;
  *
  * Created by jzou on 8/25/2016.
  */
-public abstract class PanelSegLabelReg extends PanelSeg
+abstract class PanelSegLabelReg extends PanelSeg
 {
     /**
      * Sort candidates and remove largely overlapped candidates. <p>

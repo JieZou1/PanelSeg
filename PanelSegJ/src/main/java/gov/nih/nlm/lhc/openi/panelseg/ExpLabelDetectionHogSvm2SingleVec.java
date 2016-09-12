@@ -3,36 +3,38 @@ package gov.nih.nlm.lhc.openi.panelseg;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Convert Linear SVM model to Single Vector for HOG+SVM label detection
  *
  * Created by jzou on 9/9/2016.
  */
-class ExpLabelDetectionHogSvm2SingleVec extends Exp
+final class ExpLabelDetectionHogSvm2SingleVec
 {
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
-        if (args.length != 2) {
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectionHogSvm2SingleVec <Sample List File> <target folder>");
+        if (args.length != 1) {
+            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectionHogSvm2SingleVec <target folder>");
             System.out.println("	This is a utility program to Convert Linear SVM model to Single Vector for HOG+SVM label detection.");
             System.exit(0);
         }
 
-        ExpLabelDetectionHogSvm2SingleVec generator = new ExpLabelDetectionHogSvm2SingleVec(args[0], args[1]);
+        ExpLabelDetectionHogSvm2SingleVec generator = new ExpLabelDetectionHogSvm2SingleVec(args[0]);
         generator.generate();
         System.out.println("Completed!");
     }
+
+    private Path targetFolder;    //The folder for saving the result
 
     /**
      * Ctor, set targetFolder and then collect all imagePaths
      * It also clean the targetFolder
      *
-     * @param trainListFile
      * @param targetFolder
      */
-    ExpLabelDetectionHogSvm2SingleVec(String trainListFile, String targetFolder) {
-        super(trainListFile, targetFolder, false);
+    ExpLabelDetectionHogSvm2SingleVec(String targetFolder) {
+        this.targetFolder = Paths.get(targetFolder);
     }
 
     /**

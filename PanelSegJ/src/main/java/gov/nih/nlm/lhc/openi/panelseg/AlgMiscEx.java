@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class AlgMiscEx
+final class AlgMiscEx
 {
     static int findMaxIndex(double[] array)
     {

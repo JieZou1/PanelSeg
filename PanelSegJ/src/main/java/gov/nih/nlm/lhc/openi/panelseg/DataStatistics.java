@@ -6,7 +6,7 @@ import java.util.*;
 /**
  * Created by jzou on 8/25/2016.
  */
-public final class DataStatistics extends DataAll
+final class DataStatistics extends DataAll
 {
     public static void main(String args[]) throws Exception
     {

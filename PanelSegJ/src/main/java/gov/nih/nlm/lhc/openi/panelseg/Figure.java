@@ -17,7 +17,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.*;
  *
  * Created by jzou on 8/25/2016.
  */
-public class Figure
+class Figure
 {
     Mat imageColor;		//The original figure image, has to be BGR image
     Mat imageGray;	//The gray image converted from original BGR image

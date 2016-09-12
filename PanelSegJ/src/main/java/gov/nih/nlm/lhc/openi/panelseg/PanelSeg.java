@@ -19,6 +19,26 @@ import static org.bytedeco.javacpp.opencv_imgproc.rectangle;
  */
 public abstract class PanelSeg
 {
+    public enum SegMethed {LabelRegHog}
+
+    /**
+     * Entry function for all Panel Segmentation methods.
+     * The consuming clients just need to know this function.
+     * @param image
+     * @param method
+     * @return
+     */
+    public static java.util.List<Panel> segment(opencv_core.Mat image, SegMethed method)
+    {
+        PanelSeg seg = null;
+        switch (method)
+        {
+            case LabelRegHog: seg = new PanelSegLabelRegHog(); break;
+        }
+        seg.segment(image);
+        return seg.getSegmentationResult();
+    }
+
     //All possible panel label chars, 'c', 'k', 'o', 'p', 's', 'u', 'v' 'w', 'x', 'y', 'z' no difference between upper and lower cases.
     static final char[] labelChars = {
             'a', 'A', 'b', 'B', 'c', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H',
@@ -51,19 +71,19 @@ public abstract class PanelSeg
     }
 
     //Below info is collected from LabelStatistics.txt
-    static final int labelMinSize = 8;	//The minimum side length of panel labels
+    static final int labelMinSize = 12;	//The minimum side length of panel labels
     static final int labelMaxSize = 80;	//The maximum side length of panel labels
 
     protected Figure figure;
 
-    public abstract void segment(opencv_core.Mat image);
+    abstract void segment(opencv_core.Mat image);
 
     /**
      * The entrance function to perform panel segmentation. <p>
      * It simply loads the image from the file, and then calls segment(Mat image) function.
      * Call getSegmentationResult* functions to retrieve result in different format.
      */
-    public void segment(String image_file_path)
+    void segment(String image_file_path)
     {
         opencv_core.Mat image = imread(image_file_path, CV_LOAD_IMAGE_COLOR);
         segment(image);
@@ -78,7 +98,7 @@ public abstract class PanelSeg
      * It is recommended to avoid using this function if opencv_core.Mat type can be used.
      *
      */
-    public void segment(BufferedImage buffered_image) throws Exception
+    void segment(BufferedImage buffered_image) throws Exception
     {
         opencv_core.Mat image = AlgOpenCVEx.bufferdImg2Mat(buffered_image);
         segment(image);

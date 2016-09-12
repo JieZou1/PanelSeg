@@ -17,7 +17,7 @@ import net.sf.json.JSONSerializer;
 /**
  * Created by jzou on 8/25/2016.
  */
-public class MiscFigureDownload
+class MiscFigureDownload
 {
     /**
      * @description Module to download the images for a given search query.

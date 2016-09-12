@@ -14,6 +14,6 @@ import org.apache.commons.lang3.*;
  *
  * Created by jzou on 8/25/2016.
  */
-public class PanelSegEval
+class PanelSegEval
 {
 }

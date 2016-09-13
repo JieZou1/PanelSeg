@@ -35,7 +35,7 @@ final class ExpLabelDetectHogPos extends Exp {
      * @param trainListFile
      * @param targetFolder
      */
-    ExpLabelDetectHogPos(String trainListFile, String targetFolder) {
+    private ExpLabelDetectHogPos(String trainListFile, String targetFolder) {
         super(trainListFile, targetFolder, false);
 
         //Clean up all the folders
@@ -55,9 +55,9 @@ final class ExpLabelDetectHogPos extends Exp {
         for (int i = 0; i < imagePaths.size(); i++) generate(i);
     }
 
-    void generateMulti(int seqThreshold)
+    private void generateMulti(int seqThreshold)
     {
-        ExpTask task = new ExpTask(this, 0, imagePaths.size(), seqThreshold);
+        ExpTask task = new ExpTask(this, 0, imagePaths.size());
         task.invoke();
     }
 
@@ -65,7 +65,7 @@ final class ExpLabelDetectHogPos extends Exp {
     {
         Path imagePath = imagePaths.get(i);
         String imageFile = imagePath.toString();
-        //System.out.println(Integer.toString(i+1) +  ": processing " + imageFile);
+        //System.out.println(Integer.toString(i) +  ": processing " + imageFile);
 
         //Load annotation
         String xmlFile = FilenameUtils.removeExtension(imageFile) + "_data.xml";

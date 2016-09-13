@@ -12,18 +12,14 @@ class ExpTask extends RecursiveAction
 {
     private static final long serialVersionUID = 1L;
 
-    int seqThreshold;
+    private Exp exp;
+    private int start, end;
+    private int cores;
 
-    Exp exp;	int start, end;
-
-    ExpTask(Exp exp, int start, int end, int seqThreshold)
+    ExpTask(Exp exp, int start, int end)
     {
-        this.exp = exp;		this.start = start;		this.end = end; this.seqThreshold = seqThreshold;
-    }
-
-    ExpTask(Exp segTrain, int start, int end)
-    {
-        this.exp = segTrain;		this.start = start;		this.end = end;
+        this.exp = exp;		this.start = start;		this.end = end;
+        cores = Runtime.getRuntime().availableProcessors() - 2; //# of cores to use. We left one core for other apps.
     }
 
     @Override
@@ -43,11 +39,10 @@ class ExpTask extends RecursiveAction
         }
         else
         {
-            int n = 15; //# of cores to use.
-            int k = (exp.imagePaths.size() % n > 0) ? n+1: n; //# of threads to create
+            int k = (exp.imagePaths.size() % cores > 0) ? cores + 1: cores; //# of threads to create
             ExpTask[] tasks = new ExpTask[k]; int starts[] = new int[k], ends[] = new int[k];
 
-            int stride = exp.imagePaths.size() / n;
+            int stride = exp.imagePaths.size() / cores;
             for (int i = 0; i < k; i++)
             {
                 starts[i] = i * stride;

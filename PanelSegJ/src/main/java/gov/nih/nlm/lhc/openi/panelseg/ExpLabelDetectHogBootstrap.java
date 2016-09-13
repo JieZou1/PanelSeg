@@ -38,7 +38,7 @@ final class ExpLabelDetectHogBootstrap extends Exp
      * @param trainListFile
      * @param targetFolder
      */
-    ExpLabelDetectHogBootstrap(String trainListFile, String targetFolder) {
+    private ExpLabelDetectHogBootstrap(String trainListFile, String targetFolder) {
         super(trainListFile, targetFolder, false);
 
         for (String name : PanelSegLabelRegHog.labelSetsHOG)
@@ -57,21 +57,10 @@ final class ExpLabelDetectHogBootstrap extends Exp
         for (int k = 0; k < imagePaths.size(); k++) generate(k);
     }
 
-    void generateMulti()
+    private void generateMulti()
     {
-        int n = 15; //# of cores to use.
-        int k = (imagePaths.size() % n > 0) ? n+1: n; //# of threads to create
-        ExpTask[] tasks = new ExpTask[k]; int starts[] = new int[k], ends[] = new int[k];
-
-        int stride = imagePaths.size() / n;
-        for (int i = 0; i < k; i++)
-        {
-            starts[i] = i * stride;
-            ends[i] = (i + 1) * stride; if (ends[i] > imagePaths.size()) ends[i] = imagePaths.size();
-
-            tasks[i] = new ExpTask(this, starts[i], ends[i]);
-            tasks[i].invoke();
-        }
+        ExpTask task = new ExpTask(this, 0, imagePaths.size());
+        task.invoke();
     }
 
     void generate(int k)
@@ -80,7 +69,7 @@ final class ExpLabelDetectHogBootstrap extends Exp
 
         Path imagePath = imagePaths.get(k);
         String imageFile = imagePath.toString();
-        System.out.println(Integer.toString(k+1) +  ": processing " + imageFile);
+        System.out.println(Integer.toString(k) +  ": processing " + imageFile);
 
         hog.segment(imageFile);
 

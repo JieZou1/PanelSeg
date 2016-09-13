@@ -63,7 +63,7 @@ final class ExpLabelDetectionHogSvm2SingleVec
                 pw.println("final class " + classname);
                 pw.println("{");
 
-                pw.println("	public static float[] svmModel = ");
+                pw.println("	static float[] svmModel = ");
 
                 pw.println("    	{");
                 for (int k = 0; k < singleVector.length; k++)

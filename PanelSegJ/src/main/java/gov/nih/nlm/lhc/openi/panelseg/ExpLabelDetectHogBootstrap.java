@@ -27,11 +27,9 @@ final class ExpLabelDetectHogBootstrap extends Exp
 
         ExpLabelDetectHogBootstrap generator = new ExpLabelDetectHogBootstrap(args[0], args[1]);
         //generator.generateSingle();
-        generator.generateMulti(10);
+        generator.generateMulti();
         System.out.println("Completed!");
     }
-
-    private PanelSegLabelRegHog hog;
 
     /**
      * Ctor, set targetFolder and then collect all imagePaths
@@ -49,8 +47,6 @@ final class ExpLabelDetectHogBootstrap extends Exp
             folder = folder.resolve("detected");
             AlgMiscEx.createClearFolder(folder);
         }
-
-        hog = new PanelSegLabelRegHog();
     }
 
     /**
@@ -61,14 +57,27 @@ final class ExpLabelDetectHogBootstrap extends Exp
         for (int k = 0; k < imagePaths.size(); k++) generate(k);
     }
 
-    void generateMulti(int seqThreshold)
+    void generateMulti()
     {
-        ExpTask task = new ExpTask(this, 0, imagePaths.size(), seqThreshold);
-        task.invoke();
+        int n = 15; //# of cores to use.
+        int k = (imagePaths.size() % n > 0) ? n+1: n; //# of threads to create
+        ExpTask[] tasks = new ExpTask[k]; int starts[] = new int[k], ends[] = new int[k];
+
+        int stride = imagePaths.size() / n;
+        for (int i = 0; i < k; i++)
+        {
+            starts[i] = i * stride;
+            ends[i] = (i + 1) * stride; if (ends[i] > imagePaths.size()) ends[i] = imagePaths.size();
+
+            tasks[i] = new ExpTask(this, starts[i], ends[i]);
+            tasks[i].invoke();
+        }
     }
 
     void generate(int k)
     {
+        PanelSegLabelRegHog hog = new PanelSegLabelRegHog();
+
         Path imagePath = imagePaths.get(k);
         String imageFile = imagePath.toString();
         System.out.println(Integer.toString(k+1) +  ": processing " + imageFile);

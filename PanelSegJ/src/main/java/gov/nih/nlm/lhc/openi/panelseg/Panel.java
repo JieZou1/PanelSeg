@@ -3,7 +3,6 @@ package gov.nih.nlm.lhc.openi.panelseg;
 import org.bytedeco.javacpp.opencv_core;
 
 import java.awt.Rectangle;
-import java.util.Comparator;
 
 /**
  * A simple class for holding panel segmentation result. We want to make this simple.

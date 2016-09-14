@@ -7,6 +7,7 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+import static java.util.concurrent.ForkJoinTask.invokeAll;
 import static org.bytedeco.javacpp.opencv_imgproc.resize;
 
 /**
@@ -33,7 +34,7 @@ final class ExpLabelDetectHogBootstrap extends Exp
 
     /**
      * Ctor, set targetFolder and then collect all imagePaths
-     * It also clean the targetFolder, and initialize the hog of PanelSegLabelRegHog type
+     * It also clean the targetFolder
      *
      * @param trainListFile
      * @param targetFolder
@@ -59,18 +60,17 @@ final class ExpLabelDetectHogBootstrap extends Exp
 
     private void generateMulti()
     {
-        ExpTask task = new ExpTask(this, 0, imagePaths.size());
-        task.invoke();
+        ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 5);
+        invokeAll(tasks);
     }
 
     void generate(int k)
     {
-        PanelSegLabelRegHog hog = new PanelSegLabelRegHog();
-
         Path imagePath = imagePaths.get(k);
         String imageFile = imagePath.toString();
         System.out.println(Integer.toString(k) +  ": processing " + imageFile);
 
+        PanelSegLabelRegHog hog = new PanelSegLabelRegHog();
         hog.segment(imageFile);
 
         //Save detected patches

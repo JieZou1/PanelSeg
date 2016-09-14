@@ -76,7 +76,7 @@ class MiscCopyOriginalImage
 
         //load src list
         System.out.println("Loading " + src_list_file);
-        srcList = new ArrayList<String>();
+        srcList = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(src_list_file)))
         {
             String line;

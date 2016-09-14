@@ -10,6 +10,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility functions related to iPhotoDraw annotations
@@ -31,7 +32,7 @@ class iPhotoDraw
         {
             Node child = children.item(j);
             nodeName = child.getNodeName();
-            if (tag != nodeName) continue;
+            if (!tag.equals(nodeName)) continue;
 
             return child;
         }
@@ -44,7 +45,7 @@ class iPhotoDraw
      * @return
      * @throws Exception
      */
-    static ArrayList<gov.nih.nlm.lhc.openi.panelseg.Panel> loadPanelSeg(File xml_file) throws Exception
+    static ArrayList<Panel> loadPanelSeg(File xml_file) throws Exception
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -416,7 +417,7 @@ class iPhotoDraw
      * @param panels    panels
      * @throws Exception
      */
-    static void savePanelSeg(File xml_file, ArrayList<Panel> panels) throws Exception
+    static void savePanelSeg(File xml_file, List<Panel> panels) throws Exception
     {
         //Create document template
         Document doc = createDocTemplate();

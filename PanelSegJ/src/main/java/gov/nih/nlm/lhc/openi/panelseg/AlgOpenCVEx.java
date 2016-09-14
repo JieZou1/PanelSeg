@@ -122,8 +122,7 @@ final class AlgOpenCVEx
      */
     static opencv_core.Rect Rectangle2Rect(Rectangle rectangle)
     {
-        opencv_core.Rect rect = new opencv_core.Rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-        return rect;
+        return new opencv_core.Rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
     }
 
     /**
@@ -145,8 +144,7 @@ final class AlgOpenCVEx
                         Color.YELLOW,
                 };
         Color color = colors[i%colors.length];
-        opencv_core.Scalar scalar = new opencv_core.Scalar(color.getBlue(), color.getGreen(), color.getRed(), 0);
-        return scalar;
+        return new opencv_core.Scalar(color.getBlue(), color.getGreen(), color.getRed(), 0);
     }
 
     /**
@@ -157,8 +155,8 @@ final class AlgOpenCVEx
     static opencv_core.Rect findBoundingbox(opencv_core.Mat bina)
     {
         opencv_core.Mat points = new opencv_core.Mat();	findNonZero(bina,points);
-        opencv_core.Rect minRect=boundingRect(points);
-        return minRect;
+        return boundingRect(points);
     }
+
 
 }

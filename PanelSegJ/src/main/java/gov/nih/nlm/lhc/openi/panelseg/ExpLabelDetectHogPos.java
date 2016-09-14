@@ -7,6 +7,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+import static java.util.concurrent.ForkJoinTask.invokeAll;
+
 /**
  * Generate positive patches for training of HOG+SVM method for Label Detection
  * Negative patches are collected by Bootstrapping
@@ -24,7 +26,7 @@ final class ExpLabelDetectHogPos extends Exp {
 
         ExpLabelDetectHogPos generator = new ExpLabelDetectHogPos(args[0], args[1]);
         //generator.generateSingle();
-        generator.generateMulti(10);
+        generator.generateMulti();
         System.out.println("Completed!");
     }
 
@@ -55,10 +57,10 @@ final class ExpLabelDetectHogPos extends Exp {
         for (int i = 0; i < imagePaths.size(); i++) generate(i);
     }
 
-    private void generateMulti(int seqThreshold)
+    private void generateMulti()
     {
-        ExpTask task = new ExpTask(this, 0, imagePaths.size());
-        task.invoke();
+        ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 5);
+        invokeAll(tasks);
     }
 
     void generate(int i)

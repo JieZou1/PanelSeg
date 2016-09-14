@@ -1,12 +1,9 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -74,7 +71,7 @@ final class DataPreview extends Data
             Mat img = opencv_imgcodecs.imread(imageFile);
             String key = imagePath.getFileName().toString();
             String style = styles.get(key);
-            Mat imgAnnotated = load_gt_error ? img.clone() : drawAnnotation(img, panels, style);
+            Mat imgAnnotated = load_gt_error ? img.clone() : PanelSeg.drawAnnotation(img, panels, style);
 
             Path preview_path = imagePath.getParent().resolve("preview").resolve(imagePath.getFileName().toString());
             opencv_imgcodecs.imwrite(preview_path.toString(), imgAnnotated);

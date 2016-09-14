@@ -49,7 +49,7 @@ class MiscFigureDownload
 
         //Variables to store the JSON pagination params and imageColor urls.
         int m = 0, n = 0, total = 100;
-        HashSet<String> imageSet = new HashSet<String>();
+        HashSet<String> imageSet = new HashSet<>();
 
         System.out.println("Query String: " + queryString);
 
@@ -86,7 +86,7 @@ class MiscFigureDownload
 
             for(int i=0; i<imgArr.size(); i++){
                 JSONObject imgJson = (JSONObject)imgArr.get(i);
-                String imgUrl = imagePrefix + (String)imgJson.get("imgLarge");
+                String imgUrl = imagePrefix + imgJson.get("imgLarge");
                 imageSet.add(imgUrl);
             }
 

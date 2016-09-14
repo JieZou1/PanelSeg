@@ -128,7 +128,7 @@ class Figure
     }
 
     /**
-     * Crop the label patches in gray image and normalize to 64x64.
+     * Crop the label patches in gray image and normalize to norm_w x norm_h
      * result is saved in labelGrayNormPatch
      */
     void cropLabelGrayNormPatches(int norm_w, int norm_h)

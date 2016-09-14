@@ -37,7 +37,7 @@ final class AlgMiscEx
      */
     static ArrayList<Path> collectImageFiles(Path folder)
     {
-        ArrayList<Path> imagePaths = new ArrayList<Path>();
+        ArrayList<Path> imagePaths = new ArrayList<>();
         try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder))
         {
             for (Path path : dirStrm)
@@ -63,7 +63,7 @@ final class AlgMiscEx
      */
     static ArrayList<Path> collectXmlFiles(Path folder)
     {
-        ArrayList<Path> xmlPaths = new ArrayList<Path>();
+        ArrayList<Path> xmlPaths = new ArrayList<>();
         try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder))
         {
             for (Path path : dirStrm)
@@ -89,7 +89,7 @@ final class AlgMiscEx
      */
     static ArrayList<Path> collectSubfolders(Path folder)
     {
-        ArrayList<Path> folderPaths = new ArrayList<Path>();
+        ArrayList<Path> folderPaths = new ArrayList<>();
         try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder))
         {
             for (Path path : dirStrm)

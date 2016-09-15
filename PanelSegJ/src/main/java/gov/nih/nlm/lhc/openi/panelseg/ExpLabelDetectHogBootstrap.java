@@ -60,7 +60,7 @@ final class ExpLabelDetectHogBootstrap extends Exp
 
     private void generateMulti()
     {
-        ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 5);
+        ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 4);
         invokeAll(tasks);
     }
 

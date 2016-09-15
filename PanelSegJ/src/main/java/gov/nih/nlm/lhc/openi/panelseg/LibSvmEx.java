@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Some extension functions of LibSVM
@@ -16,7 +17,7 @@ import java.lang.reflect.Field;
  */
 final class LibSvmEx
 {
-    public static void SaveInLibSVMFormat(String filename, double[] targets, float[][] features)
+    static void SaveInLibSVMFormat(String filename, double[] targets, float[][] features)
     {
         try (PrintWriter pw = new PrintWriter(filename))
         {
@@ -28,6 +29,29 @@ final class LibSvmEx
                     if (Double.isNaN(features[i][j])) continue;
 
                     int index = j + 1; float value = features[i][j];
+                    pw.print(" " + index + ":" + value);
+                }
+                pw.println();
+            }
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    static void SaveInLibSVMFormat(String filename, List<Double> targets, List<float[]> features)
+    {
+        try (PrintWriter pw = new PrintWriter(filename))
+        {
+            for (int i = 0; i < targets.size(); i++)
+            {
+                pw.print(targets.get(i));
+                float[] feature = features.get(i);
+                for (int j = 0; j < feature.length; j++)
+                {
+                    if (Double.isNaN(feature[j])) continue;
+
+                    int index = j + 1; float value = feature[j];
                     pw.print(" " + index + ":" + value);
                 }
                 pw.println();
@@ -176,6 +200,7 @@ final class LibSvmEx
     public static float[] ToSingleVector(String svm_model_file)
     {
         svm_model svModel = null;
+        System.out.println("Model file is: " + svm_model_file);
         try {
             svModel = svm.svm_load_model(svm_model_file);
         } catch (IOException e) {
@@ -187,6 +212,9 @@ final class LibSvmEx
         double rho = getRho(svModel)[0];
         double[] coef = getSvCoef(svModel)[0];
         int nrFeature = support_vectors[0].length;
+
+        System.out.println("# of SV is: " + Double.toString(support_vectors.length));
+        System.out.println("rho is: " + Double.toString(rho));
 
         float[] single_vector = new float[nrFeature + 1]; int index; double value;
         for (int i = 0; i < support_vectors.length; i++)

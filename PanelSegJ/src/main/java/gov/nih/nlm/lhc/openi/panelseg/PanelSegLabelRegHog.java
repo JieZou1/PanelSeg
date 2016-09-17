@@ -36,15 +36,15 @@ class PanelSegLabelRegHog extends PanelSegLabelReg
         return null;
     }
 
-    private HOGDescriptor hog;
-    private float[][] svmModels;
+    protected HOGDescriptor hog;
+    protected float[][] svmModels;
 
     protected ArrayList<ArrayList<Panel>> hogDetectionResult; //The HOG method detection result of all labelSetsToDetect
 
     /**
      * Constructor, load all SVM models, and initialize the HOGDescriptor
      */
-    public PanelSegLabelRegHog()
+    PanelSegLabelRegHog()
     {
         int n = labelSetsHOG.length;		svmModels = new float[n][];
         for (int i = 0; i < n; i++)
@@ -84,7 +84,7 @@ class PanelSegLabelRegHog extends PanelSegLabelReg
      * @param grayPatch
      * @return
      */
-    public float[] featureExtraction(opencv_core.Mat grayPatch)
+    float[] featureExtraction(opencv_core.Mat grayPatch)
     {
         FloatPointer descriptors = new FloatPointer();
         hog.compute(grayPatch, descriptors);
@@ -112,12 +112,12 @@ class PanelSegLabelRegHog extends PanelSegLabelReg
             hog.setSVMDetector(new opencv_core.Mat(new FloatPointer(svmModels[i])));
 
             String panelLabelSet = labelSetsHOG[i];
-            double minSize = labelMinSize * scale;
-            double maxSize = labelMaxSize * scale;
+//            double minSize = labelMinSize * scale;
+//            double maxSize = labelMaxSize * scale;
 
             //Search on scaled image
-            ArrayList<Panel> candidates1 = DetectMultiScale(imgScaled, maxSize, minSize, panelLabelSet, false);
-            //ArrayList<Panel> candidates2 = DetectMultiScale(imgeScaledInverted, maxSize, minSize, panelLabelSet, true);
+            ArrayList<Panel> candidates1 = DetectMultiScale(imgScaled, panelLabelSet, false);
+            //ArrayList<Panel> candidates2 = DetectMultiScale(imgeScaledInverted, panelLabelSet, true);
 
             ArrayList<Panel> candidates = new ArrayList<>();
             if (candidates1 != null) candidates.addAll(candidates1);
@@ -125,8 +125,6 @@ class PanelSegLabelRegHog extends PanelSegLabelReg
 
             if (candidates.size() > 0)
             {
-                candidates = RemoveOverlappedCandidates(candidates);
-
                 //Scale back to the original size, and save the result to hogDetectionResult
                 ArrayList<Panel> segmentationResult = new ArrayList<>();
                 for (int j = 0; j < candidates.size(); j++)
@@ -135,14 +133,26 @@ class PanelSegLabelRegHog extends PanelSegLabelReg
                     Rectangle rect = segInfo.labelRect;
                     Rectangle orig_rect = new Rectangle((int)(rect.x / scale + .5), (int)(rect.y / scale + .5), (int)(rect.width / scale + .5), (int)(rect.height / scale + .5));
                     segInfo.labelRect = orig_rect;
+
+                    //Size checking. Ignore the size which is too small or too large
+                    if (orig_rect.width > labelMaxSize || orig_rect.height > labelMaxSize) continue;
+                    if (orig_rect.width < labelMinSize || orig_rect.height < labelMinSize) continue;
+
+                    //Position check. Ignore the rect, when at least half of it is outside the original image. (noticed that we have padded 50 pixels)
+                    int centerX = orig_rect.x + orig_rect.width / 2;
+                    int centerY = orig_rect.y + orig_rect.height / 2;
+                    if (centerX <= 50 || centerX >= figure.imageGray.cols() - 50) continue;
+                    if (centerY <= 50 || centerY >= figure.imageGray.rows() - 50) continue;
+
                     segmentationResult.add(segInfo);
                 }
-                hogDetectionResult.set(i, segmentationResult);
+                candidates = RemoveOverlappedCandidates(segmentationResult);
+                hogDetectionResult.set(i, candidates);
             }
         }
     }
 
-    private ArrayList<Panel> DetectMultiScale(opencv_core.Mat img, double maxSize, double minSize, String panelLabelSet, Boolean inverted)
+    private ArrayList<Panel> DetectMultiScale(opencv_core.Mat img, String panelLabelSet, Boolean inverted)
     {
         ArrayList<Panel> candidates = new ArrayList<>();
 
@@ -164,21 +174,14 @@ class PanelSegLabelRegHog extends PanelSegLabelReg
         for (int k = 0; k < rectVector.size(); k++)
         {
             opencv_core.Rect labelRect = rectVector.get(k);
-            if (labelRect.width() > maxSize || labelRect.height() > maxSize) continue;
-            if (labelRect.width() < minSize || labelRect.height() < minSize) continue;
 
-            int centerX = labelRect.x() + labelRect.width() / 2;
-            int centerY = labelRect.y() + labelRect.height() / 2;
-            if (centerX <= 0 || centerX >= img.cols()) continue;
-            if (centerY <= 0 || centerY >= img.rows()) continue; //We ignore cases, where the detected patch is half outside the image.
+            Panel panel = new Panel();
+            panel.labelRect = new Rectangle(labelRect.x(), labelRect.y(), labelRect.width(), labelRect.height());
+            panel.panelLabel = panelLabelSet;
+            //panel.labelInverted = inverted;
+            panel.labelScore = scores[k];
 
-            Panel segInfo = new Panel();
-            segInfo.labelRect = new Rectangle(labelRect.x(), labelRect.y(), labelRect.width(), labelRect.height());
-            segInfo.panelLabel = panelLabelSet;
-            //segInfo.labelInverted = inverted;
-            segInfo.labelScore = scores[k];
-
-            candidates.add(segInfo);
+            candidates.add(panel);
         }
         return candidates;
     }

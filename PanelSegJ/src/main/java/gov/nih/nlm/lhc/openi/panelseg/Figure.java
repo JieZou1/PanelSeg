@@ -32,7 +32,12 @@ class Figure
      */
     private void createFigure(Mat img)
     {
-        imageColor = new Mat(img);
+        //We pad 50 pixels in each directions of the image.
+        int padding = 50;
+        opencv_core.Mat imageColor = new opencv_core.Mat();
+        opencv_core.copyMakeBorder(img, imageColor, padding, padding, padding, padding, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
+        //imageColor = new Mat(img);
+
         imageGray = new Mat();		cvtColor(imageColor, imageGray, CV_BGR2GRAY);
         imageWidth = imageColor.cols(); imageHeight = imageColor.rows();
 

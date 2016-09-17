@@ -7,26 +7,27 @@ import org.bytedeco.javacpp.opencv_imgcodecs;
 import java.nio.file.Path;
 import java.util.List;
 
+import static java.util.concurrent.ForkJoinTask.invokeAll;
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
 
 /**
- * HOG+SVM method for Label Detection
+ * Experiments of HOG method for Label Detection
  *
  * Created by jzou on 9/13/2016.
  */
-public class ExpLabelDetectHog extends Exp {
+public class ExpLabelRegHog extends Exp {
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
         if (args.length != 2) {
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectHog <Sample List File> <target folder>");
-            System.out.println("	This is a utility program to do Panel Label Recognition.");
+            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelRegHog <Sample List File> <target folder>");
+            System.out.println("	This is a utility program to do Panel Label Recognition with HoG detection method.");
             System.out.println("	It saves recognition results (iPhotoDraw XML file) and preview images in target folder.");
             System.exit(0);
         }
 
-        ExpLabelDetectHog generator = new ExpLabelDetectHog(args[0], args[1]);
+        ExpLabelRegHog generator = new ExpLabelRegHog(args[0], args[1]);
         generator.generateSingle();
         //generator.generateMulti();
         System.out.println("Completed!");
@@ -39,7 +40,7 @@ public class ExpLabelDetectHog extends Exp {
      * @param trainListFile
      * @param targetFolder
      */
-    private ExpLabelDetectHog(String trainListFile, String targetFolder) {
+    private ExpLabelRegHog(String trainListFile, String targetFolder) {
         super(trainListFile, targetFolder, true);
     }
 
@@ -53,8 +54,10 @@ public class ExpLabelDetectHog extends Exp {
 
     private void generateMulti()
     {
-        ExpTask task = new ExpTask(this, 0, imagePaths.size());
-        task.invoke();
+        ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 4);
+        invokeAll(tasks);
+//        ExpTask task = new ExpTask(this, 0, imagePaths.size());
+//        task.invoke();
     }
 
     void generate(int k)

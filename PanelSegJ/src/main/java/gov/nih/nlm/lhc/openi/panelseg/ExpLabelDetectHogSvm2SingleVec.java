@@ -10,17 +10,17 @@ import java.nio.file.Paths;
  *
  * Created by jzou on 9/9/2016.
  */
-final class ExpLabelDetectionHogSvm2SingleVec
+final class ExpLabelDetectHogSvm2SingleVec
 {
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
         if (args.length != 1) {
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectionHogSvm2SingleVec <target folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectHogSvm2SingleVec <target folder>");
             System.out.println("	This is a utility program to Convert Linear SVM model to Single Vector for HOG+SVM label detection.");
             System.exit(0);
         }
 
-        ExpLabelDetectionHogSvm2SingleVec generator = new ExpLabelDetectionHogSvm2SingleVec(args[0]);
+        ExpLabelDetectHogSvm2SingleVec generator = new ExpLabelDetectHogSvm2SingleVec(args[0]);
         generator.generate();
         System.out.println("Completed!");
     }
@@ -33,7 +33,7 @@ final class ExpLabelDetectionHogSvm2SingleVec
      *
      * @param targetFolder
      */
-    ExpLabelDetectionHogSvm2SingleVec(String targetFolder) {
+    ExpLabelDetectHogSvm2SingleVec(String targetFolder) {
         this.targetFolder = Paths.get(targetFolder);
     }
 

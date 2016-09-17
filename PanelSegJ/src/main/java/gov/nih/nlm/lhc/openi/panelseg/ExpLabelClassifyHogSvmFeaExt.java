@@ -15,17 +15,17 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  *
  * Created by jzou on 9/15/2016.
  */
-class ExpLabelRecognitionHogSvm
+class ExpLabelClassifyHogSvmFeaExt
 {
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
         if (args.length != 1) {
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelRecognitionHogSvm <target folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelClassifyHogSvmFeaExt <target folder>");
             System.out.println("	This is a utility program to Extract HoG features for HOG+SVM label recognition training.");
             System.exit(0);
         }
 
-        ExpLabelRecognitionHogSvm generator = new ExpLabelRecognitionHogSvm(args[0]);
+        ExpLabelClassifyHogSvmFeaExt generator = new ExpLabelClassifyHogSvmFeaExt(args[0]);
         generator.generate();
         System.out.println("Completed!");
     }
@@ -37,7 +37,7 @@ class ExpLabelRecognitionHogSvm
      *
      * @param targetFolder
      */
-    ExpLabelRecognitionHogSvm(String targetFolder) {
+    ExpLabelClassifyHogSvmFeaExt(String targetFolder) {
         this.targetFolder = Paths.get(targetFolder);
     }
 

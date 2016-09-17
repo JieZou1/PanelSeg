@@ -13,17 +13,17 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  *
  * Created by jzou on 9/9/2016.
  */
-final class ExpLabelDetectHogFeaExt extends Exp
+final class ExpLabelDetectHogSvmFeaExt extends Exp
 {
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
         if (args.length != 2) {
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectHogFeaExt <Sample List File> <target folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectHogSvmFeaExt <Sample List File> <target folder>");
             System.out.println("	This is a utility program to Extract HoG features for HOG+SVM label detection training.");
             System.exit(0);
         }
 
-        ExpLabelDetectHogFeaExt generator = new ExpLabelDetectHogFeaExt(args[0], args[1]);
+        ExpLabelDetectHogSvmFeaExt generator = new ExpLabelDetectHogSvmFeaExt(args[0], args[1]);
         generator.generate();
         System.out.println("Completed!");
     }
@@ -35,7 +35,7 @@ final class ExpLabelDetectHogFeaExt extends Exp
      * @param trainListFile
      * @param targetFolder
      */
-    ExpLabelDetectHogFeaExt(String trainListFile, String targetFolder) {
+    ExpLabelDetectHogSvmFeaExt(String trainListFile, String targetFolder) {
         super(trainListFile, targetFolder, false);
     }
 

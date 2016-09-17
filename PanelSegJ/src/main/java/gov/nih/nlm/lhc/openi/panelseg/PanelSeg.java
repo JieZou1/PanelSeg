@@ -17,7 +17,16 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  */
 public abstract class PanelSeg
 {
-    public enum SegMethed {LabelRegHog}
+    public enum SegMethed {LabelRegHog, LabelRegHogSvm}
+
+    public static void initialze(SegMethed method)
+    {
+        switch (method)
+        {
+            case LabelRegHog: break;
+            case LabelRegHogSvm: PanelSegLabelRegHogSvm.initialze(); break;
+        }
+    }
 
     /**
      * Entry function for all Panel Segmentation methods.
@@ -32,6 +41,7 @@ public abstract class PanelSeg
         switch (method)
         {
             case LabelRegHog: seg = new PanelSegLabelRegHog(); break;
+            case LabelRegHogSvm: seg = new PanelSegLabelRegHogSvm();  break;
         }
         seg.segment(image);
         return seg.getSegmentationResult();
@@ -189,8 +199,8 @@ public abstract class PanelSeg
             if (panel.panelLabel.length() != 0)
             {
                 opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
-                opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 50);
-                opencv_imgproc.putText(imgAnnotated, panel.panelLabel, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 1, color, 1, 8, false);
+                opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 10);
+                opencv_imgproc.putText(imgAnnotated, panel.panelLabel + Double.toString(panel.labelScore), bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 1, color, 1, 8, false);
             }
         }
 

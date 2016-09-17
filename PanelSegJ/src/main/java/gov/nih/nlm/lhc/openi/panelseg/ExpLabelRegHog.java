@@ -28,8 +28,8 @@ public class ExpLabelRegHog extends Exp {
         }
 
         ExpLabelRegHog generator = new ExpLabelRegHog(args[0], args[1]);
-        generator.generateSingle();
-        //generator.generateMulti();
+        //generator.generateSingle();
+        generator.generateMulti();
         System.out.println("Completed!");
     }
 
@@ -66,7 +66,7 @@ public class ExpLabelRegHog extends Exp {
         System.out.println(Integer.toString(k) +  ": processing " + imagePath.toString());
 
         opencv_core.Mat image = imread(imagePath.toString(), CV_LOAD_IMAGE_COLOR);
-        List<Panel> panels = PanelSeg.segment(image, PanelSeg.SegMethed.LabelRegHog);
+        List<Panel> panels = PanelSeg.segment(image, PanelSeg.SegMethod.LabelRegHog);
 
         //Save result in iPhotoDraw XML file
         String xmlFile = FilenameUtils.removeExtension(imagePath.toFile().getName()) + "_data.xml";

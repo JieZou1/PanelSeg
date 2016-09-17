@@ -28,7 +28,7 @@ public class ExpLabelRegHogSvm extends  Exp{
 
         ExpLabelRegHogSvm generator = new ExpLabelRegHogSvm(args[0], args[1]);
 
-        PanelSeg.initialze(PanelSeg.SegMethed.LabelRegHogSvm);
+        PanelSeg.initialize(PanelSeg.SegMethod.LabelRegHogSvm);
 
         generator.generateSingle();
         //generator.generateMulti();
@@ -68,7 +68,7 @@ public class ExpLabelRegHogSvm extends  Exp{
         System.out.println(Integer.toString(k) +  ": processing " + imagePath.toString());
 
         opencv_core.Mat image = imread(imagePath.toString(), CV_LOAD_IMAGE_COLOR);
-        List<Panel> panels = PanelSeg.segment(image, PanelSeg.SegMethed.LabelRegHogSvm);
+        List<Panel> panels = PanelSeg.segment(image, PanelSeg.SegMethod.LabelRegHogSvm);
 
         //Save result in iPhotoDraw XML file
         String xmlFile = FilenameUtils.removeExtension(imagePath.toFile().getName()) + "_data.xml";

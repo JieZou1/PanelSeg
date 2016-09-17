@@ -34,7 +34,7 @@ public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
 
     public PanelSegLabelRegHogSvm()
     {
-        super(); //Call base constructor
+        super();
     }
 
     protected void SvmClassification()

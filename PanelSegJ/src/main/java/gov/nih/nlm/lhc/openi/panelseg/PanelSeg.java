@@ -3,7 +3,9 @@ package gov.nih.nlm.lhc.openi.panelseg;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgproc;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
@@ -17,9 +19,14 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  */
 public abstract class PanelSeg
 {
-    public enum SegMethed {LabelRegHog, LabelRegHogSvm}
+    public enum SegMethod {LabelRegHog, LabelRegHogSvm}
 
-    public static void initialze(SegMethed method)
+    /**
+     * Initialization method, load SVM model, etc.
+     * Must call this function before call segment function.
+     * @param method
+     */
+    public static void initialize(SegMethod method)
     {
         switch (method)
         {
@@ -35,7 +42,7 @@ public abstract class PanelSeg
      * @param method
      * @return
      */
-    public static List<Panel> segment(opencv_core.Mat image, SegMethed method)
+    public static List<Panel> segment(opencv_core.Mat image, SegMethod method)
     {
         PanelSeg seg = null;
         switch (method)
@@ -44,10 +51,10 @@ public abstract class PanelSeg
             case LabelRegHogSvm: seg = new PanelSegLabelRegHogSvm();  break;
         }
         seg.segment(image);
-        return seg.getSegmentationResult();
+        return seg.getSegResultWithoutPadding();
     }
 
-    public static List<Panel> segment(String imageFile, SegMethed method)
+    public static List<Panel> segment(String imageFile, SegMethod method)
     {
         opencv_core.Mat image = imread(imageFile, CV_LOAD_IMAGE_COLOR);
         return segment(image, method);
@@ -95,7 +102,7 @@ public abstract class PanelSeg
     /**
      * The entrance function to perform panel segmentation. <p>
      * It simply loads the image from the file, and then calls segment(Mat image) function.
-     * Call getSegmentationResult* functions to retrieve result in different format.
+     * Call getSegResultWithPadding* functions to retrieve result in different format.
      */
     void segment(String image_file_path)
     {
@@ -105,7 +112,7 @@ public abstract class PanelSeg
 
     /**
      * The entrance function to perform segmentation.
-     * Call getSegmentationResult* functions to retrieve result in different format.
+     * Call getSegResultWithPadding* functions to retrieve result in different format.
      * It simply converts the buffered image to Mat, and then calls segment(Mat image) function.
      *
      * NOTICE: because converting from BufferedImage to Mat requires actual copying of the image data, it is inefficient.
@@ -120,15 +127,44 @@ public abstract class PanelSeg
 
     /**
      * Get the panel segmentation result
+     * Notice the labelRect and panelRect is on the padded image
      * @return The detected panels
      */
-    public java.util.List<Panel> getSegmentationResult()	{	return figure.panels;	}
+    List<Panel> getSegResultWithPadding()	{	return figure.panels;	}
+
+    /**
+     * Get the panel segmentation result
+     * Notice the labelRect and panelRect is converted back to the original image, i.e., no paddings.
+     * @return The detected panels
+     */
+    List<Panel> getSegResultWithoutPadding()
+    {
+        List<Panel> panels = new ArrayList<>();
+        for (Panel panel: figure.panels)
+        {
+            Panel panelNew = new Panel(panel);
+            if (panelNew.labelRect != null && !panelNew.labelRect.isEmpty())
+            {
+                panelNew.labelRect = (Rectangle) panel.labelRect.clone();
+                panelNew.labelRect.x -= Figure.padding;
+                panelNew.labelRect.y -= Figure.padding;
+            }
+            if (panelNew.panelRect != null && !panelNew.panelRect.isEmpty())
+            {
+                panelNew.panelRect = (Rectangle) panel.panelRect.clone();
+                panelNew.panelRect.x -= Figure.padding;
+                panelNew.panelRect.y -= Figure.padding;
+            }
+            panels.add(panelNew);
+        }
+        return panels;
+    }
 
     /**
      * Get the panel segmentation result by drawing the panel boundaries on the image
      * @return the image with panel boundaries superimposed on it.
      */
-    public opencv_core.Mat getSegmentationResultInMat()
+    opencv_core.Mat getSegResultWithPaddingInMat()
     {
         return drawAnnotation(figure.imageColor, figure.panels);
 //        opencv_core.Mat img = figure.imageColor.clone();

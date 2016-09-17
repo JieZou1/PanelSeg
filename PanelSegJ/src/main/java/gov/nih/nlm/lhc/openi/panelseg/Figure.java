@@ -12,15 +12,19 @@ import static org.bytedeco.javacpp.opencv_imgproc.*;
 
 /**
  * The core class for holding all information about a Figure.
- * The design is: different algorithms must have a Figure field, which is constructed during the algorithm instance construction;
+ * The design is: different algorithms must have a Figure field.
  * the algorithm takes some fields in Figure object as inputs and then save the results to some other fields of the Figure object.
  *
  * Created by jzou on 8/25/2016.
  */
 class Figure
 {
-    Mat imageColor;		//The original figure image, has to be BGR image
-    Mat imageGray;	//The gray image converted from original BGR image
+    static int padding = 50;
+
+    Mat imageOriginal;  //The original image, has to be BGR image
+
+    Mat imageColor;		//The figure image after padding,
+    Mat imageGray;	//The gray image converted from imageColor
     Mat imageGrayInverted;	//The inverted gray image
     int imageWidth, imageHeight;
 
@@ -32,9 +36,10 @@ class Figure
      */
     private void createFigure(Mat img)
     {
-        //We pad 50 pixels in each directions of the image.
-        int padding = 50;
-        opencv_core.Mat imageColor = new opencv_core.Mat();
+        imageOriginal = img;    //Keep a reference to the original image
+
+        //We pad padding pixels in each directions of the image.
+        imageColor = new opencv_core.Mat();
         opencv_core.copyMakeBorder(img, imageColor, padding, padding, padding, padding, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
         //imageColor = new Mat(img);
 
@@ -61,10 +66,8 @@ class Figure
      * panels is also instantiated as an empty ArrayList.
      * @param imgPath
      */
-    Figure(Path imgPath)
-    {
-        opencv_core.Mat img = opencv_imgcodecs.imread(imgPath.toString(), opencv_imgcodecs.CV_LOAD_IMAGE_COLOR);
-        createFigure(img);
+    Figure(Path imgPath) {
+        createFigure(opencv_imgcodecs.imread(imgPath.toString(), opencv_imgcodecs.CV_LOAD_IMAGE_COLOR));
     }
 
     /**
@@ -75,8 +78,7 @@ class Figure
      */
     Figure(String imgPath)
     {
-        opencv_core.Mat img = opencv_imgcodecs.imread(imgPath, opencv_imgcodecs.CV_LOAD_IMAGE_COLOR);
-        createFigure(img);
+        createFigure(opencv_imgcodecs.imread(imgPath, opencv_imgcodecs.CV_LOAD_IMAGE_COLOR));
     }
 
     /**

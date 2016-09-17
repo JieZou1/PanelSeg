@@ -129,22 +129,23 @@ class PanelSegLabelRegHog extends PanelSegLabelReg
                 ArrayList<Panel> segmentationResult = new ArrayList<>();
                 for (int j = 0; j < candidates.size(); j++)
                 {
-                    Panel segInfo = candidates.get(j);
-                    Rectangle rect = segInfo.labelRect;
+                    Panel panel = candidates.get(j);
+                    Rectangle rect = panel.labelRect;
                     Rectangle orig_rect = new Rectangle((int)(rect.x / scale + .5), (int)(rect.y / scale + .5), (int)(rect.width / scale + .5), (int)(rect.height / scale + .5));
-                    segInfo.labelRect = orig_rect;
+                    panel.labelRect = orig_rect;
 
                     //Size checking. Ignore the size which is too small or too large
                     if (orig_rect.width > labelMaxSize || orig_rect.height > labelMaxSize) continue;
                     if (orig_rect.width < labelMinSize || orig_rect.height < labelMinSize) continue;
 
-                    //Position check. Ignore the rect, when at least half of it is outside the original image. (noticed that we have padded 50 pixels)
+                    //Position check. Ignore the rect, when at least half of it is outside the original image.
+                    //noticed that we have padded the figure image.
                     int centerX = orig_rect.x + orig_rect.width / 2;
                     int centerY = orig_rect.y + orig_rect.height / 2;
-                    if (centerX <= 50 || centerX >= figure.imageGray.cols() - 50) continue;
-                    if (centerY <= 50 || centerY >= figure.imageGray.rows() - 50) continue;
+                    if (centerX <= Figure.padding || centerX >= figure.imageGray.cols() - Figure.padding) continue;
+                    if (centerY <= Figure.padding || centerY >= figure.imageGray.rows() - Figure.padding) continue;
 
-                    segmentationResult.add(segInfo);
+                    segmentationResult.add(panel);
                 }
                 candidates = RemoveOverlappedCandidates(segmentationResult);
                 hogDetectionResult.set(i, candidates);

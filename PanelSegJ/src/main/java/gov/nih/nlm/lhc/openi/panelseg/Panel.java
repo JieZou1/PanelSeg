@@ -26,5 +26,24 @@ public class Panel
     opencv_core.Mat labelPatch;  //The label patches cropped from the original image
     opencv_core.Mat labelGrayNormPatch;  //The label patches cropped from the gray image and normalized to standard size
 
+    /**
+     * Default ctor, do nothing.
+     */
+    Panel() {}
+
+    /**
+     * Copy ctor
+     * @param panel
+     */
+    Panel(Panel panel)
+    {
+        this.panelRect = panel.panelRect;
+        this.panelLabel = panel.panelLabel;
+        this.labelRect = panel.labelRect;
+        this.labelScore = panel.labelScore;
+        this.labelProbs = panel.labelProbs;
+        this.labelPatch = panel.labelPatch;
+        this.labelGrayNormPatch = panel.labelGrayNormPatch;
+    }
 }
 

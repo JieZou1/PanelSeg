@@ -16,7 +16,7 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  *
  * Created by jzou on 9/15/2016.
  */
-public class ExpLabelRegHogSvm extends  Exp{
+class ExpLabelRegHogSvm extends  Exp{
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
         if (args.length != 2) {

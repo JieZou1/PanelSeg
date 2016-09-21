@@ -87,7 +87,7 @@ final class DataVisualize extends Data
             ArrayList<Panel> panels = null; boolean load_gt_error = false;
             try
             {
-                panels = iPhotoDraw.loadPanelSeg(annotationFile);
+                panels = iPhotoDraw.loadPanelSegGt(annotationFile);
             }
             catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -128,7 +128,7 @@ final class DataVisualize extends Data
                 {
                     runiPhotoDraw(imageFile);
                     load_gt_error = false;
-                    try {	panels = iPhotoDraw.loadPanelSeg(annotationFile);			}
+                    try {	panels = iPhotoDraw.loadPanelSegGt(annotationFile);			}
                     catch (Exception e) {
                         System.out.println(e.getMessage());
                         load_gt_error = true;

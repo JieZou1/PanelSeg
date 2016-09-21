@@ -40,18 +40,18 @@ class iPhotoDraw
     }
 
     /**
-     * Load iPhotoDraw Annotations of panel segmentation
+     * Load iPhotoDraw ground-truth Annotations of panel segmentation
      * @param xml_file
      * @return
      * @throws Exception
      */
-    static ArrayList<Panel> loadPanelSeg(File xml_file) throws Exception
+    static ArrayList<Panel> loadPanelSegGt(File xml_file) throws Exception
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(xml_file);
 
-        ArrayList<gov.nih.nlm.lhc.openi.panelseg.Panel> panels = new ArrayList<>();
+        ArrayList<Panel> panels = new ArrayList<>();
         ArrayList<Rectangle> labelRects = new ArrayList<>();
         ArrayList<String> labelNames = new ArrayList<>();
 
@@ -74,7 +74,7 @@ class iPhotoDraw
                 int width = (int)(Double.parseDouble(attributes.getNamedItem("Width").getTextContent()) + 0.5);
                 int height = (int)(Double.parseDouble(attributes.getNamedItem("Height").getTextContent()) + 0.5);
 
-                gov.nih.nlm.lhc.openi.panelseg.Panel panel = new gov.nih.nlm.lhc.openi.panelseg.Panel();
+                Panel panel = new Panel();
                 panel.panelRect = new Rectangle(x, y, width, height);
                 String[] words = text.split("\\s+");
                 panel.panelLabel = String.join(" ", ArrayUtils.remove(words, 0));
@@ -164,6 +164,62 @@ class iPhotoDraw
 
         if (labelNames.size() > 0 || labelRects.size() > 0) //All elements in labelNames and labelRects should have been removed.
             throw new Exception("Load Data Error: Extra Label Bounding boxes found in " + xml_file + "!");
+
+        return panels;
+    }
+
+    /**
+     * Load panel label detection results in iPhotoDraw format
+     * @param xml_file
+     * @return
+     * @throws Exception
+     */
+    static ArrayList<Panel> loadPanelLabelRegAuto(File xml_file) throws Exception
+    {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(xml_file);
+
+        ArrayList<Panel> panels = new ArrayList<>();
+        ArrayList<Rectangle> labelRects = new ArrayList<>();
+        ArrayList<String> labelNames = new ArrayList<>();
+
+        NodeList shapeNodes = doc.getElementsByTagName("Shape");
+        for (int i = 0; i < shapeNodes.getLength(); i++)
+        {
+            Node shapeNode = shapeNodes.item(i);
+            Node blockTextNode = getChildNode(shapeNode, "BlockText");
+            Node textNode = getChildNode(blockTextNode, "Text");
+            String text = textNode.getTextContent().trim();
+            String textLower = text.toLowerCase();
+
+            if (textLower.startsWith("panel"))
+            {	//It is a panel
+                throw new Exception("We don't expect panel elements in " + xml_file +  "!");
+            }
+            else if (textLower.startsWith("label"))
+            {	//It is a label
+                Node dataNode = getChildNode(shapeNode, "Data");
+                Node extentNode = getChildNode(dataNode, "Extent");
+                NamedNodeMap attributes = extentNode.getAttributes();
+                int x = (int)(Double.parseDouble(attributes.getNamedItem("X").getTextContent()) + 0.5);
+                int y = (int)(Double.parseDouble(attributes.getNamedItem("Y").getTextContent()) + 0.5);
+                int width = (int)(Double.parseDouble(attributes.getNamedItem("Width").getTextContent()) + 0.5);
+                int height = (int)(Double.parseDouble(attributes.getNamedItem("Height").getTextContent()) + 0.5);
+
+                Panel panel = new Panel();
+                String[] words = text.split("\\s+");
+                panel.panelLabel = String.join(" ", ArrayUtils.remove(words, 0));
+                panel.labelRect = new Rectangle(x, y, width, height);
+                panels.add(panel);
+            }
+            else
+            {
+                throw new Exception("Load Data Error: Unknown annotation, " + text + ", in " + xml_file +  "!");
+            }
+        }
+
+        panels.sort(new PanelLabelAscending()); //sort the panels in ascending order of their labels
 
         return panels;
     }

@@ -73,7 +73,7 @@ final class ExpLabelPreview extends Exp {
         File annotationFile = new File(xmlFile);
         ArrayList<Panel> panels = null;
         try {
-            panels = iPhotoDraw.loadPanelSeg(annotationFile);
+            panels = iPhotoDraw.loadPanelSegGt(annotationFile);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

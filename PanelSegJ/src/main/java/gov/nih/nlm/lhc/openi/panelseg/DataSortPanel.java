@@ -57,7 +57,7 @@ final class DataSortPanel extends Data
             ArrayList<Panel> panels = null; boolean load_gt_error = false;
             try
             {
-                panels = iPhotoDraw.loadPanelSeg(annotationFile);
+                panels = iPhotoDraw.loadPanelSegGt(annotationFile);
             }
             catch (Exception e) {
                 System.out.println(e.getMessage());

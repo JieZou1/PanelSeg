@@ -8,7 +8,6 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * HOG + SVM method for Label Recognition

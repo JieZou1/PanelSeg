@@ -65,7 +65,7 @@ final class DataStatistics extends DataAll
 
                 ArrayList<Panel> panels;
                 try {
-                    panels = iPhotoDraw.loadPanelSeg(xml_path.toFile());
+                    panels = iPhotoDraw.loadPanelSegGt(xml_path.toFile());
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

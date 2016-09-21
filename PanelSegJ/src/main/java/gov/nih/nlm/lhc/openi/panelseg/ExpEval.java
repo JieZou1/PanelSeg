@@ -298,16 +298,24 @@ final class ExpEval extends Exp
             for (int i = 0; i < falseAlarmLabels.size(); i++) totalFalseAlarm += falseAlarmLabels.get(i).size();
             pw.println("Total Missing: " + totalMissing);
             pw.println("Total False Alarm: " + totalFalseAlarm);
+            pw.println();
+
             for (int i = 0; i < missingLabels.size(); i++)
             {
                 if (missingLabels.get(i).size() == 0 && falseAlarmLabels.get(i).size() == 0) continue; //All correct, we don't care.
                 pw.println(imagePaths.get(i));
                 pw.print("\t" + "GT Labels:\t");	for (int k = 0; k < gtLabels.get(i).size(); k++) pw.print(gtLabels.get(i).get(k) + " "); pw.println();
-                pw.print("\t" + "Missing Labels:\t");	for (int k = 0; k < missingLabels.get(i).size(); k++) pw.print(missingLabels.get(i).get(k) + " "); pw.println();
+                if (missingLabels.get(i).size() > 0)
+                {
+                    pw.print("\t" + "Missing Labels:\t");	for (int k = 0; k < missingLabels.get(i).size(); k++) pw.print(missingLabels.get(i).get(k) + " "); pw.println();
+                }
                 if (method != PanelSeg.SegMethod.LabelRegHog)
                 {
                     pw.print("\t" + "Auto Labels:\t");	for (int k = 0; k < autoLabels.get(i).size(); k++) pw.print(autoLabels.get(i).get(k) + " "); pw.println();
-                    pw.print("\t" + "False Alarm Labels:\t"); for (int k = 0; k < falseAlarmLabels.get(i).size(); k++) pw.print(falseAlarmLabels.get(i).get(k) + " "); pw.println();
+                    if (falseAlarmLabels.get(i).size() > 0)
+                    {
+                        pw.print("\t" + "False Alarm Labels:\t"); for (int k = 0; k < falseAlarmLabels.get(i).size(); k++) pw.print(falseAlarmLabels.get(i).get(k) + " "); pw.println();
+                    }
                 }
             }
 

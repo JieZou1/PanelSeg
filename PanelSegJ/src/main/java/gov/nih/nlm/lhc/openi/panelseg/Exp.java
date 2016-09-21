@@ -1,11 +1,18 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import org.apache.commons.io.FilenameUtils;
+import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.opencv_imgcodecs;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.concurrent.ForkJoinTask.invokeAll;
 
 /**
  * The base class for all experiment related operations. It works with the list text file under experiment folder <p>
@@ -70,4 +77,52 @@ abstract class Exp {
 
         return name;
     }
+
+    protected void saveSegResult(String imageFile, opencv_core.Mat image, List<Panel> panels)
+    {
+        //Save result in iPhotoDraw XML file
+        String xmlFile = FilenameUtils.removeExtension(imageFile) + "_data.xml";
+        Path xmlPath = targetFolder.resolve(xmlFile);
+        try {
+            iPhotoDraw.savePanelSeg(xmlPath.toFile(), panels);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //Save original jpg file
+        Path origPath = targetFolder.resolve(imageFile);
+        opencv_imgcodecs.imwrite(origPath.toString(), image);
+
+        //Save preview in jpg file
+        Path previewFolder = targetFolder.resolve("preview");
+        if (!Files.exists(previewFolder)) previewFolder.toFile().mkdir();
+
+        Path previewPath = previewFolder.resolve(imageFile);
+        opencv_core.Mat preview = PanelSeg.drawAnnotation(image, panels);
+        opencv_imgcodecs.imwrite(previewPath.toString(), preview);
+
+    }
+
+    /**
+     * Entry function
+     */
+    protected void segmentSingle()
+    {
+        long startTime = System.currentTimeMillis();
+        for (int k = 0; k < imagePaths.size(); k++) generate(k);
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("Total processing time: " + (endTime - startTime)/1000.0 + " seconds.");
+        System.out.println("Average processing time: " + ((endTime - startTime)/1000.0)/imagePaths.size() + " seconds.");
+    }
+
+    private void segmentMulti()
+    {
+        ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 4);
+        invokeAll(tasks);
+//        ExpTask task = new ExpTask(this, 0, imagePaths.size());
+//        task.invoke();
+    }
+
+
 }

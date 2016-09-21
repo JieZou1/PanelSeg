@@ -1,8 +1,6 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
-import org.apache.commons.io.FilenameUtils;
 import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_imgcodecs;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -27,9 +25,11 @@ public class ExpLabelRegHog extends Exp {
             System.exit(0);
         }
 
+        PanelSeg.initialize(PanelSeg.SegMethod.LabelRegHog); //Actually does nothing.
+
         ExpLabelRegHog generator = new ExpLabelRegHog(args[0], args[1]);
-        //generator.generateSingle();
-        generator.generateMulti();
+        generator.segmentSingle();
+        //generator.segmentMulti();
         System.out.println("Completed!");
     }
 
@@ -44,22 +44,6 @@ public class ExpLabelRegHog extends Exp {
         super(trainListFile, targetFolder, true);
     }
 
-    /**
-     * Entry function
-     */
-    void generateSingle()
-    {
-        for (int k = 0; k < imagePaths.size(); k++) generate(k);
-    }
-
-    private void generateMulti()
-    {
-        ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 4);
-        invokeAll(tasks);
-//        ExpTask task = new ExpTask(this, 0, imagePaths.size());
-//        task.invoke();
-    }
-
     void generate(int k)
     {
         Path imagePath = imagePaths.get(k);
@@ -68,19 +52,7 @@ public class ExpLabelRegHog extends Exp {
         opencv_core.Mat image = imread(imagePath.toString(), CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, PanelSeg.SegMethod.LabelRegHog);
 
-        //Save result in iPhotoDraw XML file
-        String xmlFile = FilenameUtils.removeExtension(imagePath.toFile().getName()) + "_data.xml";
-        Path xmlPath = targetFolder.resolve(xmlFile);
-        try {
-            iPhotoDraw.savePanelSeg(xmlPath.toFile(), panels);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //Save preview in jpg file
-        Path jpgPath = targetFolder.resolve(imagePath.toFile().getName());
-        opencv_core.Mat jpg = PanelSeg.drawAnnotation(image, panels);
-        opencv_imgcodecs.imwrite(jpgPath.toString(), jpg);
+        saveSegResult(imagePath.toFile().getName(), image, panels);
     }
 
 }

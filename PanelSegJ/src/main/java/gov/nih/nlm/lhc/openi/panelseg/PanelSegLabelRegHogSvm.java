@@ -106,14 +106,12 @@ public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
      */
     void segment(opencv_core.Mat image)
     {
-        figure = new Figure(image); //Common initializations for all segmentation method.
-
-        HoGDetect();		//HoG Detection, detected patches are stored in hogDetectionResult
-
-        mergeDetectedLabelsSimple();	//All detected patches are merged into figure.panels.
+        super.segment(image);
+//        figure = new Figure(image); //Common initializations for all segmentation method.
+//        HoGDetect();		//HoG Detection, detected patches are stored in hogDetectionResult
+//        mergeDetectedLabelsSimple();	//All detected patches are merged into figure.panels.
 
         SvmClassification();			//SVM classification of each detected patch in figure.segmentationResult.
-
         MergeRecognitionLabelsSimple();
     }
 

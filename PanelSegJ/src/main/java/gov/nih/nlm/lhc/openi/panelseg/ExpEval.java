@@ -25,8 +25,10 @@ final class ExpEval extends Exp
             System.out.println("Usage: java -cp PanelSegJ.jar ExpEval <Sample List File> <target folder> <method>");
             System.out.println("	This is a utility program to do evaluation for various panel segmentation algorithms.");
             System.out.println("method:");
-            System.out.println("LabelRegHog		LabelRegHog method for Label Detection");
+            System.out.println("LabelRegHog		    LabelRegHog method for Label Detection");
             System.out.println("LabelRegHogSvm		LabelRegHogSvm method for Label Recognition");
+            System.out.println("LabelRegHogSvmThresholding	LabelRegHogSvmThreading method for Label Recognition");
+            System.out.println("LabelRegHogSvmBeam	LabelRegHogSvmBeam method for Label Recognition");
             System.exit(0);
         }
 
@@ -34,6 +36,8 @@ final class ExpEval extends Exp
         switch (args[2]) {
             case "LabelRegHog":  method = PanelSeg.SegMethod.LabelRegHog; break;
             case "LabelRegHogSvm": method = PanelSeg.SegMethod.LabelRegHogSvm; break;
+            case "LabelRegHogSvmThresholding": method = PanelSeg.SegMethod.LabelRegHogSvmThresholding; break;
+            case "LabelRegHogSvmBeam": method = PanelSeg.SegMethod.LabelRegHogSvmBeam; break;
             default:
                 System.out.println("Unknown method!!");
                 System.exit(0);
@@ -193,7 +197,8 @@ final class ExpEval extends Exp
                 //check label
                 String autoLabel = autoPanel.panelLabel.toLowerCase();
                 String gtLabel = gtPanel.panelLabel.toLowerCase();
-                if (method == PanelSeg.SegMethod.LabelRegHog)
+                if (method == PanelSeg.SegMethod.LabelRegHog) //||
+                        //method == PanelSeg.SegMethod.LabelRegHogSvm)
                 { //For HoG Detection case, provided that it is detected, we count it as correct. No need to check label
                     autoLabel = gtLabel;
                 }

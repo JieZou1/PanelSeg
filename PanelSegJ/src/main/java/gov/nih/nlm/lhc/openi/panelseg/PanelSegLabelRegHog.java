@@ -215,7 +215,7 @@ class PanelSegLabelRegHog extends PanelSegLabelReg
 
         HoGDetect();		//HoG Detection, detected patches are stored in hogDetectionResult
 
-        //Merge all hogDetectionResult to segmentationResult
+        //Merge all hogDetectionResult to panels
         mergeDetectedLabelsSimple();
     }
 

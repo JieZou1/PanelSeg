@@ -18,12 +18,15 @@ import java.util.ArrayList;
 public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
 {
     protected static svm_model svmModel;
-    static void initialze()
+    protected static void initialize()
     {
         if (svmModel == null)
         {
             try {
-                svmModel = svm.svm_load_model("svm_model_linear_0.5");
+                //String svm_model_file = "svm_model_linear_0.5_94";
+                String svm_model_file = "svm_model_rbf_32.0_0.0078125_96.3";
+                svmModel = svm.svm_load_model(svm_model_file);
+                System.out.println(svm_model_file + " is loaded.");
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -80,7 +83,7 @@ public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
 //		}
     }
 
-    private void MergeRecognitionLabelsSimple()
+    protected void MergeRecognitionLabelsSimple()
     {
         if (figure.panels.size() == 0) return;
 
@@ -106,12 +109,13 @@ public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
      */
     void segment(opencv_core.Mat image)
     {
-        super.segment(image);
-//        figure = new Figure(image); //Common initializations for all segmentation method.
-//        HoGDetect();		//HoG Detection, detected patches are stored in hogDetectionResult
-//        mergeDetectedLabelsSimple();	//All detected patches are merged into figure.panels.
+        //run super class segmentation steps.
+        figure = new Figure(image); //Common initializations for all segmentation method.
+        HoGDetect();		//HoG Detection, detected patches are stored in hogDetectionResult
+        mergeDetectedLabelsSimple();	//All detected patches are merged into figure.panels.
 
-        SvmClassification();			//SVM classification of each detected patch in figure.segmentationResult.
+        //additional steps for this method.
+        SvmClassification();			//SVM classification of each detected patch in figure.panels.
         MergeRecognitionLabelsSimple();
     }
 

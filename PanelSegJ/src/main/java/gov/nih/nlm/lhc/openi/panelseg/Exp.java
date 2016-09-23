@@ -116,7 +116,7 @@ abstract class Exp {
         System.out.println("Average processing time: " + ((endTime - startTime)/1000.0)/imagePaths.size() + " seconds.");
     }
 
-    private void segmentMulti()
+    protected void segmentMulti()
     {
         ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 4);
         invokeAll(tasks);

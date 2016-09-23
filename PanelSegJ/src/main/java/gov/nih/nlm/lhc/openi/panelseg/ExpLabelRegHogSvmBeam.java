@@ -9,24 +9,22 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
 /**
- * Experiments of HOG+SVM method for Label Recognition
- *
- * Created by jzou on 9/21/2016.
+ * Created by jzou on 9/22/2016.
  */
-public class ExpLabelRegHogSvmThresholding extends Exp
+public class ExpLabelRegHogSvmBeam extends Exp
 {
     public static void main(String args[]) throws Exception {
         //Stop and print error msg if no arguments passed.
         if (args.length != 2) {
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelRegHogSvmThresholding <Sample List File> <target folder>");
+            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelRegHogSvmBeam <Sample List File> <target folder>");
             System.out.println("	This is a utility program to do Panel Label Recognition with HOG+SVM method.");
             System.out.println("	It saves recognition results (iPhotoDraw XML file) and preview images in target folder.");
             System.exit(0);
         }
 
-        PanelSeg.initialize(PanelSeg.SegMethod.LabelRegHogSvmThresholding);
+        PanelSeg.initialize(PanelSeg.SegMethod.LabelRegHogSvmBeam);
 
-        ExpLabelRegHogSvmThresholding generator = new ExpLabelRegHogSvmThresholding(args[0], args[1]);
+        ExpLabelRegHogSvmBeam generator = new ExpLabelRegHogSvmBeam(args[0], args[1]);
         //generator.segmentSingle();
         generator.segmentMulti();
         System.out.println("Completed!");
@@ -39,7 +37,7 @@ public class ExpLabelRegHogSvmThresholding extends Exp
      * @param trainListFile
      * @param targetFolder
      */
-    private ExpLabelRegHogSvmThresholding(String trainListFile, String targetFolder) {
+    private ExpLabelRegHogSvmBeam(String trainListFile, String targetFolder) {
         super(trainListFile, targetFolder, true);
     }
 
@@ -49,7 +47,7 @@ public class ExpLabelRegHogSvmThresholding extends Exp
         System.out.println(Integer.toString(k) +  ": processing " + imagePath.toString());
 
         opencv_core.Mat image = imread(imagePath.toString(), CV_LOAD_IMAGE_COLOR);
-        List<Panel> panels = PanelSeg.segment(image, PanelSeg.SegMethod.LabelRegHogSvmThresholding);
+        List<Panel> panels = PanelSeg.segment(image, PanelSeg.SegMethod.LabelRegHogSvmBeam);
 
         saveSegResult(imagePath.toFile().getName(), image, panels);
     }

@@ -64,13 +64,33 @@ public abstract class PanelSeg
         return segment(image, method);
     }
 
-    //All possible panel label chars, 'c', 'k', 'o', 'p', 's', 'u', 'v' 'w', 'x', 'y', 'z' no difference between upper and lower cases.
+    //All possible panel label chars
     static final char[] labelChars = {
             'a', 'A', 'b', 'B', 'c', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H',
             'i', 'I', 'j', 'J', 'k', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'p', 'q', 'Q',
             'r', 'R', 's', 't', 'T', 'u', 'v', 'w', 'x', 'y', 'z',
             '1', '2', '3', '4', '5', '6', '7', '8', '9'
     };
+
+    /**
+     * 'c', 'k', 'o', 'p', 's', 'u', 'v' 'w', 'x', 'y', 'z' no difference between upper and lower cases.
+     * @param c
+     * @return
+     */
+    static boolean isCaseSame(char c)
+    {
+        return (c == 'c' ||
+                c == 'k' ||
+                c == 'o' ||
+                c == 'p' ||
+                c == 's' ||
+                c == 'u' ||
+                c == 'v' ||
+                c == 'w' ||
+                c == 'x' ||
+                c == 'y' ||
+                c == 'z');
+    }
 
     /**
      * Convert label char to folder name. 'a' and 'A' are 2 different char, but a and A folders are the same.

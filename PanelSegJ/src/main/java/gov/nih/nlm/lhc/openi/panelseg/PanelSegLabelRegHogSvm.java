@@ -24,7 +24,8 @@ public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
         {
             try {
                 //String svm_model_file = "svm_model_linear_0.5_94";
-                String svm_model_file = "svm_model_rbf_32.0_0.0078125_96.3";
+                //String svm_model_file = "svm_model_rbf_32.0_0.0078125_96.3";
+                String svm_model_file = "svm_model_rbf_8.0_0.125";
                 svmModel = svm.svm_load_model(svm_model_file);
                 System.out.println(svm_model_file + " is loaded.");
             } catch (IOException e) {
@@ -91,13 +92,13 @@ public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
         ArrayList<Panel> candidates = new ArrayList<>();
         for (int j = 0; j < figure.panels.size(); j++)
         {
-            Panel obj = figure.panels.get(j);
-            int maxIndex = AlgMiscEx.findMaxIndex(obj.labelProbs);
+            Panel panel = figure.panels.get(j);
+            int maxIndex = AlgMiscEx.findMaxIndex(panel.labelProbs);
             if (maxIndex == labelChars.length) continue; //Classified as a negative sample.
 
-            obj.labelScore = obj.labelProbs[maxIndex];
-            obj.panelLabel = "" + labelChars[maxIndex];
-            candidates.add(obj);
+            panel.labelScore = panel.labelProbs[maxIndex];
+            panel.panelLabel = "" + labelChars[maxIndex];
+            candidates.add(panel);
         }
 
         figure.panels = RemoveOverlappedCandidates(candidates);

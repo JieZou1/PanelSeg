@@ -24,8 +24,8 @@ public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
         {
             try {
                 //String svm_model_file = "svm_model_linear_0.5_94";
-                //String svm_model_file = "svm_model_rbf_32.0_0.0078125_96.3";
-                String svm_model_file = "svm_model_rbf_8.0_0.125";
+                //String svm_model_file = "svm_model_rbf_8.0_0.125";
+                String svm_model_file = "svm_model_rbf_32.0_0.0078125_96.3";
                 svmModel = svm.svm_load_model(svm_model_file);
                 System.out.println(svm_model_file + " is loaded.");
             } catch (IOException e) {

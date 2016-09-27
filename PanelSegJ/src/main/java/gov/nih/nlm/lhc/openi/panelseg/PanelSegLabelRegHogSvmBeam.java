@@ -2,8 +2,7 @@ package gov.nih.nlm.lhc.openi.panelseg;
 
 import org.bytedeco.javacpp.opencv_core;
 
-import java.lang.reflect.Array;
-import java.nio.charset.CharacterCodingException;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,7 +35,31 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
         //additional steps for this method.
         if (figure.panels.size() == 0) return;
 
+        //Sort the candidates according their max prob, before Beam Search,
+        //Check whether in this case we have better chance to not miss the correct sequence during the beam search.
+        //sortCandidates();
+
         beamSearch();
+    }
+
+    /**
+     * Sort the candidates according their max prob
+     */
+    private void sortCandidates()
+    {
+        //set label and score according to the max of labelProbs, computed by SVM
+        ArrayList<Panel> candidates = new ArrayList<>();
+        for (int j = 0; j < figure.panels.size(); j++)
+        {
+            Panel panel = figure.panels.get(j);
+            int maxIndex = AlgMiscEx.findMaxIndex(panel.labelProbs);
+            panel.labelScore = panel.labelProbs[maxIndex];
+            //panel.panelLabel = "" + labelChars[maxIndex];
+            candidates.add(panel);
+        }
+        //candidates.sort(new LabelScoreDescending());
+        //candidates.sort(new LabelScoreAscending());
+        figure.panels = candidates;
     }
 
     private void beamSearch()
@@ -54,6 +77,9 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
             for (int j = 0; j < panel.labelProbs.length; j++)
             {
                 double p1 = panel.labelProbs[j];
+                //If p1 (Classification post-prob) is too small, we don't consider it.
+                if (j != PanelSeg.labelChars.length && p1 < 0.02) continue;
+
                 if (i == 0)
                 {
                     BeamItem item = new BeamItem();
@@ -74,8 +100,7 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
                         item.labelIndexes.addAll(prevItem.labelIndexes);
                         item.labelIndexes.add(j);
 
-                        if (checkLabelSequence(item))
-                            beam.add(item);
+                        if (checkLabelSequence(item)) beam.add(item);
                     }
                 }
             }
@@ -88,27 +113,15 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
 
         //Update prob for the last beam
         List<BeamItem> lastBeam = beams.get(beams.size()- 1);
-        for (int i = 0; i < lastBeam.size(); i++)
-        {
-            BeamItem item = lastBeam.get(i);
-            updateItem(item);
-        }
+        lastBeam = updateLastBeam(lastBeam);
+
+        //Sort and then find the optimal sequence, and update the panels
         lastBeam.sort(new ScoreDescending());
-
-        //Find the optimal option, and update the panels
         BeamItem bestItem = lastBeam.get(0);
-        ArrayList<Panel> candidates = new ArrayList<>();
-        for (int i = 0; i < figure.panels.size(); i++)
-        {
-            int labelIndex = bestItem.labelIndexes.get(i);
-            if (labelIndex == PanelSeg.labelChars.length) continue; //Classified as a negative sample.
 
-            Panel panel = figure.panels.get(i);
-            panel.panelLabel = "" + PanelSeg.labelChars[labelIndex];
-            panel.labelScore = panel.labelProbs[labelIndex];
-            candidates.add(panel);
-        }
-        figure.panels = candidates;
+        //Finally check to remove panels which looks obviously wrong, to increase precision
+        // then save the result to figure.panels.
+        figure.panels = finalCheck(bestItem);
     }
 
     /**
@@ -121,6 +134,7 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
     {
         if (!noDuplicateLabels(item)) return false;
         if (!sameCaseLabels(item)) return false;
+        if (!noOverlappingRect(item)) return false;
 
         item.score = item.p1 + item.p2 + item.p3;
 
@@ -194,13 +208,119 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
         return true;
     }
 
+    private boolean noOverlappingRect(BeamItem item)
+    {
+        //Collect all label rects.
+        List<Rectangle> rectangles = new ArrayList<>();
+        for (int i = 0; i < item.labelIndexes.size(); i++)
+        {
+            int index = item.labelIndexes.get(i);
+            if (index == PanelSeg.labelChars.length) continue; //classified as negative don't care.
+
+            Panel panel = figure.panels.get(i);
+            rectangles.add(panel.labelRect);
+        }
+
+        for (int i = 0; i < rectangles.size(); i++)
+        {
+            Rectangle r1 = rectangles.get(i);
+            for (int j = i+ 1; j < rectangles.size(); j++)
+            {
+                Rectangle r2 = rectangles.get(j);
+                Rectangle intersect = r1.intersection(r2);
+                if (!intersect.isEmpty()) return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
-     * Update the BeamItem prob, for other evidences, length K, consequence no missing,
+     * Check the last beam, updates its joint prob and remove illegal beam items.
+     * @param beam
+     * @return
+     */
+    private List<BeamItem> updateLastBeam(List<BeamItem> beam)
+    {
+        List<BeamItem> candidates = new ArrayList<>();
+        for (int i = 0; i < beam.size(); i++)
+        {
+            BeamItem item = beam.get(i);
+            if (!updateItem(item)) continue;
+
+            candidates.add(item);
+        }
+        if (candidates.size() == 0) return beam; //no one is qualified, we keep the original
+        return candidates;
+    }
+
+    /**
+     * Update the BeamItem prob, for other evidences, such as length K, consequence no missing,
      * @param item
      */
-    private void updateItem(BeamItem item)
+    private boolean updateItem(BeamItem item)
     {
+        //Collect all panels
+        List<Panel> panels = new ArrayList<>();
+        for (int i = 0; i < item.labelIndexes.size(); i++)
+        {
+            int labelIndex = item.labelIndexes.get(i);
+            if (labelIndex == PanelSeg.labelChars.length) continue; //Classified as a negative sample.
 
+            Panel panel = figure.panels.get(i);
+            panel.panelLabel = "" + PanelSeg.labelChars[labelIndex];
+            panel.labelScore = panel.labelProbs[labelIndex];
+            panels.add(panel);
+        }
+        panels.sort(new PanelLabelAscending());
+
+        //Check label sequence consecutive. It can not miss more than 2
+        if (panels.size() == 0) return true; //No labels, which is possible
+        if (panels.size() <= 1) return false; //Only one label, not good.
+        int prevChar = Character.toLowerCase(panels.get(0).panelLabel.charAt(0));
+        for (int i = 1; i < panels.size(); i++)
+        {
+            int currChar = Character.toLowerCase(panels.get(i).panelLabel.charAt(0));
+            if (currChar - prevChar > 1) return false;
+            prevChar = currChar;
+        }
+
+        return true;
+    }
+
+    private List<Panel> finalCheck(BeamItem item)
+    {
+        //Collect all panels
+        List<Panel> panels = new ArrayList<>();
+        for (int i = 0; i < item.labelIndexes.size(); i++)
+        {
+            int labelIndex = item.labelIndexes.get(i);
+            if (labelIndex == PanelSeg.labelChars.length) continue; //Classified as a negative sample.
+
+            Panel panel = figure.panels.get(i);
+            panel.panelLabel = "" + PanelSeg.labelChars[labelIndex];
+            panel.labelScore = panel.labelProbs[labelIndex];
+            panels.add(panel);
+        }
+        panels.sort(new PanelLabelAscending());
+
+        if (panels.size() <= 1) return panels;
+
+        List<Panel> candidates = new ArrayList<>();
+        candidates.add(panels.get(0));
+        int prevChar = Character.toLowerCase(panels.get(0).panelLabel.charAt(0));
+        for (int i = 1; i < panels.size(); i++)
+        {
+            Panel panel = panels.get(i);
+            int currChar = Character.toLowerCase(panel.panelLabel.charAt(0));
+            if (currChar - prevChar <= 1)
+            {
+                prevChar = currChar;
+                candidates.add(panel);
+            }
+            else break;
+        }
+        return candidates;
     }
 
     enum SequenceType {Unknown, Upper, Lower, Digit}

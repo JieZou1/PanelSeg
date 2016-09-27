@@ -25,8 +25,8 @@ public class ExpLabelRegHogSvmBeam extends Exp
         PanelSeg.initialize(PanelSeg.SegMethod.LabelRegHogSvmBeam);
 
         ExpLabelRegHogSvmBeam generator = new ExpLabelRegHogSvmBeam(args[0], args[1]);
-        //generator.segmentSingle();
-        generator.segmentMulti();
+        generator.segmentSingle();
+        //generator.segmentMulti();
         System.out.println("Completed!");
     }
 

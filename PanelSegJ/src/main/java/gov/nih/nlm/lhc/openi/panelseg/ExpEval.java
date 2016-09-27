@@ -197,8 +197,8 @@ final class ExpEval extends Exp
                 //check label
                 String autoLabel = autoPanel.panelLabel.toLowerCase();
                 String gtLabel = gtPanel.panelLabel.toLowerCase();
-                if (method == PanelSeg.SegMethod.LabelRegHog) //||
-                        //method == PanelSeg.SegMethod.LabelRegHogSvm)
+                if (method == PanelSeg.SegMethod.LabelRegHog ||
+                        method == PanelSeg.SegMethod.LabelRegHogSvm)
                 { //For HoG Detection case, provided that it is detected, we count it as correct. No need to check label
                     autoLabel = gtLabel;
                 }

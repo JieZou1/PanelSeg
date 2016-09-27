@@ -258,9 +258,11 @@ public abstract class PanelSeg
 
             if (panel.panelLabel.length() != 0)
             {
+                String label = panel.panelLabel;
+                double score = ((int)(panel.labelScore*1000+0.5))/1000.0;
                 opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
                 opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 10);
-                opencv_imgproc.putText(imgAnnotated, panel.panelLabel + Double.toString(panel.labelScore), bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 1, color, 1, 8, false);
+                opencv_imgproc.putText(imgAnnotated, label + " " + Double.toString(score), bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 1, color, 1, 8, false);
             }
         }
 

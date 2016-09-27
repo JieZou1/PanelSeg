@@ -19,7 +19,7 @@ class RectangleTopAscending implements Comparator<Rectangle>
 }
 
 /**
- * Comparator for sorting Panels in reverse order of labelScore.
+ * Comparator for sorting Panels in descending order of labelScore.
  * @author Jie Zou
  */
 class LabelScoreDescending implements Comparator<Panel>
@@ -27,6 +27,21 @@ class LabelScoreDescending implements Comparator<Panel>
     public int compare(Panel o1, Panel o2)
     {
         double diff = o2.labelScore - o1.labelScore;
+        if (diff > 0) return 1;
+        else if (diff == 0) return 0;
+        else return -1;
+    }
+}
+
+/**
+ * Comparator for sorting Panels in ascending order of labelScore.
+ * @author Jie Zou
+ */
+class LabelScoreAscending implements Comparator<Panel>
+{
+    public int compare(Panel o1, Panel o2)
+    {
+        double diff = o1.labelScore - o2.labelScore;
         if (diff > 0) return 1;
         else if (diff == 0) return 0;
         else return -1;

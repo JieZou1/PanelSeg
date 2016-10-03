@@ -40,6 +40,13 @@
       <groupId>org.nd4j</groupId>
       <artifactId>${nd4j.backend}</artifactId>
     </dependency>
+    <!-- Core DL4J functionality -->
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>deeplearning4j-core</artifactId>
+      <version>${dl4j.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

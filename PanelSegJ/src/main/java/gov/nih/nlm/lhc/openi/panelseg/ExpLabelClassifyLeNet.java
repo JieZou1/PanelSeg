@@ -20,6 +20,8 @@ import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.ui.flow.FlowIterationListener;
+import org.deeplearning4j.ui.weights.HistogramIterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -96,7 +98,7 @@ public class ExpLabelClassifyLeNet
                         .nOut(outputNum)
                         .activation("softmax")
                         .build())
-                .setInputType(InputType.convolutional(28,28,1)) //See note below
+                .setInputType(InputType.convolutional(width,height,1)) //See note below
                 .backprop(true).pretrain(false);
 
         /*
@@ -125,7 +127,7 @@ public class ExpLabelClassifyLeNet
         // split needs a random number generator for reproducibility when splitting the files into train and test
         FileSplit filesInDir = new FileSplit(parentDir, allowedExtensions, randNumGen);
 
-        long total = filesInDir.locations().length;
+        log.info("Total files: {}", filesInDir.locations().length);
 
         //You do not have to manually specify labels. This class (instantiated as below) will
         //parse the parent dir and use the name of the subdirectories as label/class names
@@ -141,6 +143,9 @@ public class ExpLabelClassifyLeNet
 
         long totalTrain = trainData.locations().length;
         long totalTest = testData.locations().length;
+
+        log.info("Total train files: {}", totalTrain);
+        log.info("Total test files: {}", totalTest);
 
         DataSetIterator trainDataIter, testDataIter;
         ImageRecordReader trainRecordReader = new ImageRecordReader(height,width,channels,labelMaker);
@@ -166,6 +171,8 @@ public class ExpLabelClassifyLeNet
         long startTime = System.nanoTime();
 
         model.setListeners(new ScoreIterationListener(10));
+        //model.setListeners(new HistogramIterationListener(1));
+        model.setListeners(new FlowIterationListener(10));
         for( int i=0; i<nEpochs; i++ )
         {
             model.fit(trainDataIter);
@@ -196,7 +203,7 @@ public class ExpLabelClassifyLeNet
         Evaluation eval = new Evaluation(outputNum);
         while(testDataIter.hasNext()){
             DataSet ds = testDataIter.next();
-            INDArray output = model.output(ds.getFeatureMatrix(), false);
+            INDArray output = model1.output(ds.getFeatureMatrix(), false);
             eval.eval(ds.getLabels(), output);
         }
         log.info(eval.stats());

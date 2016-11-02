@@ -21,7 +21,6 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.flow.FlowIterationListener;
-import org.deeplearning4j.ui.weights.HistogramIterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -32,18 +31,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.Date;
 import java.util.Random;
 
 /**
- * LeNet method for Label Recognition
+ * LeNet method for Label Recognition Training
  *
  * Created by jzou on 10/3/2016.
  */
-public class ExpLabelClassifyLeNet
+public class ExpLabelClassifyLeNetTrain
 {
-    protected static final Logger log = LoggerFactory.getLogger(ExpLabelClassifyLeNet.class);
+    protected static final Logger log = LoggerFactory.getLogger(ExpLabelClassifyLeNetTrain.class);
 
     //Images are of format given by allowedExtension -
     protected static final String [] allowedExtensions = BaseImageLoader.ALLOWED_FORMATS;
@@ -55,7 +53,7 @@ public class ExpLabelClassifyLeNet
     protected static int channels = 1;
     protected static int outputNum = 2;
     protected static int batchSize = 64;
-    protected static int nEpochs = 10;
+    protected static int nEpochs = 100;
     protected static int iterations = 1;
 
     public static void main(String[] args) throws Exception
@@ -63,9 +61,9 @@ public class ExpLabelClassifyLeNet
         log.info("Build model....");
         MultiLayerConfiguration.Builder builder = new NeuralNetConfiguration.Builder()
                 .seed(seed)
-                .iterations(iterations)
-                .regularization(true).l2(0.0005)
-                .learningRate(0.01)//.biasLearningRate(0.02)
+                .iterations(iterations) //Usually use 1, indicating that 1 parameter update for 1 minibatch
+                .regularization(true)./*dropOut(0.5)//.*/l2(0.0005)    //typical value is 0.001 to 0.000001
+                .learningRate(0.005)//.biasLearningRate(0.02) //typical value is 0.1 to 0.000001
                 //.learningRateDecayPolicy(LearningRatePolicy.Inverse).lrPolicyDecayRate(0.001).lrPolicyPower(0.75)
                 .weightInit(WeightInit.XAVIER)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -76,7 +74,8 @@ public class ExpLabelClassifyLeNet
                         .nIn(channels)
                         .stride(1, 1)
                         .nOut(20)
-                        .activation("identity")
+                        //.activation("identity")
+                        .activation("relu")
                         .build())
                 .layer(1, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
                         .kernelSize(2,2)
@@ -86,7 +85,8 @@ public class ExpLabelClassifyLeNet
                         //Note that nIn need not be specified in later layers
                         .stride(1, 1)
                         .nOut(50)
-                        .activation("identity")
+                        //.activation("identity")
+                        .activation("relu")
                         .build())
                 .layer(3, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
                         .kernelSize(2,2)
@@ -147,23 +147,17 @@ public class ExpLabelClassifyLeNet
         log.info("Total train files: {}", totalTrain);
         log.info("Total test files: {}", totalTest);
 
-        DataSetIterator trainDataIter, testDataIter;
+        log.info("Normalize data....");
+
         ImageRecordReader trainRecordReader = new ImageRecordReader(height,width,channels,labelMaker);
         trainRecordReader.initialize(trainData);
         ImageRecordReader testRecordReader = new ImageRecordReader(height,width,channels,labelMaker);
         testRecordReader.initialize(testData);
 
-        log.info("Normalize data....");
-        trainDataIter = new RecordReaderDataSetIterator(trainRecordReader, (int)totalTrain,1,outputNum);
-        DataSet datasetAll = trainDataIter.next();
-        //NormalizerMinMaxScaler preProcessor = new NormalizerMinMaxScaler();
-        ImagePreProcessingScaler myScaler = new ImagePreProcessingScaler();
-        myScaler.fit(datasetAll);
-//        log.info("Min: {}",myScaler.getMin());
-//        log.info("Max: {}",myScaler.getMax());
+        ImagePreProcessingScaler myScaler = new ImagePreProcessingScaler(0, 1);
 
-        trainDataIter = new RecordReaderDataSetIterator(trainRecordReader, batchSize, 1, outputNum);
-        testDataIter = new RecordReaderDataSetIterator(testRecordReader, batchSize, 1, outputNum);
+        DataSetIterator trainDataIter = new RecordReaderDataSetIterator(trainRecordReader, batchSize, 1, outputNum);
+        DataSetIterator testDataIter = new RecordReaderDataSetIterator(testRecordReader, batchSize, 1, outputNum);
         trainDataIter.setPreProcessor(myScaler);
         testDataIter.setPreProcessor(myScaler);
 
@@ -182,7 +176,8 @@ public class ExpLabelClassifyLeNet
             Evaluation eval = new Evaluation(outputNum);
             while(testDataIter.hasNext()){
                 DataSet ds = testDataIter.next();
-                INDArray output = model.output(ds.getFeatureMatrix(), false);
+                INDArray featureMatrix = ds.getFeatureMatrix();
+                INDArray output = model.output(featureMatrix, false);
                 eval.eval(ds.getLabels(), output);
             }
             log.info(eval.stats());

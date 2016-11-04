@@ -46,10 +46,10 @@ public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
 
         for (int i = 0; i < figure.panels.size(); i++)
         {
-            Panel info = figure.panels.get(i);
-            if (info == null) continue;
+            Panel panel = figure.panels.get(i);
+            if (panel == null) continue;
 
-            opencv_core.Mat patch = AlgOpenCVEx.cropImage(figure.imageGray, info.labelRect);
+            opencv_core.Mat patch = AlgOpenCVEx.cropImage(figure.imageGray, panel.labelRect);
             opencv_core.Mat patchNormalized = new opencv_core.Mat();
             resize(patch, patchNormalized, hog.winSize());
 
@@ -57,10 +57,9 @@ public class PanelSegLabelRegHogSvm extends PanelSegLabelRegHog
             svm_node[] svmNode = LibSvmEx.float2SvmNode(feature); double[] probs = new double[LibSvmEx.getNrClass(svmModel)];
 	        /*double label = */svm.svm_predict_probability(svmModel, svmNode, probs);
 
-            info.labelProbs = probs;
-            //figure.segmentationResult.set(i, info);
+            panel.labelProbs = probs;
+            //figure.segmentationResult.set(i, panel);
         }
-
 //		for (int i = 0; i < figure.segmentationResultIndividualLabel.size(); i++)
 //		{
 //			ArrayList<PanelSegInfo> infos = figure.segmentationResultIndividualLabel.get(i);

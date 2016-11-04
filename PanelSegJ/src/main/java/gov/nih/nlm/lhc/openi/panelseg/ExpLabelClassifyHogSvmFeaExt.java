@@ -26,7 +26,7 @@ class ExpLabelClassifyHogSvmFeaExt
         }
 
         ExpLabelClassifyHogSvmFeaExt generator = new ExpLabelClassifyHogSvmFeaExt(args[0]);
-        generator.generate();
+        generator.generate(false);
         System.out.println("Completed!");
     }
 
@@ -44,7 +44,7 @@ class ExpLabelClassifyHogSvmFeaExt
     /**
      * Entry function
      */
-    void generate()
+    void generate(boolean include_neg)
     {
         List<Double> targets = new ArrayList<>();
         List<float[]> features = new ArrayList<>();
@@ -66,8 +66,9 @@ class ExpLabelClassifyHogSvmFeaExt
                 targets.add((double)i);
             }
         }
-        //Negative class
-        {
+
+        if (include_neg)
+        {   //Negative class
             Path folder = targetFolder.resolve("neg");
             List<Path> patches = AlgMiscEx.collectImageFiles(folder);
 

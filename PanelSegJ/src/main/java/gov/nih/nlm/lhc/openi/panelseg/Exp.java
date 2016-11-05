@@ -60,7 +60,8 @@ abstract class Exp {
             AlgMiscEx.createClearFolder(this.targetFolder);
     }
 
-    abstract void generate(int k); //The method for handling processing of 1 sample, mostly for implementing multi-threading processing in Fork/Join framework
+    //The method for handling processing of 1 sample, mostly for implementing multi-threading processing in Fork/Join framework
+    abstract void doExp(int k);
 
     /**
      * Helper function for generating panel label patch filenames for saving to disks.
@@ -100,7 +101,6 @@ abstract class Exp {
         Path previewPath = previewFolder.resolve(imageFile);
         opencv_core.Mat preview = PanelSeg.drawAnnotation(image, panels);
         opencv_imgcodecs.imwrite(previewPath.toString(), preview);
-
     }
 
     /**
@@ -109,7 +109,7 @@ abstract class Exp {
     protected void segmentSingle()
     {
         long startTime = System.currentTimeMillis();
-        for (int k = 0; k < imagePaths.size(); k++) generate(k);
+        for (int k = 0; k < imagePaths.size(); k++) doExp(k);
         long endTime = System.currentTimeMillis();
 
         System.out.println("Total processing time: " + (endTime - startTime)/1000.0 + " seconds.");

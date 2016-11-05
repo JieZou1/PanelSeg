@@ -55,7 +55,7 @@ final class ExpLabelDetectHogBootstrap extends Exp
      */
     void generateSingle()
     {
-        for (int k = 0; k < imagePaths.size(); k++) generate(k);
+        for (int k = 0; k < imagePaths.size(); k++) doExp(k);
     }
 
     private void generateMulti()
@@ -64,7 +64,7 @@ final class ExpLabelDetectHogBootstrap extends Exp
         invokeAll(tasks);
     }
 
-    void generate(int k)
+    void doExp(int k)
     {
         Path imagePath = imagePaths.get(k);
         String imageFile = imagePath.toString();

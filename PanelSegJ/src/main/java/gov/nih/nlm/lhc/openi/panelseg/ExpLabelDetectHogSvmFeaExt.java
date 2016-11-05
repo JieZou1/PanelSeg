@@ -44,10 +44,10 @@ final class ExpLabelDetectHogSvmFeaExt extends Exp
      */
     void generate()
     {
-        for (int i = 0; i < PanelSegLabelRegHog.labelSetsHOG.length; i++) generate(i);
+        for (int i = 0; i < PanelSegLabelRegHog.labelSetsHOG.length; i++) doExp(i);
     }
 
-    void generate(int i)
+    void doExp(int i)
     {
         String name = PanelSegLabelRegHog.labelSetsHOG[i];
 

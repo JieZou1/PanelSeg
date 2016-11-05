@@ -26,7 +26,7 @@ class ExpTask extends RecursiveAction
         for (int i = start; i < end; i++)
         {
             try {
-                exp.generate(i);
+                exp.doExp(i);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

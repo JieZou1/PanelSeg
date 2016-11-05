@@ -15,8 +15,8 @@ final class ExpLabelPreview extends Exp {
         //Stop and print error msg if no arguments passed.
         if (args.length != 2) {
             System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectHogPos <Sample List File> <target folder>");
-            System.out.println("	This is a utility program to generate preview of label patches.");
-            System.out.println("	It can also be used for generate positive training samples for label detection.");
+            System.out.println("	This is a utility program to doExp preview of label patches.");
+            System.out.println("	It can also be used for doExp positive training samples for label detection.");
             System.exit(0);
         }
 
@@ -57,13 +57,13 @@ final class ExpLabelPreview extends Exp {
 
         this.type = type;
 
-        for (int i = 0; i < imagePaths.size(); i++) generate(i);
+        for (int i = 0; i < imagePaths.size(); i++) doExp(i);
     }
 
     /**
      * Generate label preview
      */
-    void generate(int i) {
+    void doExp(int i) {
         Path imagePath = imagePaths.get(i);
         String imageFile = imagePath.toString();
         //System.out.println(Integer.toString(i+1) +  ": processing " + imageFile);

@@ -19,8 +19,9 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  */
 public abstract class PanelSeg
 {
-    public enum SegMethod {LabelRegHog, LabelRegHogSvm, LabelRegHogSvmThresholding, LabelRegHogSvmBeam,
-                            LabelRegHogLeNet5Svm}
+    public enum SegMethod { LabelRegHog,
+                            LabelRegHogSvm, LabelRegHogSvmThreshold, LabelRegHogSvmBeam,
+                            LabelRegHogLeNet5, LabelRegHogLeNet5Svm}
 
     /**
      * Initialization method, load SVM model, etc.
@@ -33,10 +34,11 @@ public abstract class PanelSeg
         {
             case LabelRegHog: break;
             case LabelRegHogSvm: PanelSegLabelRegHogSvm.initialize(); break;
-            case LabelRegHogSvmThresholding: PanelSegLabelRegHogSvmThresholding.initialize(); break;
+            case LabelRegHogSvmThreshold: PanelSegLabelRegHogSvmThresholding.initialize(); break;
             case LabelRegHogSvmBeam: PanelSegLabelRegHogSvmBeam.initialize(); break;
 
-            case LabelRegHogLeNet5Svm: PanelSegLabelRegHogLeNetSvm.initialize(); break;
+            case LabelRegHogLeNet5: PanelSegLabelRegHogLeNet5.initialize(); break;
+            case LabelRegHogLeNet5Svm: PanelSegLabelRegHogLeNet5Svm.initialize(); break;
         }
     }
 
@@ -54,9 +56,11 @@ public abstract class PanelSeg
         {
             case LabelRegHog: seg = new PanelSegLabelRegHog(); break;
             case LabelRegHogSvm: seg = new PanelSegLabelRegHogSvm();  break;
-            case LabelRegHogSvmThresholding: seg = new PanelSegLabelRegHogSvmThresholding();  break;
+            case LabelRegHogSvmThreshold: seg = new PanelSegLabelRegHogSvmThresholding();  break;
             case LabelRegHogSvmBeam: seg = new PanelSegLabelRegHogSvmBeam();  break;
-            case LabelRegHogLeNet5Svm: seg = new PanelSegLabelRegHogLeNetSvm(); break;
+
+            case LabelRegHogLeNet5: seg = new PanelSegLabelRegHogLeNet5(); break;
+            case LabelRegHogLeNet5Svm: seg = new PanelSegLabelRegHogLeNet5Svm(); break;
         }
         seg.segment(image);
         return seg.getSegResultWithoutPadding();

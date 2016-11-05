@@ -21,30 +21,58 @@ final class ExpEval extends Exp
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
-        if (args.length != 3) {
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpEval <Sample List File> <target folder> <method>");
-            System.out.println("	This is a utility program to do evaluation for various panel segmentation algorithms.");
-            System.out.println("method:");
-            System.out.println("LabelRegHog		    LabelRegHog method for Label Detection");
-            System.out.println("LabelRegHogSvm		LabelRegHogSvm method for Label Recognition");
-            System.out.println("LabelRegHogSvmThresholding	LabelRegHogSvmThreading method for Label Recognition");
-            System.out.println("LabelRegHogSvmBeam	LabelRegHogSvmBeam method for Label Recognition");
+        if (args.length != 1 && args.length != 3)
+        {
+            System.out.println();
+
+            System.out.println("Usage: java -cp PanelSegJ.jar ExpEval <method> <Sample List File> <target folder>");
+            System.out.println("Evaluation for various panel segmentation methods.");
+
+            System.out.println();
+
+            System.out.println("Method:");
+            System.out.println("LabelRegHog                 HoG method for Label Detection");
+            System.out.println("LabelRegHogSvm              HoG+SVM method for Label Recognition");
+            System.out.println("LabelRegHogSvmThreshold     HoG+SVM then followed by simple threshold for Label Recognition");
+            System.out.println("LabelRegHogSvmBeam	        HoG+SVM then followed by beam search for Label Recognition");
+            System.out.println("LabelRegHogLeNet5Svm	    HoG+LeNet5+SVM method for Label Recognition");
+
+            System.out.println();
+
+            System.out.println("Default Sample List File: \\Users\\jie\\projects\\PanelSeg\\Exp\\eval.txt");
+            System.out.println("Default target folder: \\Users\\jie\\projects\\PanelSeg\\Exp\\PanelSeg\\eval");
+
+            System.out.println();
+
             System.exit(0);
         }
 
         PanelSeg.SegMethod method = null;
-        switch (args[2]) {
+        switch (args[0]) {
             case "LabelRegHog":  method = PanelSeg.SegMethod.LabelRegHog; break;
             case "LabelRegHogSvm": method = PanelSeg.SegMethod.LabelRegHogSvm; break;
-            case "LabelRegHogSvmThresholding": method = PanelSeg.SegMethod.LabelRegHogSvmThresholding; break;
+            case "LabelRegHogSvmThreshold": method = PanelSeg.SegMethod.LabelRegHogSvmThreshold; break;
             case "LabelRegHogSvmBeam": method = PanelSeg.SegMethod.LabelRegHogSvmBeam; break;
+            case "LabelRegHogLeNet5Svm": method = PanelSeg.SegMethod.LabelRegHogLeNet5Svm; break;
             default:
                 System.out.println("Unknown method!!");
                 System.exit(0);
         }
 
-        ExpEval eval = new ExpEval(args[0], args[1], method);
-        eval.generate();
+        String listFile, targetFolder;
+        if (args.length == 1)
+        {
+            listFile = "\\Users\\jie\\projects\\PanelSeg\\Exp\\eval.txt";
+            targetFolder = "\\Users\\jie\\projects\\PanelSeg\\Exp\\PanelSeg\\eval";
+        }
+        else
+        {
+            listFile = args[1];
+            targetFolder = args[2];
+        }
+
+        ExpEval eval = new ExpEval(listFile, targetFolder, method);
+        eval.evaluate();
     }
 
     private PanelSeg.SegMethod method;
@@ -62,16 +90,16 @@ final class ExpEval extends Exp
      * Ctor, set targetFolder and then collect all imagePaths
      * It also set the method
      *
-     * @param trainListFile
+     * @param listFile
      * @param targetFolder
      */
-    private ExpEval(String trainListFile, String targetFolder, PanelSeg.SegMethod method)
+    private ExpEval(String listFile, String targetFolder, PanelSeg.SegMethod method)
     {
-        super(trainListFile, targetFolder, false);
+        super(listFile, targetFolder, false);
         this.method = method;
     }
 
-    private void generate()
+    private void evaluate()
     {
         //Initialize
         countIndividualLabelGT = new HashMap<>();
@@ -82,12 +110,12 @@ final class ExpEval extends Exp
         missingLabels = new ArrayList<>();
         falseAlarmLabels = new ArrayList<>();
 
-        for (int k = 0; k < imagePaths.size(); k++) generate(k);
+        for (int k = 0; k < imagePaths.size(); k++) doExp(k);
 
         reportLabelRegEval();
     }
 
-    void generate(int k)
+    void doExp(int k)
     {
         ArrayList<Panel> gtPanels = null, autoPanels = null;
 
@@ -120,7 +148,6 @@ final class ExpEval extends Exp
         }
 
         evalLabelReg(gtPanels, autoPanels);
-
     }
 
     /**
@@ -197,9 +224,11 @@ final class ExpEval extends Exp
                 //check label
                 String autoLabel = autoPanel.panelLabel.toLowerCase();
                 String gtLabel = gtPanel.panelLabel.toLowerCase();
-                if (method == PanelSeg.SegMethod.LabelRegHog ||
-                        method == PanelSeg.SegMethod.LabelRegHogSvm)
-                { //For HoG Detection case, provided that it is detected, we count it as correct. No need to check label
+                if (    method == PanelSeg.SegMethod.LabelRegHog
+                        || method == PanelSeg.SegMethod.LabelRegHogLeNet5
+                        //|| method == PanelSeg.SegMethod.LabelRegHogSvm
+                        )
+                { //For LabelRegHog and LabelRegHogLeNet5 cases, provided that label is detected, we count it as correct. No need to check label
                     autoLabel = gtLabel;
                 }
                 if (!autoLabel.equals(gtLabel)) continue;
@@ -358,8 +387,6 @@ final class ExpEval extends Exp
         sorted.sort(new PanelOverlappingScore1Descending());
         return sorted;
     }
-
-
 }
 
 /**

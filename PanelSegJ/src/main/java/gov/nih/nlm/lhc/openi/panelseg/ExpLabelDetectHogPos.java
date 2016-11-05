@@ -20,7 +20,7 @@ final class ExpLabelDetectHogPos extends Exp {
         //Stop and print error msg if no arguments passed.
         if (args.length != 2) {
             System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectHogPos <Sample List File> <target folder>");
-            System.out.println("	This is a utility program to generate positive training samples for label detection.");
+            System.out.println("	This is a utility program to doExp positive training samples for label detection.");
             System.exit(0);
         }
 
@@ -54,7 +54,7 @@ final class ExpLabelDetectHogPos extends Exp {
      */
     void generateSingle()
     {
-        for (int i = 0; i < imagePaths.size(); i++) generate(i);
+        for (int i = 0; i < imagePaths.size(); i++) doExp(i);
     }
 
     private void generateMulti()
@@ -63,7 +63,7 @@ final class ExpLabelDetectHogPos extends Exp {
         invokeAll(tasks);
     }
 
-    void generate(int i)
+    void doExp(int i)
     {
         Path imagePath = imagePaths.get(i);
         String imageFile = imagePath.toString();

@@ -35,6 +35,8 @@ final class ExpEval extends Exp
             System.out.println("LabelRegHogSvm              HoG+SVM method for Label Recognition");
             System.out.println("LabelRegHogSvmThreshold     HoG+SVM then followed by simple threshold for Label Recognition");
             System.out.println("LabelRegHogSvmBeam	        HoG+SVM then followed by beam search for Label Recognition");
+
+            System.out.println("LabelRegHogLeNet5	        HoG+LeNet5 method for Label Detection");
             System.out.println("LabelRegHogLeNet5Svm	    HoG+LeNet5+SVM method for Label Recognition");
 
             System.out.println();
@@ -53,6 +55,8 @@ final class ExpEval extends Exp
             case "LabelRegHogSvm": method = PanelSeg.SegMethod.LabelRegHogSvm; break;
             case "LabelRegHogSvmThreshold": method = PanelSeg.SegMethod.LabelRegHogSvmThreshold; break;
             case "LabelRegHogSvmBeam": method = PanelSeg.SegMethod.LabelRegHogSvmBeam; break;
+
+            case "LabelRegHogLeNet5": method = PanelSeg.SegMethod.LabelRegHogLeNet5; break;
             case "LabelRegHogLeNet5Svm": method = PanelSeg.SegMethod.LabelRegHogLeNet5Svm; break;
             default:
                 System.out.println("Unknown method!!");

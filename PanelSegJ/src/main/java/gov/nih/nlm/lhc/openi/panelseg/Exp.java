@@ -61,7 +61,7 @@ abstract class Exp {
     }
 
     //The method for handling processing of 1 sample, mostly for implementing multi-threading processing in Fork/Join framework
-    abstract void doExp(int k);
+    abstract void doExp(int k) throws Exception;
 
     /**
      * Helper function for generating panel label patch filenames for saving to disks.
@@ -106,7 +106,7 @@ abstract class Exp {
     /**
      * Entry function
      */
-    protected void segmentSingle()
+    protected void segmentSingle() throws Exception
     {
         long startTime = System.currentTimeMillis();
         for (int k = 0; k < imagePaths.size(); k++) doExp(k);

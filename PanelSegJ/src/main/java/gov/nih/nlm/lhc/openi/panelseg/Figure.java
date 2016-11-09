@@ -1,12 +1,15 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import java.awt.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.*;
+import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_imgcodecs;
+import org.bytedeco.javacpp.opencv_imgproc;
 
 import static org.bytedeco.javacpp.opencv_imgproc.*;
 
@@ -174,5 +177,175 @@ class Figure
             panel.labelGrayNormPatch = new Mat();
             resize(patch, panel.labelGrayNormPatch, new Size(norm_w, norm_h));
         }
+    }
+
+    /**
+     * Get the panel segmentation result
+     * Notice the labelRect and panelRect is on the padded image
+     * @return The detected panels
+     */
+    List<Panel> getSegResultWithPadding()	{	return panels;	}
+
+    /**
+     * Get the panel segmentation result
+     * Notice the labelRect and panelRect is converted back to the original image, i.e., no paddings.
+     * @return The detected panels
+     */
+    List<Panel> getSegResultWithoutPadding()
+    {
+        List<Panel> panels = new ArrayList<>();
+        for (Panel panel: this.panels)
+        {
+            Panel panelNew = new Panel(panel);
+            if (panelNew.labelRect != null && !panelNew.labelRect.isEmpty())
+            {
+                panelNew.labelRect = (Rectangle) panel.labelRect.clone();
+                panelNew.labelRect.x -= Figure.padding;
+                panelNew.labelRect.y -= Figure.padding;
+            }
+            if (panelNew.panelRect != null && !panelNew.panelRect.isEmpty())
+            {
+                panelNew.panelRect = (Rectangle) panel.panelRect.clone();
+                panelNew.panelRect.x -= Figure.padding;
+                panelNew.panelRect.y -= Figure.padding;
+            }
+            panels.add(panelNew);
+        }
+        return panels;
+    }
+
+    /**
+     * Get the panel segmentation result by drawing the panel boundaries on the image
+     * @return the image with panel boundaries superimposed on it.
+     */
+    opencv_core.Mat getSegResultWithPaddingInMat()
+    {
+        return drawAnnotation(imageColor, panels);
+//        opencv_core.Mat img = figure.imageColor.clone();
+//        for (Panel panel : figure.panels)
+//        {
+//            if (panel.panelRect != null )
+//            {
+//                Rectangle rect = panel.panelRect;
+//                rectangle(img,
+//                        new opencv_core.Point(rect.x, rect.y), new opencv_core.Point(rect.x + rect.width, rect.y + rect.height),
+//                        opencv_core.Scalar.RED, 3, 8, 0);
+//            }
+//            if (panel.labelRect != null)
+//            {
+//                Rectangle rect = panel.labelRect;
+//                rectangle(img,
+//                        new opencv_core.Point(rect.x, rect.y), new opencv_core.Point(rect.x + rect.width, rect.y + rect.height),
+//                        opencv_core.Scalar.BLUE, 1, 8, 0);
+//
+//                if (panel.panelLabel != "")
+//                {
+//                    putText(img, panel.panelLabel,
+//                            new opencv_core.Point(panel.labelRect.x + panel.labelRect.width, panel.labelRect.y + panel.labelRect.height),
+//                            CV_FONT_HERSHEY_PLAIN, 2.0, opencv_core.Scalar.BLUE, 3, 8, false);
+//                }
+//            }
+//        }
+//
+//        return img;
+    }
+
+    /**
+     * Draw annotation onto the img for previewing and saving purpose
+     * @param img
+     * @param panels
+     * @return
+     */
+    static opencv_core.Mat drawAnnotation(opencv_core.Mat img, List<Panel> panels)
+    {
+        opencv_core.Mat imgAnnotated = new opencv_core.Mat();
+        opencv_core.copyMakeBorder(img, imgAnnotated, 0, 50, 0, 50, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
+
+        //Draw bounding box first
+        for (int i = 0; i < panels.size(); i++)
+        {
+            Panel panel = panels.get(i);
+            opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
+
+            if (panel.panelRect != null && !panel.panelRect.isEmpty())
+            {
+                opencv_core.Rect panel_rect = AlgOpenCVEx.Rectangle2Rect(panel.panelRect);
+                opencv_imgproc.rectangle(imgAnnotated, panel_rect, color, 3, 8, 0);
+            }
+
+            if (panel.labelRect != null && !panel.labelRect.isEmpty())
+            {
+                opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
+                opencv_imgproc.rectangle(imgAnnotated, label_rect, color, 1, 8, 0);
+            }
+        }
+
+        //Draw labels to make the text stand out.
+        for (int i = 0; i < panels.size(); i++)
+        {
+            Panel panel = panels.get(i);
+            opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
+
+            if (panel.panelLabel.length() != 0)
+            {
+                String label = panel.panelLabel;
+                double score = ((int)(panel.labelScore*1000+0.5))/1000.0;
+                opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
+                opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 10);
+                opencv_imgproc.putText(imgAnnotated, label + " " + Double.toString(score), bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 1, color, 1, 8, false);
+            }
+        }
+
+        return imgAnnotated;
+    }
+
+    /**
+     * Draw annotation onto the img for previewing and saving purpose
+     * @param img
+     * @param panels
+     * @return
+     */
+    static opencv_core.Mat drawAnnotation(opencv_core.Mat img, List<Panel> panels, String style)
+    {
+        opencv_core.Mat imgAnnotated = new opencv_core.Mat();
+        opencv_core.copyMakeBorder(img, imgAnnotated, 0, 100, 0, 50, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
+
+        //Draw bounding box first
+        for (int i = 0; i < panels.size(); i++)
+        {
+            Panel panel = panels.get(i);
+            opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
+
+            opencv_core.Rect panel_rect = AlgOpenCVEx.Rectangle2Rect(panel.panelRect);
+            opencv_imgproc.rectangle(imgAnnotated, panel_rect, color, 3, 8, 0);
+
+            if (panel.panelLabel.length() != 0)
+            {
+                opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
+                opencv_imgproc.rectangle(imgAnnotated, label_rect, color, 1, 8, 0);
+            }
+        }
+
+        //Draw labels to make the text stand out.
+        for (int i = 0; i < panels.size(); i++)
+        {
+            Panel panel = panels.get(i);
+            opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
+
+            if (panel.panelLabel.length() != 0)
+            {
+                opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
+                opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 50);
+                opencv_imgproc.putText(imgAnnotated, panel.panelLabel, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 5, color, 3, 8, false);
+            }
+        }
+
+        {//Draw Style Data
+            opencv_core.Scalar scalar = AlgOpenCVEx.getColor(1);
+            opencv_core.Point bottom_left = new opencv_core.Point(0, img.rows() + 100);
+            opencv_imgproc.putText(imgAnnotated, style, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 2, scalar, 3, 8, false);
+        }
+
+        return imgAnnotated;
     }
 }

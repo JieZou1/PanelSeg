@@ -41,7 +41,7 @@ final class ExpLabelDetectHogPos extends Exp {
         super(trainListFile, targetFolder, false);
 
         //Clean up all the folders
-        for (String name : PanelSegLabelRegHog.labelSetsHOG)
+        for (String name : LabelDetectHog.labelSetsHOG)
         {
             Path folder = this.targetFolder.resolve(name);
             folder = folder.resolve("pos");
@@ -87,7 +87,7 @@ final class ExpLabelDetectHogPos extends Exp {
             if (panel.labelRect == null) continue; //No label rect
             if (panel.panelLabel.length() != 1) continue; //Label has more than 1 char, we ignore for now.
 
-            String name = PanelSegLabelRegHog.getLabelSetName(panel.panelLabel.charAt(0));
+            String name = LabelDetectHog.getLabelSetName(panel.panelLabel.charAt(0));
 //                if (name == null)
 //                {
 //                    System.out.println(panel.panelLabel); continue;

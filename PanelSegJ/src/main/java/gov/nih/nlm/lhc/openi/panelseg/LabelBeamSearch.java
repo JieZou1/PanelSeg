@@ -1,69 +1,29 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
-import org.bytedeco.javacpp.opencv_core;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 /**
- * HOG + SVM method for Label Recognition
- * HOG for label detection, SVM for label classification and some rules to pick up the final result
+ * Label sequence finding using Beam Search
+ * Refactored from PanelSegLabelRegHogSvmBeam (which is obsolete) to make class hierarchy simpler.
  *
- * Created by jzou on 9/21/2016.
+ * Created by jzou on 11/8/2016.
  */
-public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
+public class LabelBeamSearch
 {
-    public PanelSegLabelRegHogSvmBeam()
+    private Figure figure;
+
+    LabelBeamSearch(Figure figure)
     {
-        super();
+        this.figure = figure;
     }
 
-    /**
-     * The main entrance function to perform segmentation.
-     * Call getResult* functions to retrieve result in different format.
-     */
-    void segment(opencv_core.Mat image)
+    void search()
     {
-        //run super class segmentation steps.
-        figure = new Figure(image); //Common initializations for all segmentation method.
-        HoGDetect();		//HoG Detection, detected patches are stored in hogDetectionResult
-        mergeDetectedLabelsSimple();	//All detected patches are merged into figure.panels.
-        SvmClassification();			//SVM classification of each detected patch in figure.panels.
-
-        //additional steps for this method.
         if (figure.panels.size() == 0) return;
 
-        //Sort the candidates according their max prob, before Beam Search,
-        //Check whether in this case we have better chance to not miss the correct sequence during the beam search.
-        //sortCandidates();
-
-        beamSearch();
-    }
-
-    /**
-     * Sort the candidates according their max prob
-     */
-    private void sortCandidates()
-    {
-        //set label and score according to the max of labelProbs, computed by SVM
-        ArrayList<Panel> candidates = new ArrayList<>();
-        for (int j = 0; j < figure.panels.size(); j++)
-        {
-            Panel panel = figure.panels.get(j);
-            int maxIndex = AlgMiscEx.findMaxIndex(panel.labelProbs);
-            panel.labelScore = panel.labelProbs[maxIndex];
-            //panel.panelLabel = "" + labelChars[maxIndex];
-            candidates.add(panel);
-        }
-        //candidates.sort(new LabelScoreDescending());
-        //candidates.sort(new LabelScoreAscending());
-        figure.panels = candidates;
-    }
-
-    private void beamSearch()
-    {
         //Initialize the beam
         int n = figure.panels.size(), beamLength = 100;
         List<List<BeamItem>> beams = new ArrayList<>();
@@ -281,7 +241,7 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
         for (int i = 1; i < panels.size(); i++)
         {
             int currChar = Character.toLowerCase(panels.get(i).panelLabel.charAt(0));
-            if (currChar - prevChar > 1) return false;
+            if (currChar - prevChar > 1) return false; //No missing more than 1
             prevChar = currChar;
         }
 
@@ -328,7 +288,7 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
     class BeamItem
     {
         double score;
-        double p1;  //prob of label sequence given the patches, from patch classification (SVM)
+        double p1;  //prob of label sequence given the patches, from patch classification
         double p2;  //prob of label sequence (same case, no duplicates, etc.)
         double p3;  //prob of label sequence given other info (bounding box position, size, etc.)
         ArrayList<Integer> labelIndexes; //The panel label-index sequence up to this BeamItem.
@@ -346,7 +306,7 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
      */
     class ScoreDescending implements Comparator<BeamItem>
     {
-        public int compare(BeamItem o1, BeamItem o2)
+        public int compare(LabelBeamSearch.BeamItem o1, LabelBeamSearch.BeamItem o2)
         {
             double diff = o2.score - o1.score;
             if (diff > 0) return 1;
@@ -356,5 +316,3 @@ public class PanelSegLabelRegHogSvmBeam extends  PanelSegLabelRegHogSvm
     }
 
 }
-
-

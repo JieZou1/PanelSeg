@@ -49,8 +49,6 @@ class ExpLabelClassifyHogSvmFeaExt
         List<Double> targets = new ArrayList<>();
         List<float[]> features = new ArrayList<>();
 
-        PanelSegLabelRegHog hog = new PanelSegLabelRegHog();
-
         //Positive classes
         for (int i = 0; i < PanelSeg.labelChars.length; i++) {
             String name = PanelSeg.getLabelCharFolderName(PanelSeg.labelChars[i]);
@@ -61,7 +59,7 @@ class ExpLabelClassifyHogSvmFeaExt
             for (Path path : patches)
             {
                 opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
-                float[] feature = hog.featureExtraction(gray);
+                float[] feature =  LabelDetectHog.featureExtraction(gray);
                 features.add(feature);
                 targets.add((double)i);
             }
@@ -75,7 +73,7 @@ class ExpLabelClassifyHogSvmFeaExt
             for (Path path : patches)
             {
                 opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
-                float[] feature = hog.featureExtraction(gray);
+                float[] feature = LabelDetectHog.featureExtraction(gray);
                 features.add(feature);
                 targets.add((double)PanelSeg.labelChars.length);
             }

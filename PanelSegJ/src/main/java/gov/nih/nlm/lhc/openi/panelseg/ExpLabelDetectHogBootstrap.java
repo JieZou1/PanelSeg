@@ -42,7 +42,7 @@ final class ExpLabelDetectHogBootstrap extends Exp
     private ExpLabelDetectHogBootstrap(String trainListFile, String targetFolder) {
         super(trainListFile, targetFolder, false);
 
-        for (String name : PanelSegLabelRegHog.labelSetsHOG)
+        for (String name : LabelDetectHog.labelSetsHOG)
         {
             Path folder = this.targetFolder.resolve(name);
             folder = folder.resolve("detected");
@@ -70,8 +70,9 @@ final class ExpLabelDetectHogBootstrap extends Exp
         String imageFile = imagePath.toString();
         System.out.println(Integer.toString(k) +  ": processing " + imageFile);
 
-        PanelSegLabelRegHog hog = new PanelSegLabelRegHog();
-        hog.segment(imageFile);
+        Figure figure = new Figure(imageFile);
+        LabelDetectHog hog = new LabelDetectHog(figure);
+        hog.hoGDetect();
 
         //Save detected patches
         for (int i = 0; i < hog.hogDetectionResult.size(); i++)

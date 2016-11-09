@@ -2,6 +2,7 @@ package gov.nih.nlm.lhc.openi.panelseg;
 
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgproc;
+import org.bytedeco.javacv.CanvasFrame;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -19,26 +20,55 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  */
 public abstract class PanelSeg
 {
-    public enum SegMethod { LabelRegHog,
-                            LabelRegHogSvm, LabelRegHogSvmThreshold, LabelRegHogSvmBeam,
-                            LabelRegHogLeNet5, LabelRegHogLeNet5Svm}
+    public enum SegMethod {
+        LabelDetHog, LabelDetHogLeNet5,
+        LabelRegHogSvm, LabelRegHogSvmThreshold, LabelRegHogSvmBeam,
+        LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam
+    }
 
     /**
      * Initialization method, load SVM model, etc.
      * Must call this function before call segment function.
      * @param method
      */
-    public static void initialize(SegMethod method)
+    public static void initialize(SegMethod method) throws Exception
     {
         switch (method)
         {
-            case LabelRegHog: break;
-            case LabelRegHogSvm: PanelSegLabelRegHogSvm.initialize(); break;
-            case LabelRegHogSvmThreshold: PanelSegLabelRegHogSvmThresholding.initialize(); break;
-            case LabelRegHogSvmBeam: PanelSegLabelRegHogSvmBeam.initialize(); break;
+            case LabelDetHog: return;
 
-            case LabelRegHogLeNet5: PanelSegLabelRegHogLeNet5.initialize(); break;
-            case LabelRegHogLeNet5Svm: PanelSegLabelRegHogLeNet5Svm.initialize(); break;
+            case LabelRegHogSvm:
+            case LabelRegHogSvmThreshold:
+            case LabelRegHogSvmBeam:
+            {
+                LabelClassifyHogSvm.initialize("svm_model_rbf_32.0_0.0078125_96.3");
+                return;
+            }
+
+            case LabelDetHogLeNet5:
+            {
+                LabelClassifyLeNet5.initialize();
+                return;
+            }
+
+            case LabelRegHogLeNet5Svm:
+            {
+                LabelClassifyLeNet5.initialize();
+                LabelClassifyHogSvm.initialize("svm_model_rbf_8.0_0.03125");
+                return;
+            }
+
+            case LabelRegHogLeNet5SvmBeam:
+            {
+                LabelClassifyLeNet5.initialize();
+                LabelClassifyHogSvm.initialize("svm_model_rbf_8.0_0.03125");
+                return;
+            }
+
+            default:
+            {
+                throw new Exception("Unknown Method!!");
+            }
         }
     }
 
@@ -49,26 +79,112 @@ public abstract class PanelSeg
      * @param method
      * @return
      */
-    public static List<Panel> segment(opencv_core.Mat image, SegMethod method)
+    public static List<Panel> segment(opencv_core.Mat image, SegMethod method) throws Exception
     {
-        PanelSeg seg = null;
-        switch (method)
-        {
-            case LabelRegHog: seg = new PanelSegLabelRegHog(); break;
-            case LabelRegHogSvm: seg = new PanelSegLabelRegHogSvm();  break;
-            case LabelRegHogSvmThreshold: seg = new PanelSegLabelRegHogSvmThresholding();  break;
-            case LabelRegHogSvmBeam: seg = new PanelSegLabelRegHogSvmBeam();  break;
+        Figure figure = new Figure(image); //Common initializations for all segmentation method.
 
-            case LabelRegHogLeNet5: seg = new PanelSegLabelRegHogLeNet5(); break;
-            case LabelRegHogLeNet5Svm: seg = new PanelSegLabelRegHogLeNet5Svm(); break;
+        switch (method) {
+            case LabelDetHog: {
+                LabelDetectHog detectHog = new LabelDetectHog(figure);
+                detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
+                detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
+
+                return figure.getSegResultWithoutPadding();
+            }
+
+            case LabelRegHogSvm: {
+                LabelDetectHog detectHog = new LabelDetectHog(figure);
+                detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
+                detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
+
+                //Do label classification with SVM
+                LabelClassifyHogSvm classifySvm = new LabelClassifyHogSvm(figure);
+                classifySvm.svmClassification();
+                classifySvm.mergeRecognitionLabelsSimple();
+
+                return figure.getSegResultWithoutPadding();
+            }
+
+            case LabelRegHogSvmThreshold: {
+                LabelDetectHog detectHog = new LabelDetectHog(figure);
+                detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
+                detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
+
+                //Do label classification with SVM
+                LabelClassifyHogSvm classifySvm = new LabelClassifyHogSvm(figure);
+                classifySvm.svmClassification();
+                classifySvm.mergeRecognitionLabelsSimple();
+                classifySvm.threshold(0.98);
+
+                return figure.getSegResultWithoutPadding();
+            }
+
+            case LabelRegHogSvmBeam: {
+                LabelDetectHog detectHog = new LabelDetectHog(figure);
+                detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
+                detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
+
+                //Do label classification with SVM
+                LabelClassifyHogSvm classifySvm = new LabelClassifyHogSvm(figure);
+                classifySvm.svmClassification();
+
+                LabelBeamSearch beamSearch = new LabelBeamSearch(figure);
+                beamSearch.search();
+
+                return figure.getSegResultWithoutPadding();
+            }
+
+            case LabelDetHogLeNet5: {
+                LabelDetectHog detectHog = new LabelDetectHog(figure);
+                detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
+                detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
+
+                //Remove false alarms with LeNet5 model
+                LabelClassifyLeNet5 classifyLeNet5 = new LabelClassifyLeNet5(figure);
+                classifyLeNet5.LeNet5Classification();    //SVM classification of each detected patch in figure.panels.
+                classifyLeNet5.removeFalseAlarms();
+
+                return figure.getSegResultWithoutPadding();
+            }
+
+            case LabelRegHogLeNet5Svm: {
+                LabelDetectHog detectHog = new LabelDetectHog(figure);
+                detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
+                detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
+
+                LabelClassifyLeNet5 classifyLeNet5 = new LabelClassifyLeNet5(figure);
+                classifyLeNet5.LeNet5Classification();    //SVM classification of each detected patch in figure.panels.
+
+                //Do label classification with HoG-SVM
+                LabelClassifyHogSvm classifySvm = new LabelClassifyHogSvm(figure);
+                classifySvm.svmClassificationWithLeNet5();
+                classifySvm.mergeRecognitionLabelsSimple();
+
+                return figure.getSegResultWithoutPadding();
+            }
+            default:
+            {
+                throw new Exception("Unknown Method!!");
+            }
         }
-        seg.segment(image);
-        return seg.getSegResultWithoutPadding();
     }
 
-    public static List<Panel> segment(String imageFile, SegMethod method)
+    public static List<Panel> segment(String imageFile, SegMethod method) throws Exception
     {
         opencv_core.Mat image = imread(imageFile, CV_LOAD_IMAGE_COLOR);
+        return segment(image, method);
+    }
+    /**
+     * The entrance function to perform segmentation.
+     * It simply converts the buffered image to Mat, and then calls segment(Mat image, SegMethod method) function.
+     *
+     * NOTICE: because converting from BufferedImage to Mat requires actual copying of the image data, it is inefficient.
+     * It is recommended to avoid using this function if opencv_core.Mat type can be used.
+     *
+     */
+    public static List<Panel> segment(BufferedImage buffered_image, SegMethod method) throws Exception
+    {
+        opencv_core.Mat image = AlgOpenCVEx.bufferdImg2Mat(buffered_image);
         return segment(image, method);
     }
 
@@ -129,32 +245,42 @@ public abstract class PanelSeg
 
     protected Figure figure;
 
-    abstract void segment(opencv_core.Mat image);
-
     /**
-     * The entrance function to perform panel segmentation. <p>
-     * It simply loads the image from the file, and then calls segment(Mat image) function.
-     * Call getSegResultWithPadding* functions to retrieve result in different format.
+     * Sort candidates and remove largely overlapped candidates. <p>
+     * Largely here means the overlapping area is over half of the area of the candidates which have higher scores.
+     * @param candidates
+     * @return
      */
-    void segment(String image_file_path)
+    static ArrayList<Panel> RemoveOverlappedLabelCandidates(ArrayList<Panel> candidates)
     {
-        opencv_core.Mat image = imread(image_file_path, CV_LOAD_IMAGE_COLOR);
-        segment(image);
-    }
+        if (candidates == null || candidates.size() == 0 || candidates.size() == 1) return candidates;
 
-    /**
-     * The entrance function to perform segmentation.
-     * Call getSegResultWithPadding* functions to retrieve result in different format.
-     * It simply converts the buffered image to Mat, and then calls segment(Mat image) function.
-     *
-     * NOTICE: because converting from BufferedImage to Mat requires actual copying of the image data, it is inefficient.
-     * It is recommended to avoid using this function if opencv_core.Mat type can be used.
-     *
-     */
-    void segment(BufferedImage buffered_image) throws Exception
-    {
-        opencv_core.Mat image = AlgOpenCVEx.bufferdImg2Mat(buffered_image);
-        segment(image);
+        candidates.sort(new LabelScoreDescending());
+
+        //Remove largely overlapped candidates
+        ArrayList<Panel> results = new ArrayList<>();        results.add(candidates.get(0));
+        for (int j = 1; j < candidates.size(); j++)
+        {
+            Panel obj = candidates.get(j);            Rectangle obj_rect = obj.labelRect;
+            double obj_area = obj_rect.width * obj_rect.height;
+
+            //Check with existing ones, if significantly overlapping with existing ones, ignore
+            Boolean overlapping = false;
+            for (int k = 0; k < results.size(); k++)
+            {
+                Rectangle result_rect = results.get(k).labelRect;
+                Rectangle intersection = obj_rect.intersection(result_rect);
+                if (intersection.isEmpty()) continue;
+                double intersection_area = intersection.width * intersection.height;
+                double result_area = result_rect.width * result_rect.height;
+                if (intersection_area > obj_area / 2 || intersection_area > result_area / 2)
+                {
+                    overlapping = true; break;
+                }
+            }
+            if (!overlapping) results.add(obj);
+        }
+        return results;
     }
 
     /**

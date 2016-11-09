@@ -44,12 +44,12 @@ final class ExpLabelDetectHogSvmFeaExt extends Exp
      */
     void generate()
     {
-        for (int i = 0; i < PanelSegLabelRegHog.labelSetsHOG.length; i++) doExp(i);
+        for (int i = 0; i <  LabelDetectHog.labelSetsHOG.length; i++) doExp(i);
     }
 
     void doExp(int i)
     {
-        String name = PanelSegLabelRegHog.labelSetsHOG[i];
+        String name = LabelDetectHog.labelSetsHOG[i];
 
         Path folder = targetFolder.resolve(name);
         Path folderPos = folder.resolve("pos");
@@ -63,13 +63,11 @@ final class ExpLabelDetectHogSvmFeaExt extends Exp
         double[] targets = new double[posPatches.size() + negPatches.size()];
         float[][] features = new float[posPatches.size() + negPatches.size()][];
 
-        PanelSegLabelRegHog hog = new PanelSegLabelRegHog();
-
         int k = 0;
         for (Path path : posPatches)
         {
             opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
-            float[] feature = hog.featureExtraction(gray);
+            float[] feature = LabelDetectHog.featureExtraction(gray);
             features[k] = feature;
             targets[k] = 1.0;
             k++;
@@ -77,7 +75,7 @@ final class ExpLabelDetectHogSvmFeaExt extends Exp
         for (Path path : negPatches)
         {
             opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
-            float[] feature = hog.featureExtraction(gray);
+            float[] feature = LabelDetectHog.featureExtraction(gray);
             features[k] = feature;
             targets[k] = 0.0;
             k++;

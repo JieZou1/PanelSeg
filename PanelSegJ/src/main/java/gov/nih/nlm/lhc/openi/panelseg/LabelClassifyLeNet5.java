@@ -1,7 +1,5 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
-import libsvm.svm;
-import libsvm.svm_node;
 import org.bytedeco.javacpp.opencv_core;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -13,16 +11,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_imgproc.resize;
-
 /**
- * Created by jzou on 11/4/2016.
+ * Classify Labels using LeNet5
+ * Refactored from PanelSegLabelRegHogLeNet5 (which is obsolete) to make class hierarchy simpler.
+ *
+ * Created by jzou on 11/7/2016.
  */
-public class PanelSegLabelRegHogLeNet5 extends PanelSegLabelRegHog
+public class LabelClassifyLeNet5
 {
+    //region Static variables (leNet5Model), need to be initialized once by initialize() function
     protected static MultiLayerNetwork leNet5Model;
 
-    protected static void initialize() {
+    static void initialize() {
         if (leNet5Model == null) {
             try {
                 //log.info("Load Models...");
@@ -36,12 +36,16 @@ public class PanelSegLabelRegHogLeNet5 extends PanelSegLabelRegHog
         }
     }
 
-    public PanelSegLabelRegHogLeNet5()
-    {
-        super();
-    }
+    //endregion
 
-    protected void LeNet5Classification()
+    private Figure figure;
+
+    LabelClassifyLeNet5(Figure figure) {this.figure = figure;}
+
+    /**
+     * Classify all label candidates with LeNet5 model
+     */
+    void LeNet5Classification()
     {
         if (figure.panels.size() == 0) return;
 
@@ -77,13 +81,16 @@ public class PanelSegLabelRegHogLeNet5 extends PanelSegLabelRegHog
             Panel panel = panels.get(i);
             double posProb = letNet5Probs.getDouble(i, 1);
 
-            panel.labelScore = posProb;
+            panel.labelScore = panel.labelClassifyPosLetNet5Score = posProb;
         }
 
         figure.panels = panels;
     }
 
-    protected void MergeRecognitionLabelsSimple()
+    /**
+     * Remove false alarms based on LeNet5 classification result (pos_prob is less than 0.5)
+     */
+    void removeFalseAlarms()
     {
         if (figure.panels.size() == 0) return;
 
@@ -96,22 +103,7 @@ public class PanelSegLabelRegHogLeNet5 extends PanelSegLabelRegHog
             candidates.add(panel);
         }
 
-        figure.panels = RemoveOverlappedCandidates(candidates);
+        figure.panels = PanelSeg.RemoveOverlappedLabelCandidates(candidates);
     }
 
-    /**
-     * The main entrance function to perform segmentation.
-     * Call getResult* functions to retrieve result in different format.
-     */
-    void segment(opencv_core.Mat image)
-    {
-        //run super class segmentation steps.
-        figure = new Figure(image); //Common initializations for all segmentation method.
-        HoGDetect();		//HoG Detection, detected patches are stored in hogDetectionResult
-        mergeDetectedLabelsSimple();	//All detected patches are merged into figure.panels.
-
-        //additional steps for this method.
-        LeNet5Classification();			//SVM classification of each detected patch in figure.panels.
-        MergeRecognitionLabelsSimple();
-    }
 }

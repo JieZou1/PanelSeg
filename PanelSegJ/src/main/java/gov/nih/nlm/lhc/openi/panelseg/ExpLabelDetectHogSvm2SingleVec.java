@@ -50,7 +50,7 @@ final class ExpLabelDetectHogSvm2SingleVec
             pw.println("package gov.nih.nlm.lhc.openi.panelseg;");
             pw.println();
 
-            for (String name : PanelSegLabelRegHog.labelSetsHOG)
+            for (String name : LabelDetectHog.labelSetsHOG)
             {
                 Path folder = targetFolder.resolve(name);
                 Path folderModel = folder.resolve("model");

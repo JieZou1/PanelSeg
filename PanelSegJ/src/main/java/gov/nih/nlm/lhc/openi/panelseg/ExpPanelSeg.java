@@ -27,12 +27,12 @@ public class ExpPanelSeg extends Exp
             System.out.println();
 
             System.out.println("Method:");
-            System.out.println("LabelRegHog                 HoG method for Label Detection");
+            System.out.println("LabelDetHog                 HoG method for Label Detection");
             System.out.println("LabelRegHogSvm              HoG+SVM method for Label Recognition");
             System.out.println("LabelRegHogSvmThreshold     HoG+SVM then followed by simple threshold for Label Recognition");
             System.out.println("LabelRegHogSvmBeam	        HoG+SVM then followed by beam search for Label Recognition");
 
-            System.out.println("LabelRegHogLeNet5	        HoG+LeNet5 method for Label Detection");
+            System.out.println("LabelDetHogLeNet5	        HoG+LeNet5 method for Label Detection");
             System.out.println("LabelRegHogLeNet5Svm	    HoG+LeNet5+SVM method for Label Recognition");
 
             System.out.println();
@@ -47,12 +47,12 @@ public class ExpPanelSeg extends Exp
 
         PanelSeg.SegMethod method = null;
         switch (args[0]) {
-            case "LabelRegHog":  method = PanelSeg.SegMethod.LabelRegHog; break;
+            case "LabelDetHog":  method = PanelSeg.SegMethod.LabelDetHog; break;
             case "LabelRegHogSvm": method = PanelSeg.SegMethod.LabelRegHogSvm; break;
             case "LabelRegHogSvmThreshold": method = PanelSeg.SegMethod.LabelRegHogSvmThreshold; break;
             case "LabelRegHogSvmBeam": method = PanelSeg.SegMethod.LabelRegHogSvmBeam; break;
 
-            case "LabelRegHogLeNet5": method = PanelSeg.SegMethod.LabelRegHogLeNet5; break;
+            case "LabelDetHogLeNet5": method = PanelSeg.SegMethod.LabelDetHogLeNet5; break;
             case "LabelRegHogLeNet5Svm": method = PanelSeg.SegMethod.LabelRegHogLeNet5Svm; break;
             default:
                 System.out.println("Unknown method!!");
@@ -73,9 +73,9 @@ public class ExpPanelSeg extends Exp
 
         PanelSeg.initialize(method);
 
-        ExpPanelSeg generator = new ExpPanelSeg(trainListFile, targetFolder, method);
-        generator.segmentSingle();
-        //generator.segmentMulti();
+        ExpPanelSeg exp = new ExpPanelSeg(trainListFile, targetFolder, method);
+        exp.segmentSingle();
+        //exp.segmentMulti();
         System.out.println("Completed!");
     }
 
@@ -93,10 +93,12 @@ public class ExpPanelSeg extends Exp
         this.method = method;
     }
 
-    void doExp(int k)
+    void doExp(int k) throws Exception
     {
         Path imagePath = imagePaths.get(k);
         System.out.println(Integer.toString(k) +  ": processing " + imagePath.toString());
+
+        //if (!imagePath.toString().endsWith("PMC1397864_1472-6882-6-3-8.jpg")) return;
 
         opencv_core.Mat image = imread(imagePath.toString(), CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);

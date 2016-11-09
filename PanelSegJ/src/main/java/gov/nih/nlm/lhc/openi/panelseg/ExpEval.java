@@ -31,12 +31,12 @@ final class ExpEval extends Exp
             System.out.println();
 
             System.out.println("Method:");
-            System.out.println("LabelRegHog                 HoG method for Label Detection");
+            System.out.println("LabelDetHog                 HoG method for Label Detection");
             System.out.println("LabelRegHogSvm              HoG+SVM method for Label Recognition");
             System.out.println("LabelRegHogSvmThreshold     HoG+SVM then followed by simple threshold for Label Recognition");
             System.out.println("LabelRegHogSvmBeam	        HoG+SVM then followed by beam search for Label Recognition");
 
-            System.out.println("LabelRegHogLeNet5	        HoG+LeNet5 method for Label Detection");
+            System.out.println("LabelDetHogLeNet5	        HoG+LeNet5 method for Label Detection");
             System.out.println("LabelRegHogLeNet5Svm	    HoG+LeNet5+SVM method for Label Recognition");
 
             System.out.println();
@@ -51,12 +51,12 @@ final class ExpEval extends Exp
 
         PanelSeg.SegMethod method = null;
         switch (args[0]) {
-            case "LabelRegHog":  method = PanelSeg.SegMethod.LabelRegHog; break;
+            case "LabelDetHog":  method = PanelSeg.SegMethod.LabelDetHog; break;
             case "LabelRegHogSvm": method = PanelSeg.SegMethod.LabelRegHogSvm; break;
             case "LabelRegHogSvmThreshold": method = PanelSeg.SegMethod.LabelRegHogSvmThreshold; break;
             case "LabelRegHogSvmBeam": method = PanelSeg.SegMethod.LabelRegHogSvmBeam; break;
 
-            case "LabelRegHogLeNet5": method = PanelSeg.SegMethod.LabelRegHogLeNet5; break;
+            case "LabelDetHogLeNet5": method = PanelSeg.SegMethod.LabelDetHogLeNet5; break;
             case "LabelRegHogLeNet5Svm": method = PanelSeg.SegMethod.LabelRegHogLeNet5Svm; break;
             default:
                 System.out.println("Unknown method!!");
@@ -228,11 +228,11 @@ final class ExpEval extends Exp
                 //check label
                 String autoLabel = autoPanel.panelLabel.toLowerCase();
                 String gtLabel = gtPanel.panelLabel.toLowerCase();
-                if (    method == PanelSeg.SegMethod.LabelRegHog
-                        || method == PanelSeg.SegMethod.LabelRegHogLeNet5
+                if (    method == PanelSeg.SegMethod.LabelDetHog
+                        || method == PanelSeg.SegMethod.LabelDetHogLeNet5
                         //|| method == PanelSeg.SegMethod.LabelRegHogSvm
                         )
-                { //For LabelRegHog and LabelRegHogLeNet5 cases, provided that label is detected, we count it as correct. No need to check label
+                { //For LabelDetHog and LabelDetHogLeNet5 cases, provided that label is detected, we count it as correct. No need to check label
                     autoLabel = gtLabel;
                 }
                 if (!autoLabel.equals(gtLabel)) continue;
@@ -347,7 +347,7 @@ final class ExpEval extends Exp
                 {
                     pw.print("\t" + "Missing Labels:\t");	for (int k = 0; k < missingLabels.get(i).size(); k++) pw.print(missingLabels.get(i).get(k) + " "); pw.println();
                 }
-                if (method != PanelSeg.SegMethod.LabelRegHog)
+                if (method != PanelSeg.SegMethod.LabelDetHog)
                 {
                     pw.print("\t" + "Auto Labels:\t");	for (int k = 0; k < autoLabels.get(i).size(); k++) pw.print(autoLabels.get(i).get(k) + " "); pw.println();
                     if (falseAlarmLabels.get(i).size() > 0)

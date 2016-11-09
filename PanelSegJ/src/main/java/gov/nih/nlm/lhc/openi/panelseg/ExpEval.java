@@ -49,15 +49,15 @@ final class ExpEval extends Exp
             System.exit(0);
         }
 
-        PanelSeg.SegMethod method = null;
+        PanelSeg.Method method = null;
         switch (args[0]) {
-            case "LabelDetHog":  method = PanelSeg.SegMethod.LabelDetHog; break;
-            case "LabelRegHogSvm": method = PanelSeg.SegMethod.LabelRegHogSvm; break;
-            case "LabelRegHogSvmThreshold": method = PanelSeg.SegMethod.LabelRegHogSvmThreshold; break;
-            case "LabelRegHogSvmBeam": method = PanelSeg.SegMethod.LabelRegHogSvmBeam; break;
+            case "LabelDetHog":  method = PanelSeg.Method.LabelDetHog; break;
+            case "LabelRegHogSvm": method = PanelSeg.Method.LabelRegHogSvm; break;
+            case "LabelRegHogSvmThreshold": method = PanelSeg.Method.LabelRegHogSvmThreshold; break;
+            case "LabelRegHogSvmBeam": method = PanelSeg.Method.LabelRegHogSvmBeam; break;
 
-            case "LabelDetHogLeNet5": method = PanelSeg.SegMethod.LabelDetHogLeNet5; break;
-            case "LabelRegHogLeNet5Svm": method = PanelSeg.SegMethod.LabelRegHogLeNet5Svm; break;
+            case "LabelDetHogLeNet5": method = PanelSeg.Method.LabelDetHogLeNet5; break;
+            case "LabelRegHogLeNet5Svm": method = PanelSeg.Method.LabelRegHogLeNet5Svm; break;
             default:
                 System.out.println("Unknown method!!");
                 System.exit(0);
@@ -79,7 +79,7 @@ final class ExpEval extends Exp
         eval.evaluate();
     }
 
-    private PanelSeg.SegMethod method;
+    private PanelSeg.Method method;
 
     private HashMap<String, Integer> countIndividualLabelGT;    //The count for each individual label (ground truth)
     private HashMap<String, Integer> countIndividualLabelAuto;  //The count for each individual label (auto recognized)
@@ -97,7 +97,7 @@ final class ExpEval extends Exp
      * @param listFile
      * @param targetFolder
      */
-    private ExpEval(String listFile, String targetFolder, PanelSeg.SegMethod method)
+    private ExpEval(String listFile, String targetFolder, PanelSeg.Method method)
     {
         super(listFile, targetFolder, false);
         this.method = method;
@@ -114,12 +114,12 @@ final class ExpEval extends Exp
         missingLabels = new ArrayList<>();
         falseAlarmLabels = new ArrayList<>();
 
-        for (int k = 0; k < imagePaths.size(); k++) doExp(k);
+        for (int k = 0; k < imagePaths.size(); k++) doWork(k);
 
         reportLabelRegEval();
     }
 
-    void doExp(int k)
+    void doWork(int k)
     {
         ArrayList<Panel> gtPanels = null, autoPanels = null;
 
@@ -228,9 +228,9 @@ final class ExpEval extends Exp
                 //check label
                 String autoLabel = autoPanel.panelLabel.toLowerCase();
                 String gtLabel = gtPanel.panelLabel.toLowerCase();
-                if (    method == PanelSeg.SegMethod.LabelDetHog
-                        || method == PanelSeg.SegMethod.LabelDetHogLeNet5
-                        //|| method == PanelSeg.SegMethod.LabelRegHogSvm
+                if (    method == PanelSeg.Method.LabelDetHog
+                        || method == PanelSeg.Method.LabelDetHogLeNet5
+                        //|| method == PanelSeg.Method.LabelRegHogSvm
                         )
                 { //For LabelDetHog and LabelDetHogLeNet5 cases, provided that label is detected, we count it as correct. No need to check label
                     autoLabel = gtLabel;
@@ -347,7 +347,7 @@ final class ExpEval extends Exp
                 {
                     pw.print("\t" + "Missing Labels:\t");	for (int k = 0; k < missingLabels.get(i).size(); k++) pw.print(missingLabels.get(i).get(k) + " "); pw.println();
                 }
-                if (method != PanelSeg.SegMethod.LabelDetHog)
+                if (method != PanelSeg.Method.LabelDetHog)
                 {
                     pw.print("\t" + "Auto Labels:\t");	for (int k = 0; k < autoLabels.get(i).size(); k++) pw.print(autoLabels.get(i).get(k) + " "); pw.println();
                     if (falseAlarmLabels.get(i).size() > 0)

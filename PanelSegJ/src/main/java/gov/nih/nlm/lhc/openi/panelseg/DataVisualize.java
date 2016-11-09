@@ -98,7 +98,7 @@ final class DataVisualize extends Data
             String style = styles.get(key);
 
             Mat img = opencv_imgcodecs.imread(imageFile);
-            Mat imgAnnotated = load_gt_error ? img.clone() : PanelSeg.drawAnnotation(img, panels, style);
+            Mat imgAnnotated = load_gt_error ? img.clone() : Figure.drawAnnotation(img, panels, style);
 
             System.out.println();
             System.out.println(Integer.toString(i+1) +  ": Visualize Data for " + imageFile);
@@ -133,7 +133,7 @@ final class DataVisualize extends Data
                         System.out.println(e.getMessage());
                         load_gt_error = true;
                     }
-                    imgAnnotated = load_gt_error ? img.clone() : PanelSeg.drawAnnotation(img, panels, style);
+                    imgAnnotated = load_gt_error ? img.clone() : Figure.drawAnnotation(img, panels, style);
                 }
                 else if (c == (int)'1' || c == (int)'2' || c == (int)'3')
                 {

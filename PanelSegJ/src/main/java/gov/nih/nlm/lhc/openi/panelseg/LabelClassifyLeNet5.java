@@ -17,10 +17,10 @@ import java.util.List;
  *
  * Created by jzou on 11/7/2016.
  */
-public class LabelClassifyLeNet5
+final class LabelClassifyLeNet5
 {
     //region Static variables (leNet5Model), need to be initialized once by initialize() function
-    protected static MultiLayerNetwork leNet5Model;
+    private static MultiLayerNetwork leNet5Model;
 
     static void initialize() {
         if (leNet5Model == null) {

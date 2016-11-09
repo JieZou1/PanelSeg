@@ -18,11 +18,11 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
  *
  * Created by jzou on 11/7/2016.
  */
-public class LabelClassifyHogSvm
+final class LabelClassifyHogSvm
 {
-    protected static svm_model svmModel;
+    private static svm_model svmModel;
 
-    protected static void initialize(String svm_model_file)
+    static void initialize(String svm_model_file)
     {
         if (svmModel == null)
         {

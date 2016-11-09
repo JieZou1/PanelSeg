@@ -45,15 +45,15 @@ public class ExpPanelSeg extends Exp
             System.exit(0);
         }
 
-        PanelSeg.SegMethod method = null;
+        PanelSeg.Method method = null;
         switch (args[0]) {
-            case "LabelDetHog":  method = PanelSeg.SegMethod.LabelDetHog; break;
-            case "LabelRegHogSvm": method = PanelSeg.SegMethod.LabelRegHogSvm; break;
-            case "LabelRegHogSvmThreshold": method = PanelSeg.SegMethod.LabelRegHogSvmThreshold; break;
-            case "LabelRegHogSvmBeam": method = PanelSeg.SegMethod.LabelRegHogSvmBeam; break;
+            case "LabelDetHog":  method = PanelSeg.Method.LabelDetHog; break;
+            case "LabelRegHogSvm": method = PanelSeg.Method.LabelRegHogSvm; break;
+            case "LabelRegHogSvmThreshold": method = PanelSeg.Method.LabelRegHogSvmThreshold; break;
+            case "LabelRegHogSvmBeam": method = PanelSeg.Method.LabelRegHogSvmBeam; break;
 
-            case "LabelDetHogLeNet5": method = PanelSeg.SegMethod.LabelDetHogLeNet5; break;
-            case "LabelRegHogLeNet5Svm": method = PanelSeg.SegMethod.LabelRegHogLeNet5Svm; break;
+            case "LabelDetHogLeNet5": method = PanelSeg.Method.LabelDetHogLeNet5; break;
+            case "LabelRegHogLeNet5Svm": method = PanelSeg.Method.LabelRegHogLeNet5Svm; break;
             default:
                 System.out.println("Unknown method!!");
                 System.exit(0);
@@ -74,12 +74,12 @@ public class ExpPanelSeg extends Exp
         PanelSeg.initialize(method);
 
         ExpPanelSeg exp = new ExpPanelSeg(trainListFile, targetFolder, method);
-        exp.segmentSingle();
-        //exp.segmentMulti();
+        exp.doWorkSingleThread();
+        //exp.doWorkMultiThread();
         System.out.println("Completed!");
     }
 
-    private PanelSeg.SegMethod method;
+    private PanelSeg.Method method;
 
     /**
      * Ctor, set targetFolder and then collect all imagePaths
@@ -88,12 +88,12 @@ public class ExpPanelSeg extends Exp
      * @param trainListFile
      * @param targetFolder
      */
-    private ExpPanelSeg(String trainListFile, String targetFolder, PanelSeg.SegMethod method) {
+    private ExpPanelSeg(String trainListFile, String targetFolder, PanelSeg.Method method) {
         super(trainListFile, targetFolder, true);
         this.method = method;
     }
 
-    void doExp(int k) throws Exception
+    void doWork(int k) throws Exception
     {
         Path imagePath = imagePaths.get(k);
         System.out.println(Integer.toString(k) +  ": processing " + imagePath.toString());

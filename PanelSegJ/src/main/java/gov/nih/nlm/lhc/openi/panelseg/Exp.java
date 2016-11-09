@@ -61,7 +61,7 @@ abstract class Exp {
     }
 
     //The method for handling processing of 1 sample, mostly for implementing multi-threading processing in Fork/Join framework
-    abstract void doExp(int k) throws Exception;
+    abstract void doWork(int k) throws Exception;
 
     /**
      * Helper function for generating panel label patch filenames for saving to disks.
@@ -99,24 +99,24 @@ abstract class Exp {
         if (!Files.exists(previewFolder)) previewFolder.toFile().mkdir();
 
         Path previewPath = previewFolder.resolve(imageFile);
-        opencv_core.Mat preview = PanelSeg.drawAnnotation(image, panels);
+        opencv_core.Mat preview = Figure.drawAnnotation(image, panels);
         opencv_imgcodecs.imwrite(previewPath.toString(), preview);
     }
 
     /**
      * Entry function
      */
-    protected void segmentSingle() throws Exception
+    protected void doWorkSingleThread() throws Exception
     {
         long startTime = System.currentTimeMillis();
-        for (int k = 0; k < imagePaths.size(); k++) doExp(k);
+        for (int k = 0; k < imagePaths.size(); k++) doWork(k);
         long endTime = System.currentTimeMillis();
 
         System.out.println("Total processing time: " + (endTime - startTime)/1000.0 + " seconds.");
         System.out.println("Average processing time: " + ((endTime - startTime)/1000.0)/imagePaths.size() + " seconds.");
     }
 
-    protected void segmentMulti()
+    protected void doWorkMultiThread()
     {
         ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 4);
         invokeAll(tasks);

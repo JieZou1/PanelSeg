@@ -11,7 +11,7 @@ import java.util.List;
  *
  * Created by jzou on 11/8/2016.
  */
-public class LabelBeamSearch
+final class LabelBeamSearch
 {
     private Figure figure;
 

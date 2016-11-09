@@ -16,7 +16,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
  *
  * Created by jzou on 11/7/2016.
  */
-public final class LabelDetectHog
+final class LabelDetectHog
 {
     //region static constants (labelSetsHOG)
     static final String[] labelSetsHOG = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"};

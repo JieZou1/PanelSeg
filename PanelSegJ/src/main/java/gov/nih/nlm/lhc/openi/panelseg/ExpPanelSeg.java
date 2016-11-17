@@ -54,6 +54,7 @@ public class ExpPanelSeg extends Exp
 
             case "LabelDetHogLeNet5": method = PanelSeg.Method.LabelDetHogLeNet5; break;
             case "LabelRegHogLeNet5Svm": method = PanelSeg.Method.LabelRegHogLeNet5Svm; break;
+            case "LabelRegHogLeNet5SvmBeam": method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam; break;
             default:
                 System.out.println("Unknown method!!");
                 System.exit(0);

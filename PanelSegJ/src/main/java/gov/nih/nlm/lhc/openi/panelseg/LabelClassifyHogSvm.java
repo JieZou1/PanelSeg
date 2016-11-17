@@ -110,7 +110,8 @@ final class LabelClassifyHogSvm
             Panel panel = figure.panels.get(i);
             if (panel == null) continue;
 
-            double posProb = panel.labelClassifyPosLetNet5Score;
+            double negProb = panel.labelClassifyLetNet5Probs[0];
+            double posProb = panel.labelClassifyLetNet5Probs[1];
 
             opencv_core.Mat patch = AlgOpenCVEx.cropImage(figure.imageGray, panel.labelRect);
             opencv_core.Mat patchNormalized = new opencv_core.Mat();
@@ -124,7 +125,7 @@ final class LabelClassifyHogSvm
             double[] probs = new double[PanelSeg.labelChars.length + 1]; //We add 1 more for negative class.
             for (int j = 0; j < PanelSeg.labelChars.length; j++)
                 probs[j] = posProb * svmProbs[j];
-            probs[PanelSeg.labelChars.length] = 1.0 - posProb;
+            probs[PanelSeg.labelChars.length] = negProb;
             panel.labelProbs = probs;
         }
     }

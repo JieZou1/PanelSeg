@@ -79,9 +79,12 @@ final class LabelClassifyLeNet5
         for (int i = 0; i < panels.size(); i++)
         {
             Panel panel = panels.get(i);
+            panel.labelClassifyLetNet5Probs = new double[2];
+            panel.labelClassifyLetNet5Probs[0] = letNet5Probs.getDouble(i, 0);
+            panel.labelClassifyLetNet5Probs[1] = letNet5Probs.getDouble(i, 1);
             double posProb = letNet5Probs.getDouble(i, 1);
 
-            panel.labelScore = panel.labelClassifyPosLetNet5Score = posProb;
+            panel.labelScore = posProb;
         }
 
         figure.panels = panels;

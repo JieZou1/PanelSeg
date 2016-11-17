@@ -105,12 +105,6 @@ public class PanelSeg
             }
 
             case LabelRegHogLeNet5Svm:
-            {
-                LabelClassifyLeNet5.initialize();
-                LabelClassifyHogSvm.initialize("svm_model_rbf_8.0_0.03125");
-                return;
-            }
-
             case LabelRegHogLeNet5SvmBeam:
             {
                 LabelClassifyLeNet5.initialize();
@@ -215,6 +209,26 @@ public class PanelSeg
 
                 return figure.getSegResultWithoutPadding();
             }
+
+            case LabelRegHogLeNet5SvmBeam: {
+                LabelDetectHog detectHog = new LabelDetectHog(figure);
+                detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
+                detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
+
+                LabelClassifyLeNet5 classifyLeNet5 = new LabelClassifyLeNet5(figure);
+                classifyLeNet5.LeNet5Classification();    //SVM classification of each detected patch in figure.panels.
+
+                //Do label classification with HoG-SVM
+                LabelClassifyHogSvm classifySvm = new LabelClassifyHogSvm(figure);
+                classifySvm.svmClassificationWithLeNet5();
+                //classifySvm.mergeRecognitionLabelsSimple();
+
+                LabelBeamSearch beamSearch = new LabelBeamSearch(figure);
+                beamSearch.search();
+
+                return figure.getSegResultWithoutPadding();
+            }
+
             default:
             {
                 throw new Exception("Unknown Method!!");

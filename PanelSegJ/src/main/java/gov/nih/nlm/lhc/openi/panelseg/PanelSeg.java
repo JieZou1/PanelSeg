@@ -21,7 +21,9 @@ public class PanelSeg
     public enum Method {
         LabelDetHog, LabelDetHogLeNet5,
         LabelRegHogSvm, LabelRegHogSvmThreshold, LabelRegHogSvmBeam,
-        LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam
+        LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam,
+
+        PanelSplitSantosh
     }
 
     //Below info is collected from LabelStatistics.txt
@@ -111,6 +113,8 @@ public class PanelSeg
                 LabelClassifyHogSvm.initialize("svm_model_rbf_8.0_0.03125");
                 return;
             }
+
+            case PanelSplitSantosh: return;
 
             default:
             {
@@ -228,6 +232,11 @@ public class PanelSeg
 
                 return figure.getSegResultWithoutPadding();
             }
+
+            case PanelSplitSantosh:
+                PanelSplitSantosh splitSantosh = new PanelSplitSantosh(figure);
+                splitSantosh.split();
+                return figure.getSegResultWithoutPadding();
 
             default:
             {

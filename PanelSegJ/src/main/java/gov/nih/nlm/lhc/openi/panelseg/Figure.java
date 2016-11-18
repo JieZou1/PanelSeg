@@ -11,6 +11,7 @@ import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.bytedeco.javacpp.opencv_imgproc;
 
+import static org.bytedeco.javacpp.opencv_core.subtract;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
 
 /**
@@ -44,10 +45,11 @@ class Figure
         //We pad padding pixels in each directions of the image.
         imageColor = new opencv_core.Mat();
         opencv_core.copyMakeBorder(img, imageColor, padding, padding, padding, padding, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
-        //imageColor = new Mat(img);
 
         imageGray = new Mat();		cvtColor(imageColor, imageGray, CV_BGR2GRAY);
         imageWidth = imageColor.cols(); imageHeight = imageColor.rows();
+
+        imageGrayInverted = subtract(Scalar.all(255), imageGray).asMat();
 
         panels = new ArrayList<>();
     }
@@ -286,7 +288,7 @@ class Figure
             Panel panel = panels.get(i);
             opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
 
-            if (panel.panelLabel.length() != 0)
+            if (panel.panelLabel != null && panel.panelLabel.length() != 0)
             {
                 String label = panel.panelLabel;
                 double score = ((int)(panel.labelScore*1000+0.5))/1000.0;

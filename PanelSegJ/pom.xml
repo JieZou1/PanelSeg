@@ -109,6 +109,18 @@
       <artifactId>libsvm</artifactId>
       <version>3.17</version>
     </dependency>
+
+    <!-- Zhiyun's Panel Splitting method -->
+    <dependency>
+      <groupId>gov.nih.nlm.iti.panelSegmentation.regular.segmentation</groupId>
+      <artifactId>panelSegmentationModule</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.imagej</groupId>
+      <artifactId>ij</artifactId>
+      <version>1.48c</version>
+    </dependency>
   </dependencies>
 
   <build>

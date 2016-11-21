@@ -91,9 +91,9 @@ final class LabelClassifyLeNet5
     }
 
     /**
-     * Remove false alarms based on LeNet5 classification result (pos_prob is less than 0.5)
+     * Remove false alarms based on LeNet5 classification result (pos_prob is less than threshold)
      */
-    void removeFalseAlarms()
+    void removeFalseAlarms(double threshold)
     {
         if (figure.panels.size() == 0) return;
 
@@ -101,7 +101,7 @@ final class LabelClassifyLeNet5
         for (int j = 0; j < figure.panels.size(); j++)
         {
             Panel panel = figure.panels.get(j);
-            if (panel.labelScore < 0.5) continue;
+            if (panel.labelScore < threshold) continue;
 
             candidates.add(panel);
         }

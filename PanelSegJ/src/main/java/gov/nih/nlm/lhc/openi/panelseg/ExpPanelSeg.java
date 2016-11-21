@@ -36,6 +36,7 @@ public class ExpPanelSeg extends Exp
             System.out.println("LabelRegHogLeNet5Svm	    HoG+LeNet5+SVM method for Label Recognition");
 
             System.out.println("PanelSplitSantosh	        Santosh's method for Panel Split, based on horizontal and vertical lines");
+            System.out.println("PanelSplitJaylene	        Jaylene's method for Panel Split, based on horizontal and vertical lines");
 
             System.out.println();
 
@@ -59,6 +60,7 @@ public class ExpPanelSeg extends Exp
             case "LabelRegHogLeNet5SvmBeam": method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam; break;
 
             case "PanelSplitSantosh": method = PanelSeg.Method.PanelSplitSantosh; break;
+            case "PanelSplitJaylene": method = PanelSeg.Method.PanelSplitJaylene; break;
 
             default:
                 System.out.println("Unknown method!!");

@@ -23,7 +23,7 @@ public class PanelSeg
         LabelRegHogSvm, LabelRegHogSvmThreshold, LabelRegHogSvmBeam,
         LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam,
 
-        PanelSplitSantosh
+        PanelSplitSantosh, PanelSplitJaylene
     }
 
     //Below info is collected from LabelStatistics.txt
@@ -115,6 +115,7 @@ public class PanelSeg
             }
 
             case PanelSplitSantosh: return;
+            case PanelSplitJaylene: return;
 
             default:
             {
@@ -193,7 +194,7 @@ public class PanelSeg
                 //Remove false alarms with LeNet5 model
                 LabelClassifyLeNet5 classifyLeNet5 = new LabelClassifyLeNet5(figure);
                 classifyLeNet5.LeNet5Classification();    //SVM classification of each detected patch in figure.panels.
-                classifyLeNet5.removeFalseAlarms();
+                classifyLeNet5.removeFalseAlarms(0.5);
 
                 return figure.getSegResultWithoutPadding();
             }
@@ -233,10 +234,17 @@ public class PanelSeg
                 return figure.getSegResultWithoutPadding();
             }
 
-            case PanelSplitSantosh:
+            case PanelSplitSantosh: {
                 PanelSplitSantosh splitSantosh = new PanelSplitSantosh(figure);
                 splitSantosh.split();
                 return figure.getSegResultWithoutPadding();
+            }
+
+            case PanelSplitJaylene: {
+                PanelSplitJaylene splitJaylene = new PanelSplitJaylene(figure);
+                splitJaylene.split();
+                return figure.getSegResultWithoutPadding();
+            }
 
             default:
             {

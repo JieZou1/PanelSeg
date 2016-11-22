@@ -10,13 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a2838b3-b093-45c7-8727-3af9206f99f9" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__gov_nih_nlm_iti_panelSegmentation_regular_segmentation_panelSegmentationModule_1_0.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__net_imagej_ij_1_48c.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSplitJaylene.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelBeamSearch1.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PanelSegJ.iml" afterPath="$PROJECT_DIR$/PanelSegJ.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpPanelSeg.java" afterPath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpPanelSeg.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyHogSvm.java" afterPath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyHogSvm.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyLeNet5.java" afterPath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyLeNet5.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelDetectHog.java" afterPath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelDetectHog.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java" afterPath="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java" />
@@ -52,8 +48,8 @@
       <file leaf-file-name="PanelSeg.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="461">
-              <caret line="211" column="43" selection-start-line="211" selection-start-column="43" selection-end-line="211" selection-end-column="43" />
+            <state relative-caret-position="416">
+              <caret line="212" column="43" selection-start-line="212" selection-start-column="43" selection-end-line="212" selection-end-column="43" />
               <folding>
                 <element signature="method#isCaseSame#0;class#PanelSeg#0" expanded="false" />
                 <element signature="method#getLabelCharFolderName#0;class#PanelSeg#0" expanded="false" />
@@ -67,25 +63,39 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PanelSplitJaylene.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSplitJaylene.java">
+      <file leaf-file-name="LabelBeamSearch.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelBeamSearch.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="506">
-              <caret line="23" column="16" selection-start-line="23" selection-start-column="16" selection-end-line="23" selection-end-column="16" />
+            <state relative-caret-position="131">
+              <caret line="9" column="24" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
               <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#383#384#0" expanded="true" />
-                <element signature="e#419#420#0" expanded="true" />
+                <element signature="method#search#0;class#LabelBeamSearch#0" expanded="false" />
+                <element signature="method#checkLabelSequence#0;class#LabelBeamSearch#0" expanded="false" />
+                <element signature="method#noDuplicateLabels#0;class#LabelBeamSearch#0" expanded="false" />
+                <element signature="method#sameCaseLabels#0;class#LabelBeamSearch#0" expanded="false" />
+                <element signature="method#noOverlappingRect#0;class#LabelBeamSearch#0" expanded="false" />
+                <element signature="class#BeamItem#0;class#LabelBeamSearch#0" expanded="false" />
+                <element signature="class#ScoreDescending#0;class#LabelBeamSearch#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LabelClassifyHogSvm.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="LabelBeamSearch1.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelBeamSearch1.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="418">
+              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LabelClassifyHogSvm.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyHogSvm.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="148">
-              <caret line="129" column="9" selection-start-line="129" selection-start-column="9" selection-end-line="129" selection-end-column="9" />
+            <state relative-caret-position="299">
+              <caret line="132" column="9" selection-start-line="132" selection-start-column="9" selection-end-line="132" selection-end-column="9" />
               <folding>
                 <element signature="method#initialize#0;class#LabelClassifyHogSvm#0" expanded="false" />
                 <element signature="method#featureExtraction#0;class#LabelClassifyHogSvm#0" expanded="false" />
@@ -97,11 +107,9 @@
       <file leaf-file-name="LabelClassifyLeNet5.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyLeNet5.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="569">
-              <caret line="93" column="97" selection-start-line="93" selection-start-column="97" selection-end-line="93" selection-end-column="97" />
-              <folding>
-                <element signature="method#initialize#0;class#LabelClassifyLeNet5#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="130">
+              <caret line="55" column="0" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -109,8 +117,8 @@
       <file leaf-file-name="LabelDetectHog.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelDetectHog.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="483">
-              <caret line="56" column="134" selection-start-line="56" selection-start-column="134" selection-end-line="56" selection-end-column="134" />
+            <state relative-caret-position="299">
+              <caret line="46" column="4" selection-start-line="46" selection-start-column="4" selection-end-line="46" selection-end-column="4" />
               <folding>
                 <element signature="e#683#727#0" expanded="false" />
                 <element signature="method#getLabelSetName#0;class#LabelDetectHog#0" expanded="false" />
@@ -123,31 +131,16 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TrainLabelDetect.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/TrainLabelDetect.java">
+      <file leaf-file-name="TrainLabelClassify.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/TrainLabelClassify.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2393">
-              <caret line="258" column="0" selection-start-line="258" selection-start-column="0" selection-end-line="258" selection-end-column="0" />
+            <state relative-caret-position="947">
+              <caret line="316" column="34" selection-start-line="316" selection-start-column="34" selection-end-line="316" selection-end-column="34" />
               <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="method#TrainLabelDetect#0;class#TrainLabelDetect#0" expanded="false" />
-                <element signature="method#doWork#0;class#TrainLabelDetect#0" expanded="false" />
-                <element signature="n#!!doc;n#initializeHogPos#0;n#TrainLabelDetect#0" expanded="false" />
-                <element signature="method#initializeHogPos#0;class#TrainLabelDetect#0" expanded="false" />
-                <element signature="method#doWorkHogPos#0;class#TrainLabelDetect#0" expanded="false" />
-                <element signature="method#doWorkHogSvmFeaExt#0;class#TrainLabelDetect#0" expanded="false" />
-                <element signature="e#6967#6993#0" expanded="false" />
+                <element signature="method#doWorkHogSvmFeaExt#0;class#TrainLabelClassify#0" expanded="false" />
+                <element signature="method#loadModel#0;class#TrainLabelClassify#0" expanded="false" />
+                <element signature="method#testWithMats#0;class#TrainLabelClassify#0" expanded="false" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="440">
-              <caret line="122" column="17" selection-start-line="122" selection-start-column="17" selection-end-line="122" selection-end-column="17" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -155,7 +148,7 @@
       <file leaf-file-name="Exp.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Exp.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="474">
+            <state relative-caret-position="218">
               <caret line="111" column="0" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
               <folding />
             </state>
@@ -165,8 +158,8 @@
       <file leaf-file-name="Figure.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Figure.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="373">
-              <caret line="40" column="17" selection-start-line="40" selection-start-column="17" selection-end-line="40" selection-end-column="17" />
+            <state relative-caret-position="310">
+              <caret line="202" column="13" selection-start-line="202" selection-start-column="13" selection-end-line="202" selection-end-column="13" />
               <folding>
                 <element signature="e#2190#2191#0" expanded="true" />
                 <element signature="e#2223#2224#0" expanded="true" />
@@ -186,8 +179,8 @@
       <file leaf-file-name="ExpPanelSeg.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpPanelSeg.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1620">
-              <caret line="111" column="42" selection-start-line="111" selection-start-column="42" selection-end-line="111" selection-end-column="42" />
+            <state relative-caret-position="328">
+              <caret line="111" column="0" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="docComment;method#ExpPanelSeg#0;class#ExpPanelSeg#0" expanded="false" />
@@ -217,7 +210,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/iPhotoDraw.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelRegHogSvm.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelRegHog.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSegLabelRegHogSvmPost2.java" />
@@ -258,16 +250,17 @@
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelClassifyLeNetTrain.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/TrainLabelClassify.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Panel.java" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyHogSvm.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpEval.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSplitSantosh.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Figure.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSplitJaylene.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpPanelSeg.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyLeNet5.java" />
         <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelDetectHog.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyHogSvm.java" />
+        <option value="$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelBeamSearch1.java" />
       </list>
     </option>
   </component>
@@ -330,10 +323,10 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="260" />
-    <option name="y" value="18" />
-    <option name="width" value="1860" />
-    <option name="height" value="1287" />
+    <option name="x" value="198" />
+    <option name="y" value="43" />
+    <option name="width" value="1922" />
+    <option name="height" value="1265" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -854,7 +847,7 @@
       </extension>
       <option name="MAIN_CLASS_NAME" value="gov.nih.nlm.lhc.openi.panelseg.ExpPanelSeg" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="LabelDetHogLeNet5 \Users\jie\projects\PanelSeg\Exp\eval.txt \Users\jie\projects\PanelSeg\Exp\PanelSeg\eval2" />
+      <option name="PROGRAM_PARAMETERS" value="LabelRegHogLeNet5Svm \Users\jie\projects\PanelSeg\Exp\train.txt \Users\jie\projects\PanelSeg\Exp\PanelSeg\train" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -1100,11 +1093,18 @@
       <option name="project" value="LOCAL" />
       <updated>1479501306928</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Completed PanelSplitting Jaylene's method">
+      <created>1479749222606</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1479749222606</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="260" y="18" width="1860" height="1287" extended-state="0" />
+    <frame x="198" y="43" width="1922" height="1265" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1113,17 +1113,17 @@
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22767498" sideWeight="0.50456256" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.097613886" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.09443861" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32920793" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34719864" sideWeight="0.49570817" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35899654" sideWeight="0.49570817" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32975295" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22939262" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22193074" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27843803" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43858132" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1172,7 +1172,8 @@
     <MESSAGE value="Major ReFactor Label classify training related classes" />
     <MESSAGE value="Fix a few minor bugs" />
     <MESSAGE value="Implemented Santosh's method for panel splitting" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented Santosh's method for panel splitting" />
+    <MESSAGE value="Completed PanelSplitting Jaylene's method" />
+    <option name="LAST_COMMIT_MESSAGE" value="Completed PanelSplitting Jaylene's method" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1292,7 +1293,7 @@
           <option name="timeStamp" value="220" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="222" />
+      <option name="time" value="223" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -1305,7 +1306,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpLabelRegHogSvmBeam.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/DataDuplicate.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="154">
@@ -1424,24 +1424,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelBeamSearch.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="748">
-          <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#425#426#0" expanded="false" />
-            <element signature="e#461#462#0" expanded="false" />
-            <element signature="method#checkLabelSequence#0;class#LabelBeamSearch#0" expanded="false" />
-            <element signature="method#noDuplicateLabels#0;class#LabelBeamSearch#0" expanded="false" />
-            <element signature="method#sameCaseLabels#0;class#LabelBeamSearch#0" expanded="false" />
-            <element signature="method#noOverlappingRect#0;class#LabelBeamSearch#0" expanded="false" />
-            <element signature="class#BeamItem#0;class#LabelBeamSearch#0" expanded="false" />
-            <element signature="class#ScoreDescending#0;class#LabelBeamSearch#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpEval.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1144">
@@ -1458,18 +1440,6 @@
             <element signature="method#sortOverlappingRects#0;class#ExpEval#0" expanded="false" />
             <element signature="class#PanelOverlappingScore1Score2Index#0" expanded="false" />
             <element signature="class#PanelOverlappingScore1Descending#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/TrainLabelClassify.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="881">
-          <caret line="316" column="34" selection-start-line="316" selection-start-column="34" selection-end-line="316" selection-end-column="34" />
-          <folding>
-            <element signature="method#doWorkHogSvmFeaExt#0;class#TrainLabelClassify#0" expanded="false" />
-            <element signature="method#loadModel#0;class#TrainLabelClassify#0" expanded="false" />
-            <element signature="method#testWithMats#0;class#TrainLabelClassify#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1513,17 +1483,17 @@
         <state relative-caret-position="-264">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1069#1070#0" expanded="true" />
-            <element signature="e#1105#1106#0" expanded="true" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#1069#1070#0" expanded="false" />
+            <element signature="e#1105#1106#0" expanded="false" />
             <element signature="method#median#0;class#PanelSplitSantosh#0" expanded="false" />
             <element signature="method#normalizeProfile#0;class#PanelSplitSantosh#0" expanded="false" />
             <element signature="docComment;method#findPeaks#0;class#PanelSplitSantosh#0" expanded="false" />
             <element signature="method#findPeaks#0;class#PanelSplitSantosh#0" expanded="false" />
-            <element signature="e#11556#11564#0" expanded="true" />
-            <element signature="e#11613#11622#0" expanded="true" />
-            <element signature="e#12478#12486#0" expanded="true" />
-            <element signature="e#12535#12544#0" expanded="true" />
+            <element signature="e#11556#11564#0" expanded="false" />
+            <element signature="e#11613#11622#0" expanded="false" />
+            <element signature="e#12478#12486#0" expanded="false" />
+            <element signature="e#12535#12544#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1545,10 +1515,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="440">
+          <caret line="122" column="17" selection-start-line="122" selection-start-column="17" selection-end-line="122" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSplitJaylene.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="594">
+          <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#383#384#0" expanded="true" />
+            <element signature="e#419#420#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Figure.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="373">
-          <caret line="40" column="17" selection-start-line="40" selection-start-column="17" selection-end-line="40" selection-end-column="17" />
+        <state relative-caret-position="310">
+          <caret line="202" column="13" selection-start-line="202" selection-start-column="13" selection-end-line="202" selection-end-column="13" />
           <folding>
             <element signature="e#2190#2191#0" expanded="true" />
             <element signature="e#2223#2224#0" expanded="true" />
@@ -1564,48 +1554,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSplitJaylene.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/TrainLabelClassify.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="23" column="16" selection-start-line="23" selection-start-column="16" selection-end-line="23" selection-end-column="16" />
+        <state relative-caret-position="947">
+          <caret line="316" column="34" selection-start-line="316" selection-start-column="34" selection-end-line="316" selection-end-column="34" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#383#384#0" expanded="true" />
-            <element signature="e#419#420#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="440">
-          <caret line="122" column="17" selection-start-line="122" selection-start-column="17" selection-end-line="122" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Exp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="474">
-          <caret line="111" column="0" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyLeNet5.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="569">
-          <caret line="93" column="97" selection-start-line="93" selection-start-column="97" selection-end-line="93" selection-end-column="97" />
-          <folding>
-            <element signature="method#initialize#0;class#LabelClassifyLeNet5#0" expanded="false" />
+            <element signature="method#doWorkHogSvmFeaExt#0;class#TrainLabelClassify#0" expanded="false" />
+            <element signature="method#loadModel#0;class#TrainLabelClassify#0" expanded="false" />
+            <element signature="method#testWithMats#0;class#TrainLabelClassify#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelDetectHog.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="483">
-          <caret line="56" column="134" selection-start-line="56" selection-start-column="134" selection-end-line="56" selection-end-column="134" />
+        <state relative-caret-position="299">
+          <caret line="46" column="4" selection-start-line="46" selection-start-column="4" selection-end-line="46" selection-end-column="4" />
           <folding>
             <element signature="e#683#727#0" expanded="false" />
             <element signature="method#getLabelSetName#0;class#LabelDetectHog#0" expanded="false" />
@@ -1617,10 +1581,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/Exp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="111" column="0" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/ExpPanelSeg.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1620">
-          <caret line="111" column="42" selection-start-line="111" selection-start-column="42" selection-end-line="111" selection-end-column="42" />
+        <state relative-caret-position="328">
+          <caret line="111" column="0" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="docComment;method#ExpPanelSeg#0;class#ExpPanelSeg#0" expanded="false" />
@@ -1628,10 +1600,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyLeNet5.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="130">
+          <caret line="55" column="0" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/PanelSeg.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="461">
-          <caret line="211" column="43" selection-start-line="211" selection-start-column="43" selection-end-line="211" selection-end-column="43" />
+        <state relative-caret-position="416">
+          <caret line="212" column="43" selection-start-line="212" selection-start-column="43" selection-end-line="212" selection-end-column="43" />
           <folding>
             <element signature="method#isCaseSame#0;class#PanelSeg#0" expanded="false" />
             <element signature="method#getLabelCharFolderName#0;class#PanelSeg#0" expanded="false" />
@@ -1646,12 +1626,36 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelClassifyHogSvm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="129" column="9" selection-start-line="129" selection-start-column="9" selection-end-line="129" selection-end-column="9" />
+        <state relative-caret-position="299">
+          <caret line="132" column="9" selection-start-line="132" selection-start-column="9" selection-end-line="132" selection-end-column="9" />
           <folding>
             <element signature="method#initialize#0;class#LabelClassifyHogSvm#0" expanded="false" />
             <element signature="method#featureExtraction#0;class#LabelClassifyHogSvm#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelBeamSearch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="131">
+          <caret line="9" column="24" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
+          <folding>
+            <element signature="method#search#0;class#LabelBeamSearch#0" expanded="false" />
+            <element signature="method#checkLabelSequence#0;class#LabelBeamSearch#0" expanded="false" />
+            <element signature="method#noDuplicateLabels#0;class#LabelBeamSearch#0" expanded="false" />
+            <element signature="method#sameCaseLabels#0;class#LabelBeamSearch#0" expanded="false" />
+            <element signature="method#noOverlappingRect#0;class#LabelBeamSearch#0" expanded="false" />
+            <element signature="class#BeamItem#0;class#LabelBeamSearch#0" expanded="false" />
+            <element signature="class#ScoreDescending#0;class#LabelBeamSearch#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/gov/nih/nlm/lhc/openi/panelseg/LabelBeamSearch1.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

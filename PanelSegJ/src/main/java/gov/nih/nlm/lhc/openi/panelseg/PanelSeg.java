@@ -194,7 +194,7 @@ public class PanelSeg
                 //Remove false alarms with LeNet5 model
                 LabelClassifyLeNet5 classifyLeNet5 = new LabelClassifyLeNet5(figure);
                 classifyLeNet5.LeNet5Classification();    //SVM classification of each detected patch in figure.panels.
-                classifyLeNet5.removeFalseAlarms(0.5);
+                classifyLeNet5.removeFalseAlarms(0.02);
 
                 return figure.getSegResultWithoutPadding();
             }

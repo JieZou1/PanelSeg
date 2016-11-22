@@ -54,7 +54,7 @@ final class LabelDetectHog
         for (int i = 0; i < n; i++)
         {
             if (labelSetsHOG[i].equals("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"))
-                svmModels[i] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_10625;
+                svmModels[i] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
 
 //            String classString = "gov.nih.nlm.lhc.openi.panelseg.PanelSegLabelRegHogModel_" + labelSetsHOG[i];
 //            try {

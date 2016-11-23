@@ -123,35 +123,11 @@ final class ExpEval extends Exp
 
     void doWork(int k)
     {
-        ArrayList<Panel> gtPanels = null, autoPanels = null;
-
         Path imagePath = imagePaths.get(k);
         System.out.println(Integer.toString(k) + ": processing " + imagePath.toString());
 
-        //Load ground truth annotation
-        {
-            String imageFile = imagePath.toString();
-            String xmlFile = FilenameUtils.removeExtension(imageFile) + "_data.xml";
-
-            File annotationFile = new File(xmlFile);
-            try {
-                gtPanels = iPhotoDraw.loadPanelSegGt(annotationFile);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-        //Load segmentation results
-        {
-            String imageFile = imagePath.toFile().getName();
-            String xmlFile = FilenameUtils.removeExtension(imageFile) + "_data.xml";
-            File annotationFile  = targetFolder.resolve(xmlFile).toFile();
-            try {
-                autoPanels = iPhotoDraw.loadPanelLabelRegAuto(annotationFile);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
+        ArrayList<Panel> gtPanels = loadGtAnnotation(imagePath);        //Load ground truth annotation
+        ArrayList<Panel> autoPanels = loadAutoAnnotation(imagePath);    //Load segmentation results
 
         evalLabelReg(gtPanels, autoPanels);
     }
@@ -268,25 +244,6 @@ final class ExpEval extends Exp
         falseAlarmLabels.add(falseAlarmLabel);
     }
 
-    /**
-     * Filter out gtPanels, which do not contain qualified panel labels.
-     * @param panels
-     * @return
-     */
-    private ArrayList<Panel> filterLabels(ArrayList<Panel> panels)
-    {
-        ArrayList<Panel> panelsFiltered = new ArrayList<>();
-        for (int i = 0; i < panels.size(); i++) {
-            Panel panel = panels.get(i);
-            if (panel.labelRect == null || panel.labelRect.isEmpty())
-                continue; //In this panel, there is no label.
-            if (panel.panelLabel == null || panel.panelLabel.length() != 1)
-                continue; //For now, we can handle single char panel label only
-            panelsFiltered.add(panel);
-        }
-        return panelsFiltered;
-    }
-
     private int sum(HashMap<String, Integer> count)
     {
         int sum = 0;
@@ -394,40 +351,4 @@ final class ExpEval extends Exp
         return sorted;
     }
 }
-
-/**
- * A class storing results of a panel compares to a list of panels. It stores:
- * index: the index of each panel in the list of panels.
- * score1: the overlapping percentage of panel panel
- * score2: the overlapping percentage of the panel in the list, whose index is index.
- */
-class PanelOverlappingScore1Score2Index
-{
-    int index;
-    Panel panel1, panel2;
-    double score1, score2;
-
-    public PanelOverlappingScore1Score2Index(int index, Panel panel1, Panel panel2, double score1, double score2)
-    {
-        this.index = index;
-        this.score1 = score1;        this.score2 = score2;
-        this.panel1 = panel1;        this.panel2 = panel2;
-    }
-}
-
-/**
- * Comparator for sorting score1 of PanelOverlappingIndesScores.
- * @author Jie Zou
- */
-class PanelOverlappingScore1Descending implements Comparator<PanelOverlappingScore1Score2Index>
-{
-    public int compare(PanelOverlappingScore1Score2Index o1, PanelOverlappingScore1Score2Index o2)
-    {
-        double diff = o2.score1 - o1.score1;
-        if (diff > 0) return 1;
-        else if (diff == 0) return 0;
-        else return -1;
-    }
-}
-
 

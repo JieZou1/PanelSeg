@@ -13,9 +13,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
-    <nd4j.version>0.6.0</nd4j.version>
-    <dl4j.version>0.6.0</dl4j.version>
-    <datavec.version>0.6.0</datavec.version>
+    <nd4j.version>0.7.0</nd4j.version>
+    <dl4j.version>0.7.0</dl4j.version>
+    <datavec.version>0.7.0</datavec.version>
     <guava.version>19.0</guava.version>
     <!-- <nd4j.backend>nd4j-cuda-7.5-platform</nd4j.backend> -->
     <nd4j.backend>nd4j-native-platform</nd4j.backend>
@@ -62,7 +62,7 @@
     <!-- deeplearning4j-ui is used for HistogramIterationListener + visualization: see http://deeplearning4j.org/visualization -->
     <dependency>
       <groupId>org.deeplearning4j</groupId>
-      <artifactId>deeplearning4j-ui</artifactId>
+      <artifactId>deeplearning4j-ui_2.10</artifactId>
       <version>${dl4j.version}</version>
     </dependency>
     <!-- Force guava versions for using UI/HistogramIterationListener -->

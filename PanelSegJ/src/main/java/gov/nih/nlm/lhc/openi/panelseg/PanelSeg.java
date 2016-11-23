@@ -21,7 +21,7 @@ public class PanelSeg
     public enum Method {
         LabelDetHog, LabelDetHogLeNet5,
         LabelRegHogSvm, LabelRegHogSvmThreshold, LabelRegHogSvmBeam,
-        LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam,
+        LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam, LabelRegHogLeNet5SvmBeam1,
 
         PanelSplitSantosh, PanelSplitJaylene
     }
@@ -108,6 +108,7 @@ public class PanelSeg
 
             case LabelRegHogLeNet5Svm:
             case LabelRegHogLeNet5SvmBeam:
+            case LabelRegHogLeNet5SvmBeam1:
             {
                 LabelClassifyLeNet5.initialize();
                 LabelClassifyHogSvm.initialize("svm_model_rbf_8.0_0.03125");
@@ -229,6 +230,25 @@ public class PanelSeg
                 //classifySvm.mergeRecognitionLabelsSimple();
 
                 LabelBeamSearch beamSearch = new LabelBeamSearch(figure);
+                beamSearch.search();
+
+                return figure.getSegResultWithoutPadding();
+            }
+
+            case LabelRegHogLeNet5SvmBeam1: {
+                LabelDetectHog detectHog = new LabelDetectHog(figure);
+                detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
+                detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
+
+                LabelClassifyLeNet5 classifyLeNet5 = new LabelClassifyLeNet5(figure);
+                classifyLeNet5.LeNet5Classification();    //SVM classification of each detected patch in figure.panels.
+
+                //Do label classification with HoG-SVM
+                LabelClassifyHogSvm classifySvm = new LabelClassifyHogSvm(figure);
+                classifySvm.svmClassificationWithLeNet5();
+                //classifySvm.mergeRecognitionLabelsSimple();
+
+                LabelBeamSearch1 beamSearch = new LabelBeamSearch1(figure);
                 beamSearch.search();
 
                 return figure.getSegResultWithoutPadding();

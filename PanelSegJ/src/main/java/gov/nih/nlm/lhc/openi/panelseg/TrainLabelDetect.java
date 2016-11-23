@@ -40,9 +40,9 @@ public class TrainLabelDetect extends Exp
 
             System.out.println("Task:");
             System.out.println("HogPos               HoG method for Label Detection");
-            System.out.println("HogSvmFeaExt              HoG+SVM method for Label Recognition");
+            System.out.println("HogSvmFeaExt         HoG+SVM method for Label Recognition");
             System.out.println("HogSvm2SingleVec     HoG+SVM then followed by simple threshold for Label Recognition");
-            System.out.println("HogBootstrap	        HoG+SVM then followed by beam search for Label Recognition");
+            System.out.println("HogBootstrap         HoG+SVM then followed by beam search for Label Recognition");
 
             System.out.println();
 

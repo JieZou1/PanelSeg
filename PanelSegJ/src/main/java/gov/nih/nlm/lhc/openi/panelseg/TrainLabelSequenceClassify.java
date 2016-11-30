@@ -1,15 +1,19 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
-import org.apache.commons.io.FilenameUtils;
+import javafx.scene.layout.Pane;
+import org.bytedeco.javacpp.opencv_core;
 
 import java.awt.*;
-import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
+
+import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
 /**
- *
- * For Label Sequence Classification
+ * To model and train label sequences
  *
  * Created by jzou on 11/22/2016.
  */
@@ -24,6 +28,7 @@ public class TrainLabelSequenceClassify extends Exp
             System.out.println("Training tasks for Label Detection.");
 
             System.out.println();
+            System.exit(0);
         }
 
         String trainListFile, targetFolder;
@@ -31,22 +36,44 @@ public class TrainLabelSequenceClassify extends Exp
         targetFolder = "\\Users\\jie\\projects\\PanelSeg\\Exp\\PanelSeg\\Train";
 
         TrainLabelSequenceClassify train = new TrainLabelSequenceClassify(trainListFile, targetFolder);
+
         train.doWorkSingleThread();
         //train.doWorkMultiThread();
+
+        //Normalize and then save the result
+        train.save();
     }
 
     TrainLabelSequenceClassify(String trainListFile, String targetFolder)
     {
         super(trainListFile, targetFolder, false);
+
+        featuresAllOrder = new ArrayList<>();
+        labelsAllOrder = new ArrayList<>();
+        for (int i = 0; i < 26; i++)
+        {
+            featuresAllOrder.add(new ArrayList<>());
+            labelsAllOrder.add(new ArrayList<>());
+        }
     }
 
-    ArrayList<Panel> autoPanels, gtPanels; //Auto segmentation results and GT annotation
-    ArrayList<Panel> correctPanels, incorrectPanels; //The correct and in correct panels from AUTO segmented Panels
+    private opencv_core.Mat image;
+    private ArrayList<Panel> autoPanels, gtPanels; //Auto segmentation results and GT annotation
+    private ArrayList<Panel> correctPanels, incorrectPanels; //The correct and in correct panels from AUTO segmented Panels
+
+    private ArrayList<float[]> featuresAll; //All features of an order
+    private ArrayList<Double> labelsAll; //All labels of an order
+    private ArrayList<ArrayList<float[]>> featuresAllOrder; //All features of all order (2 or 3, ..., or 26)
+    private ArrayList<ArrayList<Double>> labelsAllOrder; //All labels of all order (2 or 3, ..., or 26)
 
     void doWork(int i)
     {
         Path imagePath = imagePaths.get(i);
         System.out.println(Integer.toString(i) + ": processing " + imagePath.toString());
+
+        //if (!imagePath.toString().endsWith("PMC4402627_ejhg2014150f1.jpg")) return;
+
+        image = imread(imagePath.toString());
 
         autoPanels = loadAutoAnnotation(imagePath);    //Load segmentation results
         gtPanels = loadGtAnnotation(imagePath); //Load ground truth annotation
@@ -58,10 +85,16 @@ public class TrainLabelSequenceClassify extends Exp
         //Match AUTO to GT to separate AUTO into correct and incorrect panel labels.
         separateAutoByMatching2GT();
 
-        //Find all possible correct and incorrect sequences
-        correctPanels.sort(new PanelLabelAscending());
-        incorrectPanels.sort(new PanelLabelAscending());
-        collectCorrectSequences(2);
+        //Feature Extraction from correct and incorrect sequences
+        for (int order = 2; order <= 6; order++)
+        {
+            featureExtraction(order);
+            if (featuresAll.size() > 0)
+            {
+                featuresAllOrder.get(order).addAll(featuresAll);
+                labelsAllOrder.get(order).addAll(labelsAll);
+            }
+        }
     }
 
     private void separateAutoByMatching2GT()
@@ -118,11 +151,126 @@ public class TrainLabelSequenceClassify extends Exp
         }
     }
 
-    private void collectCorrectSequences(int order)
+    private void featureExtraction(int order)
     {
+        featuresAll = new ArrayList<>();       labelsAll = new ArrayList<>(); //Reset features and labels
 
+        List<float[]> posFeatures = new ArrayList<>();
+        {   //Feature Extract for correct sequence
+            if (correctPanels.size() < order) return;
+
+            List<List<Panel>> selectedPanels = AlgMiscEx.randomItemSets(correctPanels, order,100);
+
+            for (int i = 0; i < selectedPanels.size(); i++)
+            {
+                List<Panel> panelList = selectedPanels.get(i);
+                panelList.sort(new PanelLabelAscending());
+                Panel[] panels = panelList.toArray(new Panel[panelList.size()]);
+                float[] feature = LabelSequenceClassify.featureExtraction(image, panels);
+                posFeatures.add(feature);
+            }
+        }
+
+        List<float[]> negFeatures = new ArrayList<>();
+        if (    incorrectPanels.size() != 0 &&  //If no incorrect panels, we are not able to compile incorrect sets.
+                correctPanels.size() + incorrectPanels.size() >= order &&
+                posFeatures.size() != 0) //If we do not find any correct pairs, we do not compile any incorrect sets
+        {   //Feature Extract for incorrect sequence
+            for (int i = 1; i <= order; i++)
+            {
+                int incorrectCount = i, correctCount = order - i;
+                if (correctPanels.size() < correctCount) continue;
+                if (incorrectPanels.size() < incorrectCount) continue;
+
+                List<List<Panel>> selectedCorrectPanels = AlgMiscEx.randomItemSets(correctPanels, correctCount, posFeatures.size());
+                List<List<Panel>> selectedIncorrectPanels = AlgMiscEx.randomItemSets(incorrectPanels, incorrectCount, posFeatures.size());
+
+                for (int j = 0; j < selectedIncorrectPanels.size(); j++)
+                {
+                    List<Panel> incorrects = selectedIncorrectPanels.get(j);
+
+                    if (selectedCorrectPanels == null)
+                    {
+                        incorrects.sort(new PanelLabelAscending());
+
+                        Panel[] panelArr = incorrects.toArray(new Panel[incorrects.size()]);
+                        if (!LabelSequenceClassify.noDuplicateLabels(panelArr)) continue;
+                        if (!LabelSequenceClassify.noOverlappingRect(panelArr)) continue;
+
+                        float[] feature = LabelSequenceClassify.featureExtraction(image, panelArr);
+                        negFeatures.add(feature);
+                    }
+                    else
+                    {
+                        for (int k = 0; k < selectedCorrectPanels.size(); k++)
+                        {
+                            List<Panel> corrects = selectedCorrectPanels.get(k);
+
+                            List<Panel> panels = new ArrayList<>();
+                            panels.addAll(corrects); panels.addAll(incorrects);
+                            panels.sort(new PanelLabelAscending());
+
+                            Panel[] panelArr = panels.toArray(new Panel[panels.size()]);
+                            if (!LabelSequenceClassify.noDuplicateLabels(panelArr)) continue;
+                            if (!LabelSequenceClassify.noOverlappingRect(panelArr)) continue;
+
+                            float[] feature = LabelSequenceClassify.featureExtraction(image, panelArr);
+                            negFeatures.add(feature);
+                        }
+                    }
+                }
+            }
+        }
+
+        //Merge Positives and Negatives
+        featuresAll.addAll(posFeatures);
+        for (int i = 0; i < posFeatures.size(); i++)    labelsAll.add(1.0);
+
+        if (negFeatures.size() > posFeatures.size())
+        {
+            Collections.shuffle(negFeatures, new Random());
+            negFeatures = negFeatures.subList(0, posFeatures.size());
+        }
+        featuresAll.addAll(negFeatures);
+        for (int i = 0; i < negFeatures.size(); i++)    labelsAll.add(0.0);
     }
 
+    private void save()
+    {
+        for (int k = 0; k < 26; k++)
+        {
+            ArrayList<float[]> features = featuresAllOrder.get(k);
+            if (features == null || features.size() == 0) continue;
+            ArrayList<Double> labels = labelsAllOrder.get(k);
+
+            //Normalize data
+            int n_feature = features.get(0).length; int n_sample = features.size();
+            float[] min = new float[n_feature], max = new float[n_feature];
+            for (int i = 0; i < n_feature; i++) { min[i] = Float.POSITIVE_INFINITY; max[i] = Float.NEGATIVE_INFINITY; }
+            for (int i = 0; i < n_sample; i++)
+            {
+                for (int j = 0; j < n_feature; j++)
+                {
+                    if (features.get(i)[j] > max[j]) max[j] = features.get(i)[j];
+                    if (features.get(i)[j] < min[j]) min[j] = features.get(i)[j];
+                }
+            }
+            for (int i = 0; i < n_sample; i++)
+                for (int j = 0; j < n_feature; j++)
+                    features.get(i)[j] = (features.get(i)[j] - min[j]) / (max[j] - min[j]);
+
+            LibSvmEx.SaveInLibSVMFormat("train" + k + ".txt", labels, features);
+
+            try (PrintWriter pw = new PrintWriter("scaling" + k + ".txt"))
+            {
+                for (int i = 0; i < max.length; i++)
+                    pw.println(min[i] + " " + max[i]);
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
     /**
      * Find panels which overlap with panelsToMatch and sort
      * according to the percentages of overlapping in panel in descending order

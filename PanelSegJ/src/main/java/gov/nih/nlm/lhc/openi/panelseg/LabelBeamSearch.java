@@ -92,105 +92,11 @@ final class LabelBeamSearch
      */
     private boolean checkLabelSequence(BeamItem item)
     {
-        if (!noDuplicateLabels(item)) return false;
-        if (!sameCaseLabels(item)) return false;
-        if (!noOverlappingRect(item)) return false;
+        if (!LabelSequenceClassify.noDuplicateLabels(item)) return false;
+        if (!LabelSequenceClassify.sameCaseLabels(item)) return false;
+        if (!LabelSequenceClassify.noOverlappingRect(item, figure)) return false;
 
         item.score = item.p1 + item.p2 + item.p3;
-
-        return true;
-    }
-
-    private boolean noDuplicateLabels(BeamItem item)
-    {
-        List<Character> charsLower = new ArrayList<>();
-        for (int i = 0; i < item.labelIndexes.size(); i++)
-        {
-            int labelIndex = item.labelIndexes.get(i);
-            if (labelIndex == PanelSeg.labelChars.length) continue; //None label patch, we allow duplicates of course.
-
-            char ch = PanelSeg.labelChars[labelIndex];
-            char chLower = Character.toLowerCase(ch);
-
-            if (charsLower.indexOf(chLower) != -1) return false;
-
-            charsLower.add(chLower);
-        }
-        return true;
-    }
-
-    private boolean sameCaseLabels(BeamItem item)
-    {
-        SequenceType typeSeq = SequenceType.Unknown;
-        for (int i = 0; i < item.labelIndexes.size(); i++)
-        {
-            int labelIndex = item.labelIndexes.get(i);
-            if (labelIndex == PanelSeg.labelChars.length) continue; //None label patch
-
-            char ch = PanelSeg.labelChars[labelIndex];
-
-            SequenceType type;
-            if (Character.isDigit(ch))          type = SequenceType.Digit;
-            else if (Character.isLowerCase(ch)) type = SequenceType.Lower;
-            else                                type = SequenceType.Upper;
-
-            if (type == SequenceType.Digit)
-            {
-                if (typeSeq == SequenceType.Unknown) typeSeq = type;
-                else
-                {
-                    if (type != typeSeq) return false;
-                }
-            }
-            else if (type == SequenceType.Upper)
-            {
-                if (typeSeq == SequenceType.Digit) return false;
-                if (PanelSeg.isCaseSame(ch)) continue;
-
-                if (typeSeq == SequenceType.Unknown) typeSeq = type;
-                else
-                {
-                    if (type != typeSeq) return false;
-                }
-            }
-            else if (type == SequenceType.Lower)
-            {
-                if (typeSeq == SequenceType.Digit) return false;
-                if (PanelSeg.isCaseSame(ch)) continue;
-
-                if (typeSeq == SequenceType.Unknown) typeSeq = type;
-                else
-                {
-                    if (type != typeSeq) return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean noOverlappingRect(BeamItem item)
-    {
-        //Collect all label rects.
-        List<Rectangle> rectangles = new ArrayList<>();
-        for (int i = 0; i < item.labelIndexes.size(); i++)
-        {
-            int index = item.labelIndexes.get(i);
-            if (index == PanelSeg.labelChars.length) continue; //classified as negative don't care.
-
-            Panel panel = figure.panels.get(i);
-            rectangles.add(panel.labelRect);
-        }
-
-        for (int i = 0; i < rectangles.size(); i++)
-        {
-            Rectangle r1 = rectangles.get(i);
-            for (int j = i+ 1; j < rectangles.size(); j++)
-            {
-                Rectangle r2 = rectangles.get(j);
-                Rectangle intersect = r1.intersection(r2);
-                if (!intersect.isEmpty()) return false;
-            }
-        }
 
         return true;
     }
@@ -282,8 +188,6 @@ final class LabelBeamSearch
         }
         return candidates;
     }
-
-    enum SequenceType {Unknown, Upper, Lower, Digit}
 
     class BeamItem
     {

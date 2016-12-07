@@ -1,14 +1,10 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
-import org.apache.commons.io.FilenameUtils;
-
 import java.awt.*;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 
 /**

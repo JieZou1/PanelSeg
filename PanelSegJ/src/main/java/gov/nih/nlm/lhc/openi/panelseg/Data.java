@@ -27,7 +27,7 @@ abstract class Data
     {
         this.setFolder = Paths.get(setFolder);
         imagePaths = AlgMiscEx.collectImageFiles(this.setFolder);
-        System.out.println("Total number of imageColor is: " + imagePaths.size());
+        System.out.println("Total number of image is: " + imagePaths.size());
 
         stylePath = Paths.get(setFolder, "style.txt");
         styles = Data.loadStyleMap(stylePath);

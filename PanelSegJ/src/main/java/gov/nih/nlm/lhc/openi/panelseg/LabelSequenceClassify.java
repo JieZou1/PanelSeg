@@ -1,9 +1,14 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import libsvm.svm;
+import libsvm.svm_model;
 import org.apache.commons.lang.ArrayUtils;
 import org.bytedeco.javacpp.opencv_core;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -14,6 +19,49 @@ import java.util.List;
  */
 public class LabelSequenceClassify
 {
+    static svm_model[] svmModels = null;
+    static float[][] mins = null;
+    static float[][] ranges = null;
+
+    static void loadSvmScaling(int i, String svm_model_file, String scaling_file) {
+        try
+        {
+            svmModels[i] = svm.svm_load_model(svm_model_file);
+            System.out.println(svm_model_file + " is loaded. nr_class is " + svmModels[i].nr_class);
+
+            String line; List<String> lines = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new FileReader(scaling_file)))
+            {
+                while ((line = br.readLine()) != null) lines.add(line);
+            }
+            mins[i] = new float[lines.size()]; ranges[i] = new float[lines.size()];
+            for (int k = 0; k < lines.size(); k++)
+            {
+                String[] words = lines.get(k).split("\\s+");
+                float min = Float.parseFloat(words[0]), max = Float.parseFloat(words[1]);
+                mins[i][k] = min;
+                ranges[i][k] = max - min;
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    static void initialize(String svm_model_2, String svm_model_6)
+    {
+        if (svmModels == null)
+        {
+            svmModels = new svm_model[26];
+            mins = new float[26][]; ranges = new float[26][];
+            loadSvmScaling(2, "svm_model_2_2048.0_8.0", "scaling2.txt");
+            loadSvmScaling(3, "svm_model_3_2048.0_8.0", "scaling3.txt");
+            loadSvmScaling(4, "svm_model_4_512.0_8.0", "scaling4.txt");
+            loadSvmScaling(5, "svm_model_5_128.0_8.0", "scaling5.txt");
+            loadSvmScaling(6, "svm_model_6_32.0_0.5", "scaling6.txt");
+        }
+    }
+
     static boolean noDuplicateLabels(LabelBeamSearch.BeamItem item)
     {
         ArrayList<Character> labels = new ArrayList<>();
@@ -48,6 +96,17 @@ public class LabelSequenceClassify
             char ch = panels[i].panelLabel.charAt(0);
             labels.add(ch);
         }
+        return noDuplicateLabels(labels);
+    }
+
+    static boolean noDuplicateLabels(Panel panel, List<Panel> panels)
+    {
+        ArrayList<Character> labels = new ArrayList<>();
+        for (int i = 0; i < panels.size(); i++)
+        {
+            labels.add(panels.get(i).panelLabel.charAt(0));
+        }
+        labels.add(panel.panelLabel.charAt(0));
         return noDuplicateLabels(labels);
     }
 
@@ -94,6 +153,17 @@ public class LabelSequenceClassify
         }
 
         return true;
+    }
+
+    static boolean noOverlappingRect(Panel panel, List<Panel> panels)
+    {
+        List<Rectangle> rectangles = new ArrayList<>();
+        for (int i = 0; i < panels.size(); i++)
+        {
+            rectangles.add(panels.get(i).labelRect);
+        }
+        rectangles.add(panel.labelRect);
+        return noOverlappingRect(rectangles);
     }
 
     enum SequenceType {Unknown, Upper, Lower, Digit}

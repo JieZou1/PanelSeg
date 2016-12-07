@@ -21,7 +21,7 @@ public class PanelSeg
     public enum Method {
         LabelDetHog, LabelDetHogLeNet5,
         LabelRegHogSvm, LabelRegHogSvmThreshold, LabelRegHogSvmBeam,
-        LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam, LabelRegHogLeNet5SvmBeam1,
+        LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam, LabelRegHogLeNet5SvmAlignment,
 
         PanelSplitSantosh, PanelSplitJaylene
     }
@@ -37,6 +37,14 @@ public class PanelSeg
             'r', 'R', 's', 't', 'T', 'u', 'v', 'w', 'x', 'y', 'z',
             '1', '2', '3', '4', '5', '6', '7', '8', '9'
     };
+
+    static int getLabelCharIndex(char ch)
+    {
+        for (int i = 0; i < labelChars.length; i++) {
+            if (ch == labelChars[i]) return i;
+        }
+        return -1;
+    }
 
     /**
      * 'c', 'k', 'o', 'p', 's', 'u', 'v' 'w', 'x', 'y', 'z' no difference between upper and lower cases.
@@ -107,8 +115,20 @@ public class PanelSeg
             }
 
             case LabelRegHogLeNet5Svm:
+            {
+                LabelClassifyLeNet5.initialize();
+                LabelClassifyHogSvm.initialize("svm_model_rbf_8.0_0.03125");
+                return;
+            }
             case LabelRegHogLeNet5SvmBeam:
-            case LabelRegHogLeNet5SvmBeam1:
+            {
+                LabelClassifyLeNet5.initialize();
+                LabelClassifyHogSvm.initialize("svm_model_rbf_8.0_0.03125");
+                LabelSequenceClassify.initialize(   "svm_model_2_2048.0_2.0",
+                                                    "svm_model_6_32.0_0.5");
+                return;
+            }
+            case LabelRegHogLeNet5SvmAlignment:
             {
                 LabelClassifyLeNet5.initialize();
                 LabelClassifyHogSvm.initialize("svm_model_rbf_8.0_0.03125");
@@ -235,7 +255,7 @@ public class PanelSeg
                 return figure.getSegResultWithoutPadding();
             }
 
-            case LabelRegHogLeNet5SvmBeam1: {
+            case LabelRegHogLeNet5SvmAlignment: {
                 LabelDetectHog detectHog = new LabelDetectHog(figure);
                 detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
                 detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
@@ -248,7 +268,7 @@ public class PanelSeg
                 classifySvm.svmClassificationWithLeNet5();
                 //classifySvm.mergeRecognitionLabelsSimple();
 
-                LabelBeamSearch1 beamSearch = new LabelBeamSearch1(figure);
+                LabelBeamSearchAlignment beamSearch = new LabelBeamSearchAlignment(figure);
                 beamSearch.search();
 
                 return figure.getSegResultWithoutPadding();

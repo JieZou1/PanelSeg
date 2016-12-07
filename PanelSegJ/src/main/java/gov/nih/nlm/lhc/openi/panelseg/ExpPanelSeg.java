@@ -35,7 +35,7 @@ public class ExpPanelSeg extends Exp
             System.out.println("LabelDetHogLeNet5	        HoG+LeNet5 method for Label Detection");
             System.out.println("LabelRegHogLeNet5Svm	    HoG+LeNet5+SVM method for Label Recognition");
             System.out.println("LabelRegHogLeNet5SvmBeam    HoG+LeNet5+SVM+Beam method for Label Recognition");
-            System.out.println("LabelRegHogLeNet5SvmBeam1	HoG+LeNet5+SVM+Beam1 method for Label Recognition");
+            System.out.println("LabelRegHogLeNet5SvmAlignment	HoG+LeNet5+SVM+Beam1 method for Label Recognition");
 
             System.out.println("PanelSplitSantosh	        Santosh's method for Panel Split, based on horizontal and vertical lines");
             System.out.println("PanelSplitJaylene	        Jaylene's method for Panel Split, based on horizontal and vertical lines");
@@ -60,7 +60,7 @@ public class ExpPanelSeg extends Exp
             case "LabelDetHogLeNet5": method = PanelSeg.Method.LabelDetHogLeNet5; break;
             case "LabelRegHogLeNet5Svm": method = PanelSeg.Method.LabelRegHogLeNet5Svm; break;
             case "LabelRegHogLeNet5SvmBeam": method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam; break;
-            case "LabelRegHogLeNet5SvmBeam1": method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam1; break;
+            case "LabelRegHogLeNet5SvmAlignment": method = PanelSeg.Method.LabelRegHogLeNet5SvmAlignment; break;
 
             case "PanelSplitSantosh": method = PanelSeg.Method.PanelSplitSantosh; break;
             case "PanelSplitJaylene": method = PanelSeg.Method.PanelSplitJaylene; break;
@@ -109,7 +109,7 @@ public class ExpPanelSeg extends Exp
         Path imagePath = imagePaths.get(k);
         System.out.println(Integer.toString(k) +  ": processing " + imagePath.toString());
 
-        //if (!imagePath.toString().endsWith("PMC1397864_1472-6882-6-3-8.jpg")) return;
+        //if (!imagePath.toString().endsWith("1471-2121-10-48-4.jpg")) return;
 
         opencv_core.Mat image = imread(imagePath.toString(), CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);

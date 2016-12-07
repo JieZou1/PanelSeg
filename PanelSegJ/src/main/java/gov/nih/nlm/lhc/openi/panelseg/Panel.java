@@ -3,6 +3,7 @@ package gov.nih.nlm.lhc.openi.panelseg;
 import org.bytedeco.javacpp.opencv_core;
 
 import java.awt.Rectangle;
+import java.util.List;
 
 /**
  * A simple class for holding panel segmentation result. We want to make this simple.
@@ -48,6 +49,82 @@ public class Panel
         this.labelProbs = panel.labelProbs;
         this.labelPatch = panel.labelPatch;
         this.labelGrayNormPatch = panel.labelGrayNormPatch;
+    }
+
+    static void setLabelByNonNegProbs(Panel panel)
+    {
+        double maxProb= -1.0; int maxIndex = -1;
+        for (int k = 0; k < panel.labelProbs.length - 1; k++)
+        {
+            if (maxProb < panel.labelProbs[k])
+            {
+                maxProb = panel.labelProbs[k];
+                maxIndex = k;
+            }
+        }
+        panel.panelLabel = "" + PanelSeg.labelChars[maxIndex];
+    }
+
+    /**
+     * Sort panels according to their non-neg probs
+     * @param panels
+     */
+    static void sortPanelsByNonNegProbs(List<Panel> panels)
+    {
+        for (int i = 0; i < panels.size(); i++)
+        {
+            Panel panel = panels.get(i); double maxProb= -1.0;
+            for (int k = 0; k < panel.labelProbs.length - 1; k++)
+            {
+                if (maxProb < panel.labelProbs[k]) maxProb = panel.labelProbs[k];
+            }
+            panel.labelScore = maxProb;
+        }
+        panels.sort(new LabelScoreDescending());
+    }
+
+    /**
+     * Check whether panel1 and panel2 are aligned, horizontally or vertically.
+     * @param panel1
+     * @param panel2
+     * @return
+     */
+    static boolean aligned(Panel panel1, Panel panel2)
+    {
+        Rectangle rect1 = panel1.labelRect;
+        Rectangle rect2 = panel2.labelRect;
+
+        //check horizontally
+        int meanHeight = (rect1.height + rect2.height) / 2;
+        int top = Math.max(rect1.y, rect2.y);
+        int bottom = Math.min(rect1.y + rect1.height, rect2.y + rect2.height);
+        int hOverlap = bottom - top;
+        if (hOverlap > meanHeight / 2) return true;
+
+        //check vertically
+        int meanWidth = (rect1.width + rect2.width) / 2;
+        int left = Math.max(rect1.x, rect2.x);
+        int right = Math.min(rect1.x + rect1.width, rect2.x + rect2.width);
+        int vOverlap = right - left;
+        if (vOverlap > meanWidth / 2) return true;
+
+        return false;
+    }
+
+    /**
+     * Check whether panel1 is aligned with at least one panel in panels
+     * @param panel1
+     * @param panels
+     * @return
+     */
+    static boolean aligned (Panel panel1, List<Panel> panels)
+    {
+        for (int i = 0; i < panels.size(); i++)
+        {
+            Panel panel2 = panels.get(i);
+            if (aligned(panel1, panel2)) return true;
+        }
+        return false;
     }
 }
 

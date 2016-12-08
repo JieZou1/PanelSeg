@@ -33,6 +33,7 @@ class Figure
     int imageWidth, imageHeight;
 
     List<Panel> panels;	//The panels of this figure, either loaded from GT data or segmented by an algorithm.
+    List<List<LabelBeamSearch.BeamItem>> beams; //The beam search results,
 
     /**
      * Constructor help function, used by all ctors.

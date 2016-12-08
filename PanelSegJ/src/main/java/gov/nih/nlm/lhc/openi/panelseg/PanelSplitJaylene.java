@@ -21,7 +21,7 @@ public class PanelSplitJaylene
 
     void split()
     {
-        BufferedImage bufferedImage = AlgOpenCVEx.mat2BufferdImg(figure.imageOriginal);
+        BufferedImage bufferedImage = AlgOpenCVEx.mat2BufferdImg(figure.imageColor);
         PanelSplitter extractPanel = new PanelSplitter(bufferedImage);	//Construct Jaylene's panel object for calling her segmentation method
 
         extractPanel.removeLabel();

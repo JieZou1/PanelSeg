@@ -252,6 +252,9 @@ public class PanelSeg
                 LabelBeamSearch beamSearch = new LabelBeamSearch(figure);
                 beamSearch.search();
 
+                LabelSequenceHeuristic heuristic = new LabelSequenceHeuristic(figure);
+                heuristic.doHeuristic();
+
                 return figure.getSegResultWithoutPadding();
             }
 

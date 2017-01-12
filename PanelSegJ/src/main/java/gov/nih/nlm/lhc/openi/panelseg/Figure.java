@@ -200,18 +200,26 @@ class Figure
         for (Panel panel: this.panels)
         {
             Panel panelNew = new Panel(panel);
-            if (panelNew.labelRect != null && !panelNew.labelRect.isEmpty())
+            if (panel.labelRect != null && !panel.labelRect.isEmpty())
             {
                 panelNew.labelRect = (Rectangle) panel.labelRect.clone();
                 panelNew.labelRect.x -= Figure.padding;
                 panelNew.labelRect.y -= Figure.padding;
             }
-            if (panelNew.panelRect != null && !panelNew.panelRect.isEmpty())
+            if (panel.panelRect != null && !panel.panelRect.isEmpty())
             {
                 panelNew.panelRect = (Rectangle) panel.panelRect.clone();
                 panelNew.panelRect.x -= Figure.padding;
                 panelNew.panelRect.y -= Figure.padding;
             }
+//            else
+//            {   //panel rect is not set, we use label rect to set one.
+//                panelNew.panelRect = (Rectangle) panelNew.labelRect.clone();
+//                panelNew.panelRect.x -= panelNew.labelRect.width/2;
+//                panelNew.panelRect.y -= panelNew.labelRect.height/2;
+//                panelNew.panelRect.width = panelNew.labelRect.width*2;
+//                panelNew.panelRect.height = panelNew.labelRect.height*2;
+//            }
             panels.add(panelNew);
         }
         return panels;

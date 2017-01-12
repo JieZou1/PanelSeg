@@ -18,7 +18,7 @@ class MiscCopyOriginalImage
             System.out.println("	This is a utility program to copy original figure images from /hadoop/scratch folder on lhce-zol2 server.");
             System.out.println("	This program can run on lhce-zol2 server only.");
             System.out.println("	<src imgLarge list> is a text file, containing a list of figure images that we want to get.");
-            System.out.println("	<dst imgOrignal folder> is a folder, where we want to save the retrieved original figure images.");
+            System.out.println("	<dst imgOriginal folder> is a folder, where we want to save the retrieved original figure images.");
             System.out.println("	The program looks for the following mapping files:");
             System.out.println("	PMC: /hadoop/scratch/openi-v3.0/input-lists/feature-extraction/openi-v3.0-figures.txt");
             System.out.println("	HMD imageColor list: /hadoop/scratch/hmd/input-lists/feature-extraction/hmd-feature-extraction-list.txt");
@@ -50,7 +50,7 @@ class MiscCopyOriginalImage
                 "/hadoop/scratch/openi-v3.0/input-lists/feature-extraction/openi-v3.0-figures.txt", //PMC
                 "/hadoop/scratch/hmd/input-lists/feature-extraction/hmd-feature-extraction-list.txt", //HMD imageColor list"
                 "/hadoop/storage/radiology/input-lists/feature-extraction/radiology-images.txt", //CXR
-                "/hadoop/storage/allcopied-usc/input-lists/feature-extraction/usc-imageColor-list.txt" //USC
+                "/hadoop/storage/usc/input-lists/feature-extraction/usc-imageColor-list.txt" //USC
         };
 
         //load mapping files

@@ -24,17 +24,20 @@ public class DataPartitionNonGraphics
     public static void main(String args[]) throws Exception
     {
         //Stop and print error msg if no arguments passed.
-        if(args.length != 0)
+        if(args.length != 1)
         {
-            System.out.println("Usage: java -cp PanelSegJ.jar PartitionNonGraphics");
+            System.out.println("Usage: java -cp PanelSegJ.jar PartitionNonGraphics <All List File>");
             System.exit(0);
         }
 
         DataPartitionNonGraphics partitionNonGraphics = new DataPartitionNonGraphics();
+        partitionNonGraphics.allListFile = args[0];
+
         partitionNonGraphics.partition();
         System.out.println("Completed!");
     }
 
+    private String allListFile;    //The file containing a list of all figures
     private List<String> imagePaths;
     private HashMap<String, Integer> classificationResults;
 
@@ -43,8 +46,8 @@ public class DataPartitionNonGraphics
         System.out.println("Read in Graphic Classification results");
         readGraphicClassificationResult();
 
-        System.out.println("Read in eval.txt");
-        readAllFigure("D:\\Users\\jie\\projects\\PanelSeg\\Exp\\eval.txt");
+        System.out.println("Read in all figure list from a file");
+        readAllFigure(allListFile);
 
         System.out.println("Start Partitioning");
 
@@ -124,7 +127,7 @@ public class DataPartitionNonGraphics
 
     private void readAllFigure(String listFile)
     {
-        imagePaths = new ArrayList<String>();
+        imagePaths = new ArrayList<>();
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(listFile))) {
                 String line;

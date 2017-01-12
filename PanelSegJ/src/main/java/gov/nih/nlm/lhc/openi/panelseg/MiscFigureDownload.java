@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.HashSet;
 
 import org.apache.commons.io.FileUtils;
@@ -17,7 +18,7 @@ import net.sf.json.JSONSerializer;
 /**
  * Created by jzou on 8/25/2016.
  */
-class MiscFigureDownload
+public class MiscFigureDownload
 {
     /**
      * @description Module to download the images for a given search query.
@@ -28,14 +29,14 @@ class MiscFigureDownload
      */
     public static void main(String args[]) throws Exception
     {
-        //Stop and print error msg if no agruments passed.
+        //Stop and print error msg if no arguments passed.
         if(args.length < 3)
         {
             System.out.println("Usage: java -cp PanelSegJ.jar MiscFigureDownload <query-string> <output-dir> <imageColor-prefix>");
             System.out.println("	This is a utility program to download figure images through OpenI API.");
             System.out.println("	Note: The downloaded imageColor is the highest resolution images for OpenI web displaying purpose.");
-            System.out.println("	        It is not the original imageColor to be processed by PanelSeg. The original imageColor is on Hadoop server.");
-            System.out.println("			The original imageColor is on Hadoop server, and may be retrieved by MiscCopyOriginalImage program");
+            System.out.println("	      It is not the original imageColor to be processed by PanelSeg. The original imageColor is on Hadoop server.");
+            System.out.println("		  he original imageColor is on Hadoop server, and may be retrieved by MiscCopyOriginalImage program");
             System.exit(0);
         }
 
@@ -95,7 +96,7 @@ class MiscFigureDownload
             //Throttling down the requests per second to the server.
             threadWait(200);
 
-        }while(n < total);
+        }while(n < total && n < 50000); //We download 50,000 maximum for now.
         System.out.println("Total results: " + imageSet.size());
 
 
@@ -109,10 +110,18 @@ class MiscFigureDownload
         for(String eachQueryImage : imageSet)
         {
             String fileBaseName = FilenameUtils.getBaseName(eachQueryImage);
-            FileUtils.copyURLToFile(new URL(eachQueryImage), new File(outputDirPath, fileBaseName + ".png"));
+            URL source = new URL(eachQueryImage);
+            File destination = new File(outputDirPath, fileBaseName + ".png");
+            if (destination.exists()) {counter++; continue; }//already downloaded
 
-            if(++counter%50 == 0){
-                System.out.println(counter + " images downloaded...");
+            try
+            {
+                FileUtils.copyURLToFile(source, destination);
+                if(++counter%1000 == 0){
+                    System.out.println(counter + " images downloaded...");
+                }
+            }catch(Exception e){
+                e.printStackTrace();
             }
 
             //Throttling down the requests per second to the server.

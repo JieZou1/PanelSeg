@@ -160,7 +160,6 @@ public class TrainLabelClassify
         Path file = folderModel.resolve("train.txt");
 
         LibSvmEx.SaveInLibSVMFormat(file.toString(), targets, features);
-
     }
 
     private void doWorkLeNet5Train() throws Exception

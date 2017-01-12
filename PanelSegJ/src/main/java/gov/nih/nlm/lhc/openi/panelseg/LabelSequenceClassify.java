@@ -48,7 +48,7 @@ public class LabelSequenceClassify
         }
     }
 
-    static void initialize(String svm_model_2, String svm_model_6)
+    static void initialize()
     {
         if (svmModels == null)
         {

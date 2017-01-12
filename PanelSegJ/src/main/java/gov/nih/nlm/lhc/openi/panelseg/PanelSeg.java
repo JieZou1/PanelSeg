@@ -124,8 +124,7 @@ public class PanelSeg
             {
                 LabelClassifyLeNet5.initialize();
                 LabelClassifyHogSvm.initialize("svm_model_rbf_8.0_0.03125");
-                LabelSequenceClassify.initialize(   "svm_model_2_2048.0_2.0",
-                                                    "svm_model_6_32.0_0.5");
+                LabelSequenceClassify.initialize();
                 return;
             }
             case LabelRegHogLeNet5SvmAlignment:

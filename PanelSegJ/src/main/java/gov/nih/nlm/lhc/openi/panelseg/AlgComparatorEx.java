@@ -96,3 +96,39 @@ class PanelLabelAscending implements Comparator<Panel>
 }
 
 
+/**
+ * A class storing results of a panel compares to a list of panels. It stores:
+ * index: the index of each panel in the list of panels.
+ * score1: the overlapping percentage of panel panel
+ * score2: the overlapping percentage of the panel in the list, whose index is index.
+ */
+class PanelOverlappingScore1Score2Index
+{
+    int index;
+    Panel panel1, panel2;
+    double score1, score2;
+
+    public PanelOverlappingScore1Score2Index(int index, Panel panel1, Panel panel2, double score1, double score2)
+    {
+        this.index = index;
+        this.score1 = score1;        this.score2 = score2;
+        this.panel1 = panel1;        this.panel2 = panel2;
+    }
+}
+
+/**
+ * Comparator for sorting score1 of PanelOverlappingIndesScores.
+ * @author Jie Zou
+ */
+class PanelOverlappingScore1Descending implements Comparator<PanelOverlappingScore1Score2Index>
+{
+    public int compare(PanelOverlappingScore1Score2Index o1, PanelOverlappingScore1Score2Index o2)
+    {
+        double diff = o2.score1 - o1.score1;
+        if (diff > 0) return 1;
+        else if (diff == 0) return 0;
+        else return -1;
+    }
+}
+
+

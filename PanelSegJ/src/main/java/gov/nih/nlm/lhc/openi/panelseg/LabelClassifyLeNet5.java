@@ -22,11 +22,10 @@ final class LabelClassifyLeNet5
     //region Static variables (leNet5Model), need to be initialized once by initialize() function
     private static MultiLayerNetwork leNet5Model;
 
-    static void initialize() {
+    static void initialize(String modelFile) {
         if (leNet5Model == null) {
             try {
                 //log.info("Load Models...");
-                String modelFile = "LeNet5.model";
                 leNet5Model = ModelSerializer.restoreMultiLayerNetwork(modelFile);
                 System.out.println(modelFile + " is loaded.");
             } catch (IOException e) {

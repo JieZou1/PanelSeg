@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
@@ -23,7 +24,7 @@ public class PanelSeg
         LabelRegHogSvm, LabelRegHogSvmThreshold, LabelRegHogSvmBeam,
         LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam, LabelRegHogLeNet5SvmAlignment,
 
-        PanelSplitSantosh, PanelSplitJaylene
+        PanelSplitSantosh, PanelSplitJaylene,
     }
 
     //Below info is collected from LabelStatistics.txt
@@ -87,6 +88,24 @@ public class PanelSeg
         if (labelCharLower == 'z') return "z";
 
         return Character.isUpperCase(labelChar) ? labelChar + "_" : Character.toString(labelChar);
+    }
+
+    /**
+     * Initialization method, load models, etc.
+     * Must call this function before call segment function.
+     *
+     * @param method    the method
+     * @param properties key-value pairs read from .properties file
+     * @throws Exception
+     */
+    public static void initialize(Method method, Properties properties) throws Exception
+    {
+        switch (method)
+        {
+            case LabelDetHog:
+                LabelDetectHog.initialize(properties);
+                return;
+        }
     }
 
     /**

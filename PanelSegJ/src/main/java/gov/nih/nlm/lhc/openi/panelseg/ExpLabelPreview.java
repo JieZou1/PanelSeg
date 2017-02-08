@@ -60,6 +60,16 @@ final class ExpLabelPreview extends Exp {
         for (int i = 0; i < imagePaths.size(); i++) doWork(i);
     }
 
+    @Override
+    void initialize() throws Exception {
+
+    }
+
+    @Override
+    void doWork() throws Exception {
+
+    }
+
     /**
      * Generate label preview
      */

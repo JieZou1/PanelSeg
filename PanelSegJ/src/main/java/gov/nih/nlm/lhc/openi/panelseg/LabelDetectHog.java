@@ -7,6 +7,7 @@ import org.bytedeco.javacpp.opencv_objdetect;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import static org.bytedeco.javacpp.opencv_imgproc.resize;
 
@@ -19,7 +20,8 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
 final class LabelDetectHog
 {
     //region static constants (labelSetsHOG)
-    static final String[] labelSetsHOG = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"};
+    static String[] labelSetsHOG = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"};
+    static float[][] models;
 //    static final String[] labelSetsHOG = {
 //        "A", "a", "B", "bh", "CceG", "D", "d", "E", "F", "f", "gq", "H", "IiJjlrt", "Kk", "L", "Mm", "Nn", "OoQ", "Pp", "R", "Ss", "T", "UuVvWw", "XxYyZz"
 //    };
@@ -38,6 +40,44 @@ final class LabelDetectHog
         }
         return null;
     }
+
+    static void initialize(Properties properties) throws Exception
+    {
+        String strlabelSetsHOG = properties.getProperty("labelSetsHOG");
+        if (strlabelSetsHOG == null) throw new Exception("ERROR: labelSetsHOG property is Missing.");
+
+        String strlabelHogModel = properties.getProperty("labelHogModel");
+        if (strlabelHogModel == null) throw new Exception("ERROR: labelHogModel property is Missing.");
+
+        switch (strlabelSetsHOG)
+        {
+            case "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789":
+                labelSetsHOG = new String[1];
+                labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
+
+                models = new float[1][];
+                switch (strlabelHogModel) {
+                    case "svmModel_19409_7171":
+                        models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_7171;
+                        break;
+                    case "svmModel_19409_10625":
+                        models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_10625;
+                        break;
+                    case "svmModel_19409_17675":
+                        models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
+                        break;
+                    case "svmModel_23500_25130":
+                        models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_23500_25130;
+                        break;
+                    default:
+                        throw new Exception("labelHogModel of " + strlabelHogModel + "is Unknown!");
+                }
+                break;
+            default:
+                throw new Exception("labelHogModelSet of " + labelSetsHOG + "is Unknown!");
+        }
+    }
+
     //endregion
 
     /**

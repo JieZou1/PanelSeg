@@ -1,9 +1,13 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import com.google.common.io.Files;
 import org.bytedeco.javacpp.opencv_core;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Properties;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
@@ -15,7 +19,8 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  */
 public class ExpPanelSeg extends Exp
 {
-    public static void main(String args[]) throws Exception {
+    public static void main(String args[]) throws Exception
+    {
         //Stop and print error msg if no arguments passed.
         if (args.length != 1 && args.length != 3) {
             System.out.println();
@@ -49,6 +54,7 @@ public class ExpPanelSeg extends Exp
 
             System.exit(0);
         }
+
 
         PanelSeg.Method method = null;
         switch (args[0]) {
@@ -102,6 +108,16 @@ public class ExpPanelSeg extends Exp
     private ExpPanelSeg(String trainListFile, String targetFolder, PanelSeg.Method method) {
         super(trainListFile, targetFolder, true);
         this.method = method;
+    }
+
+    @Override
+    void initialize() throws Exception {
+
+    }
+
+    @Override
+    void doWork() throws Exception {
+
     }
 
     void doWork(int k) throws Exception

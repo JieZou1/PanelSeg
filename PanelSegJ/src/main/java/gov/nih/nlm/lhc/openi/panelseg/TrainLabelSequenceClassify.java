@@ -66,6 +66,16 @@ public class TrainLabelSequenceClassify extends Exp
     private ArrayList<ArrayList<float[]>> featuresAllOrder; //All features of all order (2 or 3, ..., or 26)
     private ArrayList<ArrayList<Double>> labelsAllOrder; //All labels of all order (2 or 3, ..., or 26)
 
+    @Override
+    void initialize() throws Exception {
+
+    }
+
+    @Override
+    void doWork() throws Exception {
+
+    }
+
     void doWork(int i)
     {
         Path imagePath = imagePaths.get(i);

@@ -117,6 +117,16 @@ final class ExpEval extends Exp
         reportLabelRegEval();
     }
 
+    @Override
+    void initialize() throws Exception {
+
+    }
+
+    @Override
+    void doWork() throws Exception {
+
+    }
+
     void doWork(int k)
     {
         Path imagePath = imagePaths.get(k);

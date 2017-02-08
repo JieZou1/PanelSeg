@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 
 import static java.util.concurrent.ForkJoinTask.invokeAll;
 
@@ -25,12 +26,23 @@ import static java.util.concurrent.ForkJoinTask.invokeAll;
 abstract class Exp {
     public enum LabelPreviewType {ORIGINAL, NORM64}
 
+    protected Properties properties = null;
+
     protected Path listFile;        //The list file containing the samples to be experimented with
     protected Path targetFolder;    //The folder for saving the result
 
     protected List<Path> imagePaths;    //The paths to sample images.
 
-    //protected Exp() {}
+    Exp() {}
+
+    protected void loadListFile() throws Exception {
+        imagePaths = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(listFile.toFile()))) {
+            String line;
+            while ((line = br.readLine()) != null)
+                imagePaths.add(Paths.get(line));
+        }
+    }
 
     /**
      * Ctor, set targetFolder and then collect all imagePaths
@@ -62,7 +74,27 @@ abstract class Exp {
             AlgMiscEx.createClearFolder(this.targetFolder);
     }
 
+    /**
+     * Initialization before doWork
+     * @throws Exception
+     */
+    abstract void initialize() throws Exception;
+
+    /**
+     * Do work,
+     * call doWorkSingleThread to do work in single thread
+     * call doWorkMultiThread to do work in multiple threads
+     * @throws Exception
+     */
+    abstract void doWork() throws Exception;
+
     //The method for handling processing of 1 sample, mostly for implementing multi-threading processing in Fork/Join framework
+
+    /**
+     * Do individual work
+     * @param k
+     * @throws Exception
+     */
     abstract void doWork(int k) throws Exception;
 
     /**

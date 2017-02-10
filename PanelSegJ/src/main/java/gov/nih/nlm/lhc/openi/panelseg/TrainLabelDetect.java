@@ -98,7 +98,7 @@ public class TrainLabelDetect extends Exp
     }
 
     @Override
-    void initialize() throws Exception {
+    void initialize(String propertyFile) throws Exception {
 
     }
 

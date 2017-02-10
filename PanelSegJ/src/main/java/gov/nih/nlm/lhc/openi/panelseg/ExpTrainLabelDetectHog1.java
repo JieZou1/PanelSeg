@@ -12,32 +12,28 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import static org.bytedeco.javacpp.opencv_imgproc.resize;
 
 /**
- * Refactor from TrainLabelDetect to use Properties to configure the training.
- *
- * Created by jzou on 2/8/2017.
+ * Created by jzou on 2/10/2017.
  */
-public class ExpTrainLabelDetectHog extends Exp
+public class ExpTrainLabelDetectHog1 extends Exp
 {
     public enum Task { HogPos, HogSvmFeaExt, HogSvm2SingleVec, HogBootstrap }
-
-    private String posGtFolder, posFolder, negFolder, modelFolder, detectedFolder;
-    private String trainFile, svmModelFile, vectorSvmFile;
-
 
     public static void main(String args[])
     {
         log.info("Training tasks for HOG-based Label Detection.");
 
-        ExpTrainLabelDetectHog exp = new ExpTrainLabelDetectHog();
+        ExpTrainLabelDetectHog1 exp = new ExpTrainLabelDetectHog1();
         try
         {
-            exp.initialize("ExpTrainLabelDetectHog.properties");
+            exp.loadProperties("ExpTrainLabelDetectHog.properties");
+            exp.initialize();
             exp.doWork();
             log.info("Completed!");
         }
@@ -47,114 +43,157 @@ public class ExpTrainLabelDetectHog extends Exp
         }
     }
 
-    private ExpTrainLabelDetectHog.Task task;
+    private ExpTrainLabelDetectHog1.Task task;
 
-    private ExpTrainLabelDetectHog() {super();}
+    private String propLabelSetsHOG;
+    private String propPosGtFolder, propPosFolder, propNegFolder, propModelFolder, propDetectedFolder;
+    private String propTrainFile, propSvmModelFile, propVectorSvmFile;
 
-    /**
-     * Load the properties from ExpPanelSeg.properties file.
-     * Also, validate all property values, throw exceptions if not valid.
-     * Then, do initializations, including static fields, etc.
-     * @throws Exception
-     */
-    @Override
-    void initialize(String propertyFile) throws Exception
+    void loadProperties(String propertiesFile) throws Exception
     {
-        super.initialize(propertyFile);
+        super.loadProperties(propertiesFile);
 
-        //Task
-        String strTask = setProperty("task");
+        String strTask = setProperty("Task");
         switch (strTask)
         {
-            case "HogPos":                task = Task.HogPos;                break;
-            case "HogSvmFeaExt":          task = Task.HogSvmFeaExt;          break;
-            case "HogSvm2SingleVec":      task = Task.HogSvm2SingleVec;      break;
-            case "HogBootstrap":          task = Task.HogBootstrap;          break;
+            case "HogPos":
+                task = ExpTrainLabelDetectHog1.Task.HogPos;
+                loadPropertiesHogPos();
+                break;
+            case "HogSvmFeaExt":
+                task = ExpTrainLabelDetectHog1.Task.HogSvmFeaExt;
+                loadPropertiesHogSvmFeaExt();
+                break;
+            case "HogSvm2SingleVec":
+                task = ExpTrainLabelDetectHog1.Task.HogSvm2SingleVec;
+                loadPropertiesHogSvm2SingleVec();
+                break;
+            case "HogBootstrap":
+                task = ExpTrainLabelDetectHog1.Task.HogBootstrap;
+                loadPropertiesHogBootstrap();
+                break;
             default: throw new Exception("Task " + strTask + " is Unknown");
         }
 
+        waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
+    }
+
+    void loadPropertiesHogPos() throws Exception
+    {
+        propThreading = setProperty("Threading");
+        propListFile = setProperty("ListFile");
+        propTargetFolder = setProperty("TargetFolder");
+        propLabelSetsHOG = setProperty("LabelSetsHOG");
+        propPosGtFolder = setProperty("PosGtFolder");
+    }
+
+    void loadPropertiesHogSvmFeaExt() throws Exception
+    {
+        propTargetFolder = setProperty("TargetFolder");
+        propLabelSetsHOG = setProperty("LabelSetsHOG");
+        propModelFolder = setProperty("ModelFolder");
+        propPosFolder = setProperty("PosFolder");
+        propNegFolder = setProperty("NegFolder");
+        propTrainFile = setProperty("TrainFile");
+    }
+
+    void loadPropertiesHogSvm2SingleVec() throws Exception
+    {
+        propTargetFolder = setProperty("TargetFolder");
+        propLabelSetsHOG = setProperty("LabelSetsHOG");
+        propModelFolder = setProperty("ModelFolder");
+        propSvmModelFile = setProperty("SvmModelFile");
+        propVectorSvmFile = setProperty("VectorSvmFile");
+    }
+
+    void loadPropertiesHogBootstrap() throws Exception
+    {
+        propThreading = setProperty("Threading");
+        propListFile = setProperty("ListFile");
+        propTargetFolder = setProperty("TargetFolder");
+        propLabelSetsHOG = setProperty("LabelSetsHOG");
+        propDetectedFolder = setProperty("DetectedFolder");
+    }
+
+    void initialize() throws Exception
+    {
+        super.initialize();
+
         switch (task)
         {
-            case HogPos:                initializeHogPos();                break;
-            case HogSvmFeaExt:          initializeHogSvmFeaExt();          break;
-            case HogSvm2SingleVec:            break;
-            case HogBootstrap:          initializeHogBootstrap();          break;
+            case HogPos: initializeHogPos(); break;
+            case HogSvmFeaExt: initializeHogSvmFeaExt(); break;
+            case HogSvm2SingleVec: initializeHogSvm2SingleVec(); break;
+            case HogBootstrap: initializeHogBootstrap(); break;
         }
-
-//        this.modelFolder = properties.getProperty("modelFolder");
-//        if (modelFolder == null) throw new Exception("ERROR: modelFolder property is Missing.");
-//        log.info("modelFolder: " + modelFolder);
-//
-//        this.svmModelFile = properties.getProperty("svmModelFile");
-//        if (svmModelFile == null) throw new Exception("ERROR: svmModelFile property is Missing.");
-//        log.info("svmModelFile: " + svmModelFile);
-//
-//        this.vectorSvmFile = properties.getProperty("vectorSvmFile");
-//        if (vectorSvmFile == null) throw new Exception("ERROR: vectorSvmFile property is Missing.");
-//        log.info("vectorSvmFile: " + vectorSvmFile);
-//
-//        this.detectedFolder = properties.getProperty("detectedFolder");
-//        if (detectedFolder == null) throw new Exception("ERROR: detectedFolder property is Missing.");
-//        log.info("detectedFolder: " + detectedFolder);
     }
 
-    private void initializeHogPos() throws Exception
+    protected void setPosGtFolder(boolean toCleanFolder) throws Exception
     {
-        setProperty("labelSetsHOG");
-        setProperty("threading");
-        setProperty("listFile");
-        setProperty("targetFolder");
-        posGtFolder = setProperty("posGtFolder");
-
-        System.out.println();
-
-        for (String name : LabelDetectHog.labelSetsHOG)
+        if (toCleanFolder)
         {
-            Path folder = this.targetFolder.resolve(name);
-            folder = folder.resolve(posGtFolder);
-            System.out.println(folder + " is going to be cleaned!");
+            for (String name : LabelDetectHog.labelSetsHOG)
+            {
+                Path folder = this.targetFolder.resolve(name);
+                folder = folder.resolve(propPosGtFolder);
+                System.out.println(folder + " is going to be cleaned!");
+            }
+            waitKeyContinueOrQuit("Press any key to continue, press N to quit");
+
+            //Clean up all the folders
+            for (String name : LabelDetectHog.labelSetsHOG) {
+                Path folder = this.targetFolder.resolve(name);
+                folder = folder.resolve(propPosGtFolder);
+                AlgMiscEx.createClearFolder(folder);
+                log.info("Folder " + folder + " is created or cleaned!");
+            }
         }
     }
 
-    private void initializeHogSvmFeaExt() throws Exception
+    private void setLabelSetsHOG() throws Exception
     {
-        setProperty("labelSetsHOG");
-        posFolder = setProperty("posFolder");
-        negFolder = setProperty("negFolder");
-        modelFolder = setProperty("modelFolder");
-        trainFile = setProperty("trainFile");
+        switch (propLabelSetsHOG) {
+            case "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789":
+                LabelDetectHog.labelSetsHOG = new String[1];
+                LabelDetectHog.labelSetsHOG[0] = propLabelSetsHOG;
+                break;
+            default:
+                throw new Exception("labelSetsHOG " + propLabelSetsHOG + " is Unknown");
+        }
     }
 
-    private void initializeHogBootstrap()
+    void initializeHogPos() throws Exception
     {
-        for (String name : LabelDetectHog.labelSetsHOG)
-        {
-            Path folder = this.targetFolder.resolve(name);
-            folder = folder.resolve(detectedFolder);
-            AlgMiscEx.createClearFolder(folder);
-            log.info("Folder " + folder + " is created or cleaned!");
-        }
+        setMultiThreading();
+        setListFile();
+        setTargetFolder();
+        setLabelSetsHOG();
+        setPosGtFolder(true);
+    }
+
+    void initializeHogSvmFeaExt() throws Exception
+    {
+        setLabelSetsHOG();
+        setTargetFolder();
+    }
+
+    void initializeHogSvm2SingleVec() throws Exception
+    {
+        setLabelSetsHOG();
+        setTargetFolder();
+    }
+
+    void initializeHogBootstrap() throws Exception
+    {
+        setMultiThreading();
+        setListFile();
+        setTargetFolder();
     }
 
     @Override
     void doWork() throws Exception
     {
         super.doWork();
-
-        //initialize for certain tasks
-        switch (task)
-        {
-            case HogPos:
-                //Clean up all the folders
-                for (String name : LabelDetectHog.labelSetsHOG) {
-                    Path folder = this.targetFolder.resolve(name);
-                    folder = folder.resolve(posGtFolder);
-                    AlgMiscEx.createClearFolder(folder);
-                    log.info("Folder " + folder + " is created or cleaned!");
-                }
-                break;
-            case HogBootstrap:  initializeHogBootstrap();   break;
-        }
 
         //Do work
         switch (task)
@@ -211,7 +250,7 @@ public class ExpTrainLabelDetectHog extends Exp
 //                {
 //                    System.out.println(panel.panelLabel); continue;
 //                }
-            Path folder = targetFolder.resolve(name).resolve(posGtFolder);
+            Path folder = targetFolder.resolve(name).resolve(propPosGtFolder);
             Path file = folder.resolve(getLabelPatchFilename(imageFile, panel));
             opencv_imgcodecs.imwrite(file.toString(), panel.labelGrayNormPatch);
         }
@@ -223,14 +262,14 @@ public class ExpTrainLabelDetectHog extends Exp
             String name = LabelDetectHog.labelSetsHOG[i];
 
             Path folder = targetFolder.resolve(name);
-            Path folderPos = folder.resolve(posFolder);
-            Path folderNeg = folder.resolve(negFolder);
-            Path folderModel = folder.resolve(modelFolder);
+            Path folderPos = folder.resolve(propPosFolder);
+            Path folderNeg = folder.resolve(propNegFolder);
+            Path folderModel = folder.resolve(propModelFolder);
 
             List<Path> posPatches = AlgMiscEx.collectImageFiles(folderPos);
             List<Path> negPatches = AlgMiscEx.collectImageFiles(folderNeg);
 
-            Path file = folderModel.resolve(trainFile);
+            Path file = folderModel.resolve(propTrainFile);
             double[] targets = new double[posPatches.size() + negPatches.size()];
             float[][] features = new float[posPatches.size() + negPatches.size()][];
 
@@ -280,7 +319,7 @@ public class ExpTrainLabelDetectHog extends Exp
                 panel.labelGrayNormPatch = new opencv_core.Mat();
                 resize(patch, panel.labelGrayNormPatch, new opencv_core.Size(64, 64)); //Resize to 64x64 for easy browsing the results
 
-                Path folder = targetFolder.resolve(panel.panelLabel).resolve(detectedFolder);
+                Path folder = targetFolder.resolve(panel.panelLabel).resolve(propDetectedFolder);
                 Path file = folder.resolve(getLabelPatchFilename(imageFile, panel));
                 opencv_imgcodecs.imwrite(file.toString(), panel.labelGrayNormPatch);
             }
@@ -289,7 +328,7 @@ public class ExpTrainLabelDetectHog extends Exp
 
     private void doWorkHogSvm2SingleVec()
     {
-        Path vectorPath = targetFolder.resolve(vectorSvmFile);
+        Path vectorPath = targetFolder.resolve(propVectorSvmFile);
 
         //Save to a java file
         try (PrintWriter pw = new PrintWriter(vectorPath.toString()))
@@ -300,8 +339,8 @@ public class ExpTrainLabelDetectHog extends Exp
             for (String name : LabelDetectHog.labelSetsHOG)
             {
                 Path folder = targetFolder.resolve(name);
-                Path folderModel = folder.resolve(modelFolder);
-                Path modelPath = folderModel.resolve(svmModelFile);
+                Path folderModel = folder.resolve(propModelFolder);
+                Path modelPath = folderModel.resolve(propSvmModelFile);
 
                 float[] singleVector = LibSvmEx.ToSingleVector(modelPath.toString());
 

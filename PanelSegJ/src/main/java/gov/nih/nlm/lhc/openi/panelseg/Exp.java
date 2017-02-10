@@ -3,6 +3,8 @@ package gov.nih.nlm.lhc.openi.panelseg;
 import org.apache.commons.io.FilenameUtils;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgcodecs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,10 +12,7 @@ import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static java.util.concurrent.ForkJoinTask.invokeAll;
 
@@ -23,25 +22,88 @@ import static java.util.concurrent.ForkJoinTask.invokeAll;
  *
  * Created by jzou on 8/30/2016.
  */
-abstract class Exp {
+abstract class Exp
+{
+    protected static final Logger log = LoggerFactory.getLogger(Exp.class);
+
     public enum LabelPreviewType {ORIGINAL, NORM64}
 
     protected Properties properties = null;
+    protected String propThreading, propListFile, propTargetFolder;
 
     protected Path listFile;        //The list file containing the samples to be experimented with
     protected Path targetFolder;    //The folder for saving the result
 
     protected List<Path> imagePaths;    //The paths to sample images.
+    protected boolean multiThreading;   //Single threading or multi-threading
+
+    protected void setMultiThreading()
+    {
+        multiThreading = Objects.equals(propThreading, "Multi");
+    }
+    protected void setListFile()throws Exception
+    {
+        listFile = (new File(propListFile)).toPath();
+        loadListFile();
+    }
+    protected void setTargetFolder() throws Exception
+    {
+        targetFolder = Paths.get(propTargetFolder);
+    }
 
     Exp() {}
 
-    protected void loadListFile() throws Exception {
+    protected void loadListFile() throws Exception
+    {
+        File list_file = listFile.toFile();
+        if (!list_file.exists()) throw new Exception("ERROR: " + listFile.toString() + " does not exist.");
+        if (!list_file.isFile()) throw new Exception("ERROR: " + listFile.toString() + " is not a file.");
+
         imagePaths = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(listFile.toFile()))) {
             String line;
             while ((line = br.readLine()) != null)
                 imagePaths.add(Paths.get(line));
         }
+        log.info("Total number of image is: " + imagePaths.size());
+    }
+
+    protected String setProperty(String propName) throws Exception
+    {
+        String prop = properties.getProperty(propName);
+        if (prop == null) throw new Exception("ERROR: " + propName + " property is Missing.");
+        log.info(propName + ": " + prop);
+
+//        switch (propName)
+//        {
+//            case "negFolder": break;
+//            case "posFolder": break;
+//            case "posGtFolder": break;
+//            case "labelSetsHOG":
+//                switch (prop)
+//                {
+//                    case "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789":
+//                        LabelDetectHog.labelSetsHOG = new String[1];
+//                        LabelDetectHog.labelSetsHOG[0] = prop;
+//                        break;
+//                    default: throw new Exception("labelSetsHOG " + prop + " is Unknown");
+//                }
+//                break;
+//            case "listFile":
+//                File list_file = new File(prop);
+//                listFile = list_file.toPath();
+//                loadListFile();
+//                break;
+//            case "targetFolder":
+//                targetFolder = Paths.get(prop);
+//                break;
+//            case "threading":
+//                multiThreading = Objects.equals(prop, "Multi"); break;
+//            case "task": break;
+//            default: throw new Exception("Property " + propName + " is Unknown");
+//        }
+
+        return prop;
     }
 
     /**
@@ -74,11 +136,37 @@ abstract class Exp {
             AlgMiscEx.createClearFolder(this.targetFolder);
     }
 
+    void loadProperties(String propertiesFile) throws Exception
+    {
+        properties = new Properties();
+        properties.load(this.getClass().getClassLoader().getResourceAsStream(propertiesFile));
+    }
+
+    void initialize()  throws  Exception
+    {
+    }
+
+    protected void waitKeyContinueOrQuit(String message) throws Exception
+    {
+        System.out.println();
+        System.out.println(message);
+
+        Scanner sc = new Scanner(System.in);
+        String s = sc.nextLine();
+        if (Objects.equals(s, "n") || Objects.equals(s, "N"))
+            throw new Exception("User stops the process!");
+    }
+
     /**
      * Initialization before doWork
      * @throws Exception
      */
-    abstract void initialize() throws Exception;
+    void initialize(String propertyFile) throws Exception
+    {
+        //Load properties
+        properties = new Properties();
+        properties.load(this.getClass().getClassLoader().getResourceAsStream(propertyFile));
+    }
 
     /**
      * Do work,
@@ -86,7 +174,9 @@ abstract class Exp {
      * call doWorkMultiThread to do work in multiple threads
      * @throws Exception
      */
-    abstract void doWork() throws Exception;
+    void doWork() throws Exception
+    {
+    }
 
     //The method for handling processing of 1 sample, mostly for implementing multi-threading processing in Fork/Join framework
 
@@ -95,7 +185,10 @@ abstract class Exp {
      * @param k
      * @throws Exception
      */
-    abstract void doWork(int k) throws Exception;
+    void doWork(int k) throws Exception
+    {
+        log.info(Integer.toString(k) +  ": processing " + imagePaths.get(k).toString());
+    }
 
     /**
      * Helper function for generating panel label patch filenames for saving to disks.
@@ -196,25 +289,27 @@ abstract class Exp {
         opencv_imgcodecs.imwrite(previewPath.toString(), preview);
     }
 
-    /**
-     * Entry function
-     */
     protected void doWorkSingleThread() throws Exception
     {
         long startTime = System.currentTimeMillis();
         for (int k = 0; k < imagePaths.size(); k++) doWork(k);
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Total processing time: " + (endTime - startTime)/1000.0 + " seconds.");
-        System.out.println("Average processing time: " + ((endTime - startTime)/1000.0)/imagePaths.size() + " seconds.");
+        log.info("Total processing time: " + (endTime - startTime)/1000.0 + " seconds.");
+        log.info("Average processing time per image: " + ((endTime - startTime)/1000.0)/imagePaths.size() + " seconds.");
     }
 
     protected void doWorkMultiThread()
     {
+        long startTime = System.currentTimeMillis();
         ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 4);
         invokeAll(tasks);
 //        ExpTask task = new ExpTask(this, 0, imagePaths.size());
 //        task.invoke();
+        long endTime = System.currentTimeMillis();
+
+        log.info("Total processing time: " + (endTime - startTime)/1000.0 + " seconds.");
+        log.info("Average processing time per image: " + ((endTime - startTime)/1000.0)/imagePaths.size() + " seconds.");
     }
 }
 

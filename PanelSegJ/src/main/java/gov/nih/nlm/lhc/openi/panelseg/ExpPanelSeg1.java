@@ -32,7 +32,7 @@ public class ExpPanelSeg1 extends Exp
     private ExpPanelSeg1() {super();}
 
     @Override
-    void initialize() throws Exception {
+    void initialize(String propertyFile) throws Exception {
 
     }
 

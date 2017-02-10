@@ -61,7 +61,7 @@ final class ExpLabelPreview extends Exp {
     }
 
     @Override
-    void initialize() throws Exception {
+    void initialize(String propertyFile) throws Exception {
 
     }
 

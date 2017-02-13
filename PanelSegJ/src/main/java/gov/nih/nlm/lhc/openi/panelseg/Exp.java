@@ -29,21 +29,21 @@ abstract class Exp
     public enum LabelPreviewType {ORIGINAL, NORM64}
 
     protected Properties properties = null;
-    protected String propThreading, propListFile, propTargetFolder;
+    protected String propThreads, propListFile, propTargetFolder;
 
     protected Path listFile;        //The list file containing the samples to be experimented with
     protected Path targetFolder;    //The folder for saving the result
 
     protected List<Path> imagePaths;    //The paths to sample images.
-    protected boolean multiThreading;   //Single threading or multi-threading
+    protected int threads;   // == 1 Single threading; > 1 multi-threading
 
-    protected void setMultiThreading()
+    protected void setMultiThreading() throws Exception
     {
-        multiThreading = Objects.equals(propThreading, "Multi");
+        threads = Integer.parseInt(propThreads);
     }
     protected void setListFile()throws Exception
     {
-        listFile = (new File(propListFile)).toPath();
+        listFile = Paths.get(propListFile);
         loadListFile();
     }
     protected void setTargetFolder() throws Exception
@@ -53,7 +53,7 @@ abstract class Exp
 
     Exp() {}
 
-    protected void loadListFile() throws Exception
+    private void loadListFile() throws Exception
     {
         File list_file = listFile.toFile();
         if (!list_file.exists()) throw new Exception("ERROR: " + listFile.toString() + " does not exist.");
@@ -73,35 +73,6 @@ abstract class Exp
         String prop = properties.getProperty(propName);
         if (prop == null) throw new Exception("ERROR: " + propName + " property is Missing.");
         log.info(propName + ": " + prop);
-
-//        switch (propName)
-//        {
-//            case "negFolder": break;
-//            case "posFolder": break;
-//            case "posGtFolder": break;
-//            case "labelSetsHOG":
-//                switch (prop)
-//                {
-//                    case "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789":
-//                        LabelDetectHog.labelSetsHOG = new String[1];
-//                        LabelDetectHog.labelSetsHOG[0] = prop;
-//                        break;
-//                    default: throw new Exception("labelSetsHOG " + prop + " is Unknown");
-//                }
-//                break;
-//            case "listFile":
-//                File list_file = new File(prop);
-//                listFile = list_file.toPath();
-//                loadListFile();
-//                break;
-//            case "targetFolder":
-//                targetFolder = Paths.get(prop);
-//                break;
-//            case "threading":
-//                multiThreading = Objects.equals(prop, "Multi"); break;
-//            case "task": break;
-//            default: throw new Exception("Property " + propName + " is Unknown");
-//        }
 
         return prop;
     }
@@ -136,15 +107,15 @@ abstract class Exp
             AlgMiscEx.createClearFolder(this.targetFolder);
     }
 
-    void loadProperties(String propertiesFile) throws Exception
+    void loadProperties() throws Exception {}
+
+    protected void loadProperties(String propertiesFile) throws Exception
     {
         properties = new Properties();
         properties.load(this.getClass().getClassLoader().getResourceAsStream(propertiesFile));
     }
 
-    void initialize()  throws  Exception
-    {
-    }
+    void initialize()  throws  Exception    {    }
 
     protected void waitKeyContinueOrQuit(String message) throws Exception
     {
@@ -174,9 +145,7 @@ abstract class Exp
      * call doWorkMultiThread to do work in multiple threads
      * @throws Exception
      */
-    void doWork() throws Exception
-    {
-    }
+    void doWork() throws Exception    {    }
 
     //The method for handling processing of 1 sample, mostly for implementing multi-threading processing in Fork/Join framework
 
@@ -302,7 +271,7 @@ abstract class Exp
     protected void doWorkMultiThread()
     {
         long startTime = System.currentTimeMillis();
-        ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), 4);
+        ExpTask[] tasks = ExpTask.createTasks(this, imagePaths.size(), threads);
         invokeAll(tasks);
 //        ExpTask task = new ExpTask(this, 0, imagePaths.size());
 //        task.invoke();

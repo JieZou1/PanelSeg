@@ -46,7 +46,7 @@ public class ExpPanelSeg1 extends Exp
      * Also, validate all property values, throw exceptions if not valid.
      * @throws Exception
      */
-    private void loadProperties() throws Exception
+    void loadProperties() throws Exception
     {
         //Load properties
         properties = new Properties();

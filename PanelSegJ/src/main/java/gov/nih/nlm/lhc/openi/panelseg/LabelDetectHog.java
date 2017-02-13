@@ -43,20 +43,20 @@ final class LabelDetectHog
 
     static void initialize(Properties properties) throws Exception
     {
-        String strlabelSetsHOG = properties.getProperty("labelSetsHOG");
-        if (strlabelSetsHOG == null) throw new Exception("ERROR: labelSetsHOG property is Missing.");
+        String propLabelSetsHOG = properties.getProperty("LabelSetsHOG");
+        if (propLabelSetsHOG == null) throw new Exception("ERROR: LabelSetsHOG property is Missing.");
 
-        String strlabelHogModel = properties.getProperty("labelHogModel");
-        if (strlabelHogModel == null) throw new Exception("ERROR: labelHogModel property is Missing.");
+        String propLabelHogModel = properties.getProperty("LabelHogModel");
+        if (propLabelHogModel == null) throw new Exception("ERROR: LabelHogModel property is Missing.");
 
-        switch (strlabelSetsHOG)
+        switch (propLabelSetsHOG)
         {
             case "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789":
                 labelSetsHOG = new String[1];
                 labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
 
                 models = new float[1][];
-                switch (strlabelHogModel) {
+                switch (propLabelHogModel) {
                     case "svmModel_19409_7171":
                         models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_7171;
                         break;
@@ -70,7 +70,7 @@ final class LabelDetectHog
                         models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_23500_25130;
                         break;
                     default:
-                        throw new Exception("labelHogModel of " + strlabelHogModel + "is Unknown!");
+                        throw new Exception("LabelHogModel of " + propLabelHogModel + "is Unknown!");
                 }
                 break;
             default:
@@ -90,12 +90,12 @@ final class LabelDetectHog
 
         hog = createHog();
 
-        int n = labelSetsHOG.length;		svmModels = new float[n][];
-        for (int i = 0; i < n; i++)
-        {
-            if (labelSetsHOG[i].equals("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"))
-                svmModels[i] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_10625;
-
+//        int n = labelSetsHOG.length;		svmModels = new float[n][];
+//        for (int i = 0; i < n; i++)
+//        {
+//            if (labelSetsHOG[i].equals("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"))
+//                svmModels[i] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_10625;
+//
 //            String classString = "gov.nih.nlm.lhc.openi.panelseg.PanelSegLabelRegHogModel_" + labelSetsHOG[i];
 //            try {
 //                Class<?> cls = Class.forName(classString);
@@ -105,12 +105,12 @@ final class LabelDetectHog
 //                // TODO Auto-generated catch block
 //                e.printStackTrace();
 //            }
-        }
+//        }
     }
 
     Figure figure;
     private opencv_objdetect.HOGDescriptor hog;
-    private float[][] svmModels;
+    //private float[][] svmModels;
     ArrayList<ArrayList<Panel>> hogDetectionResult; //The HOG method detection result of all labelSetsToDetect
 
     private static opencv_objdetect.HOGDescriptor createHog()
@@ -153,7 +153,7 @@ final class LabelDetectHog
 
         for (int i = 0; i < n; i++)
         {
-            hog.setSVMDetector(new opencv_core.Mat(new FloatPointer(svmModels[i])));
+            hog.setSVMDetector(new opencv_core.Mat(new FloatPointer(models[i])));
 
             String panelLabelSet = labelSetsHOG[i];
 //            double minSize = labelMinSize * scale;

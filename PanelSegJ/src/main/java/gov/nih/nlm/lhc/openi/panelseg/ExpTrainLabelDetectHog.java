@@ -108,7 +108,7 @@ public class ExpTrainLabelDetectHog extends Exp
     {
         loadProperties("ExpTrainLabelDetectHog.properties");
 
-        String strTask = setProperty("Task");
+        String strTask = getProperty("Task");
         switch (strTask)
         {
             case "HogPos":
@@ -156,9 +156,6 @@ public class ExpTrainLabelDetectHog extends Exp
     @Override
     void doWork() throws Exception
     {
-        super.doWork();
-
-        //Do work
         switch (task)
         {
             case HogPos:
@@ -184,11 +181,11 @@ public class ExpTrainLabelDetectHog extends Exp
 
     private void loadPropertiesHogPos() throws Exception
     {
-        propThreads = setProperty("Threads");
-        propListFile = setProperty("ListFile");
-        propLabelSetsHOG = setProperty("LabelSetsHOG");
-        propTargetFolder = setProperty("TargetFolder");
-        propPosGtFolder = setProperty("PosGtFolder");
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propLabelSetsHOG = getProperty("LabelSetsHOG");
+        propTargetFolder = getProperty("TargetFolder");
+        propPosGtFolder = getProperty("PosGtFolder");
     }
 
     private void initializeHogPos() throws Exception
@@ -196,7 +193,7 @@ public class ExpTrainLabelDetectHog extends Exp
         setMultiThreading();
         setListFile();
         setLabelSetsHOG();
-        setTargetFolder();
+        setTargetFolder(false);
         setPosGtFolder(true);
     }
 
@@ -237,18 +234,18 @@ public class ExpTrainLabelDetectHog extends Exp
 
     private void loadPropertiesHogSvmFeaExt() throws Exception
     {
-        propTargetFolder = setProperty("TargetFolder");
-        propLabelSetsHOG = setProperty("LabelSetsHOG");
-        propModelFolder = setProperty("ModelFolder");
-        propPosFolder = setProperty("PosFolder");
-        propNegFolder = setProperty("NegFolder");
-        propTrainFile = setProperty("TrainFile");
+        propTargetFolder = getProperty("TargetFolder");
+        propLabelSetsHOG = getProperty("LabelSetsHOG");
+        propModelFolder = getProperty("ModelFolder");
+        propPosFolder = getProperty("PosFolder");
+        propNegFolder = getProperty("NegFolder");
+        propTrainFile = getProperty("TrainFile");
     }
 
     private void initializeHogSvmFeaExt() throws Exception
     {
         setLabelSetsHOG();
-        setTargetFolder();
+        setTargetFolder(false);
     }
 
     private void doWorkHogSvmFeaExt()
@@ -295,17 +292,17 @@ public class ExpTrainLabelDetectHog extends Exp
 
     private void loadPropertiesHogSvm2SingleVec() throws Exception
     {
-        propTargetFolder = setProperty("TargetFolder");
-        propLabelSetsHOG = setProperty("LabelSetsHOG");
-        propModelFolder = setProperty("ModelFolder");
-        propSvmModelFile = setProperty("SvmModelFile");
-        propVectorSvmFile = setProperty("VectorSvmFile");
+        propTargetFolder = getProperty("TargetFolder");
+        propLabelSetsHOG = getProperty("LabelSetsHOG");
+        propModelFolder = getProperty("ModelFolder");
+        propSvmModelFile = getProperty("SvmModelFile");
+        propVectorSvmFile = getProperty("VectorSvmFile");
     }
 
     private void initializeHogSvm2SingleVec() throws Exception
     {
         setLabelSetsHOG();
-        setTargetFolder();
+        setTargetFolder(false);
     }
 
     private void doWorkHogSvm2SingleVec() throws  Exception
@@ -348,18 +345,18 @@ public class ExpTrainLabelDetectHog extends Exp
 
     private void loadPropertiesHogBootstrap() throws Exception
     {
-        propThreads = setProperty("Threads");
-        propListFile = setProperty("ListFile");
-        propTargetFolder = setProperty("TargetFolder");
-        propLabelSetsHOG = setProperty("LabelSetsHOG");
-        propDetectedFolder = setProperty("DetectedFolder");
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        propLabelSetsHOG = getProperty("LabelSetsHOG");
+        propDetectedFolder = getProperty("DetectedFolder");
     }
 
     private void initializeHogBootstrap() throws Exception
     {
         setMultiThreading();
         setListFile();
-        setTargetFolder();
+        setTargetFolder(false);
         setDetectFolder(true);
     }
 

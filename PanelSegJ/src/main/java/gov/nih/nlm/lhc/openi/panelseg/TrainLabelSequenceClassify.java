@@ -67,6 +67,16 @@ public class TrainLabelSequenceClassify extends Exp
     private ArrayList<ArrayList<Double>> labelsAllOrder; //All labels of all order (2 or 3, ..., or 26)
 
     @Override
+    void loadProperties() throws Exception {
+
+    }
+
+    @Override
+    void initialize() throws Exception {
+
+    }
+
+    @Override
     void initialize(String propertyFile) throws Exception {
 
     }

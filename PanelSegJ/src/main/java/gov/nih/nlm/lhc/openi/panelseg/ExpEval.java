@@ -10,74 +10,28 @@ import java.util.HashMap;
 /**
  * Programs related to evaluation
  *
- * Created by jzou on 9/19/2016.
+ * Created by jzou on 2/13/2017.
  */
-final class ExpEval extends Exp
+public class ExpEval extends Exp
 {
-    public static void main(String args[]) throws Exception
+    public static void main(String args[])
     {
-        //Stop and print error msg if no arguments passed.
-        if (args.length != 1 && args.length != 3)
+        ExpEval expPanelSeg = new ExpEval();
+        try
         {
-            System.out.println();
-
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpEval <method> <Sample List File> <target folder>");
-            System.out.println("Evaluation for various panel segmentation methods.");
-
-            System.out.println();
-
-            System.out.println("Method:");
-            System.out.println("LabelDetHog                 HoG method for Label Detection");
-            System.out.println("LabelRegHogSvm              HoG+SVM method for Label Recognition");
-            System.out.println("LabelRegHogSvmThreshold     HoG+SVM then followed by simple threshold for Label Recognition");
-            System.out.println("LabelRegHogSvmBeam	        HoG+SVM then followed by beam search for Label Recognition");
-
-            System.out.println("LabelDetHogLeNet5	        HoG+LeNet5 method for Label Detection");
-            System.out.println("LabelRegHogLeNet5Svm	    HoG+LeNet5+SVM method for Label Recognition");
-            System.out.println("LabelRegHogLeNet5SvmBeam    HoG+LeNet5+SVM+Beam method for Label Recognition");
-
-            System.out.println();
-
-            System.out.println("Default Sample List File: \\Users\\jie\\projects\\PanelSeg\\Exp\\eval.txt");
-            System.out.println("Default target folder: \\Users\\jie\\projects\\PanelSeg\\Exp\\PanelSeg\\eval");
-
-            System.out.println();
-
-            System.exit(0);
+            expPanelSeg.loadProperties();
+            expPanelSeg.initialize();
+            expPanelSeg.doWork();
+            log.info("Completed!");
         }
-
-        PanelSeg.Method method = null;
-        switch (args[0]) {
-            case "LabelDetHog":  method = PanelSeg.Method.LabelDetHog; break;
-            case "LabelRegHogSvm": method = PanelSeg.Method.LabelRegHogSvm; break;
-            case "LabelRegHogSvmThreshold": method = PanelSeg.Method.LabelRegHogSvmThreshold; break;
-            case "LabelRegHogSvmBeam": method = PanelSeg.Method.LabelRegHogSvmBeam; break;
-
-            case "LabelDetHogLeNet5": method = PanelSeg.Method.LabelDetHogLeNet5; break;
-            case "LabelRegHogLeNet5Svm": method = PanelSeg.Method.LabelRegHogLeNet5Svm; break;
-            case "LabelRegHogLeNet5SvmBeam": method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam; break;
-            default:
-                System.out.println("Unknown method!!");
-                System.exit(0);
-        }
-
-        String listFile, targetFolder;
-        if (args.length == 1)
+        catch (Exception ex)
         {
-            listFile = "\\Users\\jie\\projects\\PanelSeg\\Exp\\eval.txt";
-            targetFolder = "\\Users\\jie\\projects\\PanelSeg\\Exp\\PanelSeg\\eval";
+            log.error(ex.getMessage());
         }
-        else
-        {
-            listFile = args[1];
-            targetFolder = args[2];
-        }
-
-        ExpEval eval = new ExpEval(listFile, targetFolder, method);
-        eval.evaluate();
     }
 
     private PanelSeg.Method method;
+    private String propEvalFile;
 
     private HashMap<String, Integer> countIndividualLabelGT;    //The count for each individual label (ground truth)
     private HashMap<String, Integer> countIndividualLabelAuto;  //The count for each individual label (auto recognized)
@@ -88,22 +42,61 @@ final class ExpEval extends Exp
     private ArrayList<ArrayList<String>> missingLabels;
     private ArrayList<ArrayList<String>> falseAlarmLabels;
 
-    /**
-     * Ctor, set targetFolder and then collect all imagePaths
-     * It also set the method
-     *
-     * @param listFile
-     * @param targetFolder
-     */
-    private ExpEval(String listFile, String targetFolder, PanelSeg.Method method)
+    @Override
+    void loadProperties() throws Exception
     {
-        super(listFile, targetFolder, false);
-        this.method = method;
+        loadProperties("ExpEval.properties");
+
+        String propMethod = getProperty("Method");
+        switch (propMethod)
+        {
+            case "LabelDetHog":
+                method = PanelSeg.Method.LabelDetHog;
+                break;
+            case "LabelRegHogSvm":
+                method = PanelSeg.Method.LabelRegHogSvm;
+                break;
+            case "LabelRegHogSvmThreshold":
+                method = PanelSeg.Method.LabelRegHogSvmThreshold;
+                break;
+            case "LabelRegHogSvmBeam":
+                method = PanelSeg.Method.LabelRegHogSvmBeam;
+                break;
+
+            case "LabelDetHogLeNet5":
+                method = PanelSeg.Method.LabelDetHogLeNet5;
+                break;
+            case "LabelRegHogLeNet5Svm":
+                method = PanelSeg.Method.LabelRegHogLeNet5Svm;
+                break;
+            case "LabelRegHogLeNet5SvmBeam":
+                method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam;
+                break;
+            case "LabelRegHogLeNet5SvmAlignment":
+                method = PanelSeg.Method.LabelRegHogLeNet5SvmAlignment;
+                break;
+
+            case "PanelSplitSantosh":
+                method = PanelSeg.Method.PanelSplitSantosh;
+                break;
+            case "PanelSplitJaylene":
+                method = PanelSeg.Method.PanelSplitJaylene;
+                break;
+            default: throw new Exception(propMethod + " is Unknown");
+        }
+
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        propEvalFile = getProperty("EvalFile");
+
+        waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
     }
 
-    private void evaluate()
-    {
-        //Initialize
+    @Override
+    void initialize() throws Exception {
+        setListFile();
+        setTargetFolder(false);
+
         countIndividualLabelGT = new HashMap<>();
         countIndividualLabelAuto = new HashMap<>();
         countIndividualLabelCorrect = new HashMap<>();
@@ -111,26 +104,20 @@ final class ExpEval extends Exp
         gtLabels = new ArrayList<>();
         missingLabels = new ArrayList<>();
         falseAlarmLabels = new ArrayList<>();
+    }
 
-        for (int k = 0; k < imagePaths.size(); k++) doWork(k);
-
+    @Override
+    void doWork() throws Exception
+    {
+        doWorkSingleThread();
         reportLabelRegEval();
     }
 
     @Override
-    void initialize(String propertyFile) throws Exception {
+    void doWork(int k) throws Exception {
+        super.doWork(k);
 
-    }
-
-    @Override
-    void doWork() throws Exception {
-
-    }
-
-    void doWork(int k)
-    {
         Path imagePath = imagePaths.get(k);
-        System.out.println(Integer.toString(k) + ": processing " + imagePath.toString());
 
         ArrayList<Panel> gtPanels = loadGtAnnotation(imagePath);        //Load ground truth annotation
         ArrayList<Panel> autoPanels = loadAutoAnnotation(imagePath);    //Load segmentation results
@@ -214,7 +201,7 @@ final class ExpEval extends Exp
                 String gtLabel = gtPanel.panelLabel.toLowerCase();
                 if (    method == PanelSeg.Method.LabelDetHog
                         || method == PanelSeg.Method.LabelDetHogLeNet5
-                        //|| method == PanelSeg.Method.LabelRegHogSvm
+                    //|| method == PanelSeg.Method.LabelRegHogSvm
                         )
                 { //For LabelDetHog and LabelDetHogLeNet5 cases, provided that label is detected, we count it as correct. No need to check label
                     autoLabel = gtLabel;
@@ -265,7 +252,7 @@ final class ExpEval extends Exp
         int countTotalLabelsCorrect = sum(countIndividualLabelCorrect);
 
         //Save result
-        try (PrintWriter pw = new PrintWriter("eval.txt"))
+        try (PrintWriter pw = new PrintWriter(propEvalFile))
         {
             float precision, recall; int countGT, countAuto, countCorrect; String item;
 
@@ -357,4 +344,3 @@ final class ExpEval extends Exp
         return sorted;
     }
 }
-

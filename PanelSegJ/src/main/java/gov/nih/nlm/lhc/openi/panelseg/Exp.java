@@ -46,9 +46,18 @@ abstract class Exp
         listFile = Paths.get(propListFile);
         loadListFile();
     }
-    protected void setTargetFolder() throws Exception
+    protected void setTargetFolder(boolean toClean) throws Exception
     {
         targetFolder = Paths.get(propTargetFolder);
+        if (toClean)
+        {
+            System.out.println(targetFolder + " is going to be cleaned!");
+
+            waitKeyContinueOrQuit("Press any key to continue, press N to quit");
+
+            AlgMiscEx.createClearFolder(targetFolder);
+            log.info("Folder " + targetFolder + " is created or cleaned!");
+        }
     }
 
     Exp() {}
@@ -68,7 +77,7 @@ abstract class Exp
         log.info("Total number of image is: " + imagePaths.size());
     }
 
-    protected String setProperty(String propName) throws Exception
+    protected String getProperty(String propName) throws Exception
     {
         String prop = properties.getProperty(propName);
         if (prop == null) throw new Exception("ERROR: " + propName + " property is Missing.");
@@ -107,7 +116,7 @@ abstract class Exp
             AlgMiscEx.createClearFolder(this.targetFolder);
     }
 
-    void loadProperties() throws Exception {}
+    abstract void loadProperties() throws Exception;
 
     protected void loadProperties(String propertiesFile) throws Exception
     {
@@ -115,7 +124,7 @@ abstract class Exp
         properties.load(this.getClass().getClassLoader().getResourceAsStream(propertiesFile));
     }
 
-    void initialize()  throws  Exception    {    }
+    abstract void initialize()  throws  Exception;
 
     protected void waitKeyContinueOrQuit(String message) throws Exception
     {
@@ -145,7 +154,7 @@ abstract class Exp
      * call doWorkMultiThread to do work in multiple threads
      * @throws Exception
      */
-    void doWork() throws Exception    {    }
+    abstract void doWork() throws Exception;
 
     //The method for handling processing of 1 sample, mostly for implementing multi-threading processing in Fork/Join framework
 

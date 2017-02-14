@@ -12,7 +12,7 @@ import java.util.HashMap;
  *
  * Created by jzou on 2/13/2017.
  */
-public class ExpEval extends Exp
+final class ExpEval extends Exp
 {
     public static void main(String args[])
     {
@@ -257,8 +257,8 @@ public class ExpEval extends Exp
             float precision, recall; int countGT, countAuto, countCorrect; String item;
 
             pw.println("Total images processed: " + imagePaths.size());
-//            pw.println("Total processing time: " + (endTime - startTime)/1000.0 + " secondes.");
-//            pw.println("Average processing time: " + ((endTime - startTime)/1000.0)/allPaths.size() + " secondes.");
+//            pw.println("Total processing time: " + (endTime - startTime)/1000.0 + " seconds.");
+//            pw.println("Average processing time: " + ((endTime - startTime)/1000.0)/allPaths.size() + " seconds.");
 
             pw.println();
             pw.println("Item\tGT\tAuto\tCorrect\tPrecision\tRecall");

@@ -6,9 +6,14 @@ import libsvm.svm_node;
 import org.bytedeco.javacpp.FloatPointer;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_objdetect;
+import org.deeplearning4j.util.ModelSerializer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import static org.bytedeco.javacpp.opencv_imgproc.resize;
 
@@ -21,6 +26,25 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
 final class LabelClassifyHogSvm
 {
     private static svm_model svmModel;
+    private static String propSvmModel;
+
+    static void initialize(Properties properties) throws Exception
+    {
+        propSvmModel = properties.getProperty("LabelSvmModel");
+        if (propSvmModel == null) throw new Exception("ERROR: LabelSvmModel property is Missing.");
+
+        switch (propSvmModel)
+        {
+            case "svm_model_rbf_32.0_0.0078125_96.3":
+                InputStream modelStream = LabelClassifyLeNet5.class.getClassLoader().getResourceAsStream(propSvmModel);
+                BufferedReader br = new BufferedReader(new InputStreamReader(modelStream));
+                svmModel = svm.svm_load_model(br);
+                System.out.println(propSvmModel + " is loaded. nr_class is " + svmModel.nr_class);
+                break;
+            default:
+                throw new Exception("LabelSvmModel of " + propSvmModel + "is Unknown!");
+        }
+    }
 
     static void initialize(String svm_model_file)
     {

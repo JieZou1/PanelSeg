@@ -24,7 +24,6 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.flow.FlowIterationListener;
-import org.deeplearning4j.ui.weights.HistogramIterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
@@ -32,142 +31,106 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import scala.Int;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.PrintWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
-
 /**
- * For Label Classification Training
- * Refactored from ExpLabelClassify* classes
- *
- * Created by jzou on 11/9/2016.
+ * Created by jzou on 2/14/2017.
  */
-public class TrainLabelClassify
+public class ExpTrainLabelClassifyLeNet5 extends Exp
 {
-    protected static final Logger log = LoggerFactory.getLogger(TrainLabelClassify.class);
+    public static void main(String args[])
+    {
+        log.info("Training tasks for LeNet5 Label Classification.");
 
-    public enum Task {
-        HogSvmFeaExt,
-        LeNet5, LeNet5Test
+        ExpTrainLabelClassifyLeNet5 exp = new ExpTrainLabelClassifyLeNet5();
+        try
+        {
+            exp.loadProperties();
+            exp.initialize();
+            exp.doWork();
+            log.info("Completed!");
+        }
+        catch (Exception ex)
+        {
+            log.error(ex.getMessage());
+        }
     }
 
-    public static void main(String args[]) throws Exception {
-        //Stop and print error msg if no arguments passed.
-        if (args.length != 1) {
-            System.out.println();
+    private enum Task { Train, Test }
+    private Task task;
+    private String propEpoch, propLabelLeNet5Model;
 
-            System.out.println("Usage: java -cp PanelSegJ.jar TrainLabelClassify <Task>");
-            System.out.println("Training tasks for Label Classification.");
+    @Override
+    void loadProperties() throws Exception
+    {
+        loadProperties("ExpTrainLabelClassifyLeNet5.properties");
 
-            System.out.println();
-
-            System.out.println("Task:");
-            System.out.println("HogSvmFeaExt    HoG+SVM method for Label (50 or 51 classes) classification");
-            System.out.println("LeNet5          LeNet5 method for Label (pos/neg) classification");
-            System.out.println("LeNet5Test      Some codes for testing trained LeNet5 classification (pos/neg) model");
-
-            System.out.println();
-
-            System.exit(0);
+        String strTask = getProperty("Task");
+        switch (strTask) {
+            case "Train":
+                task = Task.Train;
+                loadPropertiesTrain();
+                break;
+            case "Test":
+                task = Task.Test;
+                loadPropertiesTest();
+                break;
+            default: throw new Exception("Task " + strTask + " is Unknown");
         }
 
-        Task task = null;
-        switch (args[0]) {
-            case "HogSvmFeaExt":    task = Task.HogSvmFeaExt;   break;
-            case "LeNet5":          task = Task.LeNet5;         break;
-            case "LeNet5Test":      task = Task.LeNet5Test;         break;
-            default:
-                System.out.println("Unknown method!!");
-                System.exit(0);
-        }
+        waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
+    }
 
-        String targetFolder;
-        targetFolder = "\\Users\\jie\\projects\\PanelSeg\\Exp\\LabelClassify";
+    private void loadPropertiesTrain() throws Exception
+    {
+        propTrainFolder = getProperty("TrainFolder");
+        propTargetFile = getProperty("TargetFile");
+        propEpoch = getProperty("Epoch");
+    }
 
-        TrainLabelClassify train = new TrainLabelClassify(targetFolder, task);
+    private void loadPropertiesTest() throws Exception
+    {
+        propTestFolder = getProperty("TestFolder");
+        propLabelLeNet5Model = getProperty("LabelLeNet5Model");
+    }
 
+    @Override
+    void initialize() throws Exception
+    {
         switch (task)
         {
-            case HogSvmFeaExt:
-                train.doWorkHogSvmFeaExt(false);
-                break;
-            case LeNet5:
-                train.doWorkLeNet5Train();
-                break;
-            case LeNet5Test:
-                train.doWorkLeNet5Test();
+            case Train: initializeTrain(); break;
+            case Test: initializeTest(); break;
         }
-        System.out.println("Completed!");
     }
 
-    private Task task;
-    private Path targetFolder;    //The folder for saving the result
-
-    TrainLabelClassify(String targetFolder, Task task) {
-        this.task = task;
-        this.targetFolder = Paths.get(targetFolder);
-    }
-
-    private void doWorkHogSvmFeaExt(boolean include_neg)
+    private void initializeTrain() throws Exception
     {
-        targetFolder = targetFolder.resolve("51classes");
-
-        List<Double> targets = new ArrayList<>();
-        List<float[]> features = new ArrayList<>();
-
-        //Positive classes
-        for (int i = 0; i < PanelSeg.labelChars.length; i++) {
-            String name = PanelSeg.getLabelCharFolderName(PanelSeg.labelChars[i]);
-
-            Path folder = targetFolder.resolve(name);
-            List<Path> patches = AlgMiscEx.collectImageFiles(folder);
-
-            for (Path path : patches)
-            {
-                opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
-                float[] feature =  LabelDetectHog.featureExtraction(gray);
-                features.add(feature);
-                targets.add((double)i);
-            }
-        }
-
-        if (include_neg)
-        {   //Negative class
-            Path folder = targetFolder.resolve("neg");
-            List<Path> patches = AlgMiscEx.collectImageFiles(folder);
-
-            for (Path path : patches)
-            {
-                opencv_core.Mat gray = imread(path.toString(), CV_LOAD_IMAGE_GRAYSCALE);
-                float[] feature = LabelDetectHog.featureExtraction(gray);
-                features.add(feature);
-                targets.add((double)PanelSeg.labelChars.length);
-            }
-        }
-
-        Path folderModel = targetFolder.resolve("model");
-        Path file = folderModel.resolve("train.txt");
-
-        LibSvmEx.SaveInLibSVMFormat(file.toString(), targets, features);
+        setTrainFolder();
     }
 
+    private void initializeTest() throws Exception
+    {
+        setTestFolder();
+    }
+
+    @Override
+    void doWork() throws Exception {
+        switch (task)
+        {
+            case Train: doWorkLeNet5Train(); break;
+            case Test: doWorkLeNet5Test(); break;
+        }
+
+    }
     private void doWorkLeNet5Train() throws Exception
     {
-        targetFolder = targetFolder.resolve("2classes");
-
         String [] allowedExtensions = BaseImageLoader.ALLOWED_FORMATS;
         long seed = 12345;
         Random randNumGen = new Random(seed);
@@ -177,8 +140,8 @@ public class TrainLabelClassify
         int channels = 1;
         int outputNum = 2;
         int batchSize = 64;
-        int nEpochs = 100;
         int iterations = 1;
+        int nEpochs = Integer.parseInt(propEpoch);
 
         log.info("Build model....");
         MultiLayerConfiguration.Builder builder = new NeuralNetConfiguration.Builder()
@@ -243,7 +206,7 @@ public class TrainLabelClassify
         model.init();
 
         log.info("Load data....");
-        File parentDir = targetFolder.toFile();
+        File parentDir = trainFolder.toFile();
 
         //Files in directories under the parent dir that have "allowed extensions"
         // split needs a random number generator for reproducibility when splitting the files into train and test
@@ -288,7 +251,7 @@ public class TrainLabelClassify
 
         model.setListeners(new ScoreIterationListener(10));
         //model.setListeners(new HistogramIterationListener(1));
-        model.setListeners(new FlowIterationListener(10));
+        //model.setListeners(new FlowIterationListener(10));
         for( int i=0; i<nEpochs; i++ )
         {
             model.fit(trainDataIter);
@@ -311,7 +274,7 @@ public class TrainLabelClassify
         log.info("Training Time in Seconds: {}", (endTime - startTime)/ 1000000000.0);
 
         log.info("Save Model...");
-        String modelFile = "LeNet5.model";
+        String modelFile = propTargetFile;
         ModelSerializer.writeModel(model, modelFile, true);
 
         log.info("Load Model...");
@@ -331,22 +294,22 @@ public class TrainLabelClassify
 
     private void doWorkLeNet5Test() throws Exception
     {
-        targetFolder = targetFolder.resolve("2Classes-LeNet5-test");
-
         int height = 28;
         int width = 28;
         int channels = 1;
 
         MultiLayerNetwork model = loadModel();
-        //testWithMats(model, width, height, channels);
-        testWithImageRecordReader(model, width, height, channels);
+        testWithMats(model, width, height, channels);
+        //testWithImageRecordReader(model, width, height, channels);
     }
 
     private MultiLayerNetwork loadModel() throws Exception
     {
         log.info("Load Model...");
-        String modelFile = "LeNet5.model";
-        return ModelSerializer.restoreMultiLayerNetwork(modelFile);
+        InputStream modelStream = LabelClassifyLeNet5.class.getClassLoader().getResourceAsStream(propLabelLeNet5Model);
+        MultiLayerNetwork leNet5Model = ModelSerializer.restoreMultiLayerNetwork(modelStream);
+        System.out.println(propLabelLeNet5Model + " is loaded.");
+        return leNet5Model;
     }
 
     public void testWithMats(MultiLayerNetwork model, int width, int height, int channels)  throws Exception
@@ -358,7 +321,7 @@ public class TrainLabelClassify
         for (int k = 0; k < subfolder.length; k++)
         {   log.info("Test " + subfolder[k] + " images...");
 
-            File[] testImageFiles = targetFolder.resolve(subfolder[k]).toFile().listFiles(new FilenameFilter() {
+            File[] testImageFiles = testFolder.resolve(subfolder[k]).toFile().listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
                     return name.toLowerCase().endsWith(".png");
                 }
@@ -396,7 +359,7 @@ public class TrainLabelClassify
     {
         PrintWriter outputFile = new PrintWriter(new FileWriter("OutputWithImageRecordReader.txt"));
 
-        FileSplit filesInDir = new FileSplit(targetFolder.toFile(), BaseImageLoader.ALLOWED_FORMATS);
+        FileSplit filesInDir = new FileSplit(testFolder.toFile(), BaseImageLoader.ALLOWED_FORMATS);
 
         log.info("Total files: {}", filesInDir.locations().length);
 

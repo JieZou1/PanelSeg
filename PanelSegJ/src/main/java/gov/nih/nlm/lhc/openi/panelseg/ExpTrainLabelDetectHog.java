@@ -40,7 +40,7 @@ public class ExpTrainLabelDetectHog extends Exp
         }
     }
 
-    public enum Task { HogPos, HogSvmFeaExt, HogSvm2SingleVec, HogBootstrap }
+    private enum Task { HogPos, HogSvmFeaExt, HogSvm2SingleVec, HogBootstrap }
     private ExpTrainLabelDetectHog.Task task;
 
     private String propLabelSetsHOG;

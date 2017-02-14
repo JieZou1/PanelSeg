@@ -110,7 +110,6 @@ final class LabelDetectHog
 
     Figure figure;
     private opencv_objdetect.HOGDescriptor hog;
-    //private float[][] svmModels;
     ArrayList<ArrayList<Panel>> hogDetectionResult; //The HOG method detection result of all labelSetsToDetect
 
     private static opencv_objdetect.HOGDescriptor createHog()

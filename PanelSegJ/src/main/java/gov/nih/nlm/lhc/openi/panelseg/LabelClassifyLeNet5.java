@@ -8,8 +8,12 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 
 /**
  * Classify Labels using LeNet5
@@ -19,23 +23,17 @@ import java.util.List;
  */
 final class LabelClassifyLeNet5
 {
-    //region Static variables (leNet5Model), need to be initialized once by initialize() function
-    private static MultiLayerNetwork leNet5Model;
+    private static MultiLayerNetwork leNet5Model = null;
+    private static String propLabelLeNet5Model;
 
-    static void initialize(String modelFile) {
-        if (leNet5Model == null) {
-            try {
-                //log.info("Load Models...");
-                leNet5Model = ModelSerializer.restoreMultiLayerNetwork(modelFile);
-                System.out.println(modelFile + " is loaded.");
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+    static void initialize(Properties properties) throws Exception {
+        propLabelLeNet5Model = properties.getProperty("LabelLeNet5Model");
+        if (propLabelLeNet5Model == null) throw new Exception("ERROR: LabelLeNet5Model property is Missing.");
+
+        InputStream modelStream = LabelClassifyLeNet5.class.getClassLoader().getResourceAsStream(propLabelLeNet5Model);
+        leNet5Model = ModelSerializer.restoreMultiLayerNetwork(modelStream);
+        System.out.println(propLabelLeNet5Model + " is loaded.");
     }
-
-    //endregion
 
     private Figure figure;
 
@@ -79,8 +77,16 @@ final class LabelClassifyLeNet5
         {
             Panel panel = panels.get(i);
             panel.labelClassifyLetNet5Probs = new double[2];
-            panel.labelClassifyLetNet5Probs[0] = letNet5Probs.getDouble(i, 1); //neg
-            panel.labelClassifyLetNet5Probs[1] = letNet5Probs.getDouble(i, 0); //pos
+            if (Objects.equals(propLabelLeNet5Model, "LeNet5-28-26039_23501.model"))
+            {
+                panel.labelClassifyLetNet5Probs[0] = letNet5Probs.getDouble(i, 0); //neg
+                panel.labelClassifyLetNet5Probs[1] = letNet5Probs.getDouble(i, 1); //pos
+            }
+            else if (Objects.equals(propLabelLeNet5Model, "LeNet5-28-23500_25130.model"))
+            {
+                panel.labelClassifyLetNet5Probs[0] = letNet5Probs.getDouble(i, 1); //neg
+                panel.labelClassifyLetNet5Probs[1] = letNet5Probs.getDouble(i, 0); //pos
+            }
             double posProb = panel.labelClassifyLetNet5Probs[1];
 
             panel.labelScore = posProb;

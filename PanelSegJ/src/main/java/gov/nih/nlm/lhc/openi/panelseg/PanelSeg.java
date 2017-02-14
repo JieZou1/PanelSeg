@@ -105,6 +105,16 @@ public class PanelSeg
             case LabelDetHog:
                 LabelDetectHog.initialize(properties);
                 return;
+            case LabelRegHogSvm:
+                LabelDetectHog.initialize(properties);
+                LabelClassifyHogSvm.initialize(properties);
+                return;
+            case LabelDetHogLeNet5:
+            {
+                LabelDetectHog.initialize(properties);
+                LabelClassifyLeNet5.initialize(properties);
+                return;
+            }
         }
     }
 
@@ -129,26 +139,26 @@ public class PanelSeg
 
             case LabelDetHogLeNet5:
             {
-                LabelClassifyLeNet5.initialize("models\\LeNet5.model");
+                //LabelClassifyLeNet5.initialize("models\\LeNet5.model");
                 return;
             }
 
             case LabelRegHogLeNet5Svm:
             {
-                LabelClassifyLeNet5.initialize("models\\LeNet5.model");
+                //LabelClassifyLeNet5.initialize("models\\LeNet5.model");
                 LabelClassifyHogSvm.initialize("models\\svm_model_rbf_8.0_0.03125");
                 return;
             }
             case LabelRegHogLeNet5SvmBeam:
             {
-                LabelClassifyLeNet5.initialize("models\\LeNet5.model");
+                //LabelClassifyLeNet5.initialize("models\\LeNet5.model");
                 LabelClassifyHogSvm.initialize("models\\svm_model_rbf_8.0_0.03125");
                 LabelSequenceClassify.initialize();
                 return;
             }
             case LabelRegHogLeNet5SvmAlignment:
             {
-                LabelClassifyLeNet5.initialize("models\\LeNet5.model");
+                //LabelClassifyLeNet5.initialize("models\\LeNet5.model");
                 LabelClassifyHogSvm.initialize("models\\svm_model_rbf_8.0_0.03125");
                 return;
             }

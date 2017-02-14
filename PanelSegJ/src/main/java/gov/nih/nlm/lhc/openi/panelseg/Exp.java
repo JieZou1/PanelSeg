@@ -29,10 +29,13 @@ abstract class Exp
     public enum LabelPreviewType {ORIGINAL, NORM64}
 
     protected Properties properties = null;
-    protected String propThreads, propListFile, propTargetFolder;
+    protected String propThreads, propListFile, propTargetFolder, propTrainFolder, propTargetFile, propTestFolder;
 
     protected Path listFile;        //The list file containing the samples to be experimented with
+    protected Path trainFolder;     //The folder where training data are loaded from.
     protected Path targetFolder;    //The folder for saving the result
+    protected Path targetFile;      //The file for saving the result
+    protected Path testFolder;      //The folder where test data are loaded from.
 
     protected List<Path> imagePaths;    //The paths to sample images.
     protected int threads;   // == 1 Single threading; > 1 multi-threading
@@ -59,6 +62,10 @@ abstract class Exp
             log.info("Folder " + targetFolder + " is created or cleaned!");
         }
     }
+    protected void setTrainFolder() {trainFolder = Paths.get(propTrainFolder);}
+
+    protected void setTargetFile() {targetFile = Paths.get(propTargetFile);}
+    protected void setTestFolder() {testFolder = Paths.get(propTestFolder);}
 
     Exp() {}
 

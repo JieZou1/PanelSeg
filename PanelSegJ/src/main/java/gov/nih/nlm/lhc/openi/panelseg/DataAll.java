@@ -19,7 +19,7 @@ abstract class DataAll
      * ctor, set dataFolder and then collect all setFolders
      * @param dataFolder
      */
-    protected DataAll(String dataFolder)
+    protected DataAll(String dataFolder) throws Exception
     {
         this.dataFolder = Paths.get(dataFolder);
         setFolders = AlgMiscEx.collectSubfolders(this.dataFolder);

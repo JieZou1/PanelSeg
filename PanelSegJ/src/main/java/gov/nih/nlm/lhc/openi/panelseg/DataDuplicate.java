@@ -26,12 +26,12 @@ final class DataDuplicate extends DataAll
         System.out.println("Completed!");
     }
 
-    private DataDuplicate(String dataFolder)
+    private DataDuplicate(String dataFolder) throws Exception
     {
         super(dataFolder);
     }
 
-    private void findDuplicate()
+    private void findDuplicate() throws Exception
     {
         HashMap<String, ArrayList<Path>> collection = new HashMap<>();
 
@@ -69,12 +69,6 @@ final class DataDuplicate extends DataAll
                     bw.newLine();
                 }
             }
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 }

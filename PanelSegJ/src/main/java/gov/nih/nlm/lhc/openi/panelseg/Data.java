@@ -23,7 +23,7 @@ abstract class Data
      * If style.txt is not found in the setFolder, styles is set to null.
      * @param setFolder
      */
-    Data(String setFolder)
+    Data(String setFolder) throws Exception
     {
         this.setFolder = Paths.get(setFolder);
         imagePaths = AlgMiscEx.collectImageFiles(this.setFolder);
@@ -40,7 +40,7 @@ abstract class Data
      * @param stylePath The filepath
      * @return imageColor file name string and style annotation in HashMap<string, string>
      */
-    static HashMap<String, String> loadStyleMap(Path stylePath)
+    static HashMap<String, String> loadStyleMap(Path stylePath) throws Exception
     {
         HashMap<String, String> styles = new HashMap<>();
 
@@ -58,9 +58,6 @@ abstract class Data
                 String[] words = line.split("\\s+");
                 styles.put(words[0], words[1]);
             }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
         return styles;
@@ -71,7 +68,7 @@ abstract class Data
      * @param stylePath
      * @param styles
      */
-    static void saveStyleMap(Path stylePath, Map<String, String> styles)
+    static void saveStyleMap(Path stylePath, Map<String, String> styles) throws Exception
     {
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(stylePath.toFile()))))
         {
@@ -82,12 +79,6 @@ abstract class Data
                 bw.write(key + "\t " + value);
                 bw.newLine();
             }
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 

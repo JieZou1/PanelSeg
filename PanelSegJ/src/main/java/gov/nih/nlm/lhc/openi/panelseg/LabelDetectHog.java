@@ -102,7 +102,6 @@ final class LabelDetectHog
 //                Field field = cls.getField("svmModel");
 //                svmModels[i] = (float[])field.get(null);
 //            } catch (Exception e) {
-//                // TODO Auto-generated catch block
 //                e.printStackTrace();
 //            }
 //        }

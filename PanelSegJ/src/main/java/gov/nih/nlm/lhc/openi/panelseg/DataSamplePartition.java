@@ -26,12 +26,12 @@ final class DataSamplePartition extends DataAll
         System.out.println("Completed!");
     }
 
-    private DataSamplePartition(String dataFolder)
+    private DataSamplePartition(String dataFolder) throws Exception
     {
         super(dataFolder);
     }
 
-    private void partition()
+    private void partition() throws Exception
     {
         List<Path> all = new ArrayList<>();
 
@@ -57,7 +57,7 @@ final class DataSamplePartition extends DataAll
         writeList("train.txt", train);
     }
 
-    private void writeList(String filename, List<Path> list)
+    private void writeList(String filename, List<Path> list) throws Exception
     {
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename))))
         {
@@ -66,12 +66,6 @@ final class DataSamplePartition extends DataAll
                 bw.write(path.toString());
                 bw.newLine();
             }
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 }

@@ -32,7 +32,7 @@ final class DataVisualize extends Data
      * ctor, set setFolder and then collect all imagefiles and save in imagePaths
      * @param annotationFolder
      */
-    private DataVisualize(String annotationFolder)
+    private DataVisualize(String annotationFolder) throws Exception
     {
         super(annotationFolder);
     }
@@ -41,24 +41,16 @@ final class DataVisualize extends Data
      * Run iPhotoDraw for manually modify the bounding box annotation
      * @param filepath
      */
-    private void runiPhotoDraw(String filepath)
+    private void runiPhotoDraw(String filepath) throws Exception
     {
-        try {
-            Process process = new ProcessBuilder("C:\\Program Files (x86)\\iPhotoDraw\\iPhotoDraw.exe", filepath).start();
-            process.waitFor();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Process process = new ProcessBuilder("C:\\Program Files (x86)\\iPhotoDraw\\iPhotoDraw.exe", filepath).start();
+        process.waitFor();
     }
 
     /**
      * Entry function for verifying the annotation
      */
-    private void visualize()
+    private void visualize() throws Exception
     {
         if (styles == null)
         {   //No styles are loaded, we set all of them as "SINGLE"

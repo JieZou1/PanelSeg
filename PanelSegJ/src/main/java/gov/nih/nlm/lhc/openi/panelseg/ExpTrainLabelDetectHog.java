@@ -248,7 +248,7 @@ public class ExpTrainLabelDetectHog extends Exp
         setTargetFolder(false);
     }
 
-    private void doWorkHogSvmFeaExt()
+    private void doWorkHogSvmFeaExt() throws Exception
     {
         for (int i = 0; i <  LabelDetectHog.labelSetsHOG.length; i++) {
             String name = LabelDetectHog.labelSetsHOG[i];

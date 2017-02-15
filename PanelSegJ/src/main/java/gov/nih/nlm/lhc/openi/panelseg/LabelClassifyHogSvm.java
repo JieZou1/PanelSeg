@@ -46,20 +46,15 @@ final class LabelClassifyHogSvm
         }
     }
 
-    static void initialize(String svm_model_file)
+    static void initialize(String svm_model_file) throws Exception
     {
         if (svmModel == null)
         {
-            try {
-                //String svm_model_file = "svm_model_linear_0.5_94";
-                //String svm_model_file = "svm_model_rbf_8.0_0.125";
-                //String svm_model_file = "svm_model_rbf_32.0_0.0078125_96.3";
-                svmModel = svm.svm_load_model(svm_model_file);
-                System.out.println(svm_model_file + " is loaded. nr_class is " + svmModel.nr_class);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            //String svm_model_file = "svm_model_linear_0.5_94";
+            //String svm_model_file = "svm_model_rbf_8.0_0.125";
+            //String svm_model_file = "svm_model_rbf_32.0_0.0078125_96.3";
+            svmModel = svm.svm_load_model(svm_model_file);
+            System.out.println(svm_model_file + " is loaded. nr_class is " + svmModel.nr_class);
         }
     }
 
@@ -103,7 +98,7 @@ final class LabelClassifyHogSvm
     }
 
 
-    void svmClassification()
+    void svmClassification() throws Exception
     {
         if (figure.panels.size() == 0) return;
 
@@ -125,7 +120,7 @@ final class LabelClassifyHogSvm
         }
     }
 
-    void svmClassificationWithLeNet5()
+    void svmClassificationWithLeNet5() throws Exception
     {
         if (figure.panels.size() == 0) return;
 

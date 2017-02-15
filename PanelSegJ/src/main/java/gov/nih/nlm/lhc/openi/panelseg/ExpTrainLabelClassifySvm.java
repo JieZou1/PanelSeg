@@ -57,7 +57,7 @@ public class ExpTrainLabelClassifySvm extends Exp
         doWorkHogSvmFeaExt();
     }
 
-    private void doWorkHogSvmFeaExt()
+    private void doWorkHogSvmFeaExt() throws Exception
     {
         int numberOfClasses = Integer.parseInt(propNumberOfClasses);
 

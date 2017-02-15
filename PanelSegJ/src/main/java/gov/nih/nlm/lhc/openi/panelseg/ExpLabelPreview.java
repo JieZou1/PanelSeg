@@ -36,14 +36,15 @@ final class ExpLabelPreview extends Exp {
      * @param trainListFile
      * @param targetFolder
      */
-    ExpLabelPreview(String trainListFile, String targetFolder) {
+    ExpLabelPreview(String trainListFile, String targetFolder) throws Exception
+    {
         super(trainListFile, targetFolder, false);
     }
 
     /**
      * Generate original label preview (Single Thread)
      */
-    void generateSingle(LabelPreviewType type)
+    void generateSingle(LabelPreviewType type) throws Exception
     {
         //Clean up all the folders
         typeFolder = this.targetFolder.resolve(type.toString());

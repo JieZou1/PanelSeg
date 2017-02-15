@@ -44,7 +44,7 @@ public class TrainLabelSequenceClassify extends Exp
         train.save();
     }
 
-    TrainLabelSequenceClassify(String trainListFile, String targetFolder)
+    TrainLabelSequenceClassify(String trainListFile, String targetFolder) throws Exception
     {
         super(trainListFile, targetFolder, false);
 
@@ -255,7 +255,7 @@ public class TrainLabelSequenceClassify extends Exp
         for (int i = 0; i < negFeatures.size(); i++)    labelsAll.add(0.0);
     }
 
-    private void save()
+    private void save() throws Exception
     {
         for (int k = 0; k < 26; k++)
         {
@@ -285,9 +285,6 @@ public class TrainLabelSequenceClassify extends Exp
             {
                 for (int i = 0; i < max.length; i++)
                     pw.println(min[i] + " " + max[i]);
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
     }

@@ -23,32 +23,27 @@ public class LabelSequenceClassify
     static float[][] mins = null;
     static float[][] ranges = null;
 
-    static void loadSvmScaling(int i, String svm_model_file, String scaling_file) {
-        try
-        {
-            svmModels[i] = svm.svm_load_model(svm_model_file);
-            System.out.println(svm_model_file + " is loaded. nr_class is " + svmModels[i].nr_class);
+    static void loadSvmScaling(int i, String svm_model_file, String scaling_file) throws Exception
+    {
+        svmModels[i] = svm.svm_load_model(svm_model_file);
+        System.out.println(svm_model_file + " is loaded. nr_class is " + svmModels[i].nr_class);
 
-            String line; List<String> lines = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(new FileReader(scaling_file)))
-            {
-                while ((line = br.readLine()) != null) lines.add(line);
-            }
-            mins[i] = new float[lines.size()]; ranges[i] = new float[lines.size()];
-            for (int k = 0; k < lines.size(); k++)
-            {
-                String[] words = lines.get(k).split("\\s+");
-                float min = Float.parseFloat(words[0]), max = Float.parseFloat(words[1]);
-                mins[i][k] = min;
-                ranges[i][k] = max - min;
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        String line; List<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(scaling_file)))
+        {
+            while ((line = br.readLine()) != null) lines.add(line);
+        }
+        mins[i] = new float[lines.size()]; ranges[i] = new float[lines.size()];
+        for (int k = 0; k < lines.size(); k++)
+        {
+            String[] words = lines.get(k).split("\\s+");
+            float min = Float.parseFloat(words[0]), max = Float.parseFloat(words[1]);
+            mins[i][k] = min;
+            ranges[i][k] = max - min;
         }
     }
 
-    static void initialize()
+    static void initialize() throws Exception
     {
         if (svmModels == null)
         {

@@ -105,7 +105,8 @@ public class ExpPanelSeg extends Exp
      * @param trainListFile
      * @param targetFolder
      */
-    private ExpPanelSeg(String trainListFile, String targetFolder, PanelSeg.Method method) {
+    private ExpPanelSeg(String trainListFile, String targetFolder, PanelSeg.Method method) throws Exception
+    {
         super(trainListFile, targetFolder, true);
         this.method = method;
     }

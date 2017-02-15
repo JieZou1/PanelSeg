@@ -41,7 +41,7 @@ public class DataPartitionNonGraphics
     private List<String> imagePaths;
     private HashMap<String, Integer> classificationResults;
 
-    private void partition()
+    private void partition() throws Exception
     {
         System.out.println("Read in Graphic Classification results");
         readGraphicClassificationResult();
@@ -142,7 +142,7 @@ public class DataPartitionNonGraphics
 
     }
 
-    private void writeList(String filename, List<String> list)
+    private void writeList(String filename, List<String> list) throws Exception
     {
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename))))
         {
@@ -151,12 +151,6 @@ public class DataPartitionNonGraphics
                 bw.write(path);
                 bw.newLine();
             }
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 

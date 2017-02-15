@@ -94,12 +94,7 @@ final class AlgOpenCVEx
 
         out.getRaster().setDataElements(0, 0, width, height, data);
         out = convert(out, BufferedImage.TYPE_INT_RGB);
-//        try {
 //			ImageIO.write(out, "jpg", new File("temp.jpg"));
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
         return out;
     }
 

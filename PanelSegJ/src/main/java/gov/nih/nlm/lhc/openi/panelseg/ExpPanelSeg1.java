@@ -52,33 +52,37 @@ public class ExpPanelSeg1 extends Exp
                 method = PanelSeg.Method.LabelRegHogSvm;
                 loadPropertiesLabelRegHogSvm();
                 break;
-//            case "LabelRegHogSvmThreshold":
-//                method = PanelSeg.Method.LabelRegHogSvmThreshold;
-//                break;
-//            case "LabelRegHogSvmBeam":
-//                method = PanelSeg.Method.LabelRegHogSvmBeam;
-//                break;
-//
+            case "LabelRegHogSvmThreshold":
+                method = PanelSeg.Method.LabelRegHogSvmThreshold;
+                loadPropertiesLabelRegHogSvmThreshold();
+                break;
+            case "LabelRegHogSvmBeam":
+                method = PanelSeg.Method.LabelRegHogSvmBeam;
+                loadPropertiesLabelRegHogSvmBeam();
+                break;
+
             case "LabelDetHogLeNet5":
                 method = PanelSeg.Method.LabelDetHogLeNet5;
                 loadPropertiesLabelDetHogLeNet5();
                 break;
-//            case "LabelRegHogLeNet5Svm":
-//                method = PanelSeg.Method.LabelRegHogLeNet5Svm;
-//                break;
-//            case "LabelRegHogLeNet5SvmBeam":
-//                method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam;
-//                break;
-//            case "LabelRegHogLeNet5SvmAlignment":
-//                method = PanelSeg.Method.LabelRegHogLeNet5SvmAlignment;
-//                break;
-//
-//            case "PanelSplitSantosh":
-//                method = PanelSeg.Method.PanelSplitSantosh;
-//                break;
-//            case "PanelSplitJaylene":
-//                method = PanelSeg.Method.PanelSplitJaylene;
-//                break;
+            case "LabelRegHogLeNet5Svm":
+                method = PanelSeg.Method.LabelRegHogLeNet5Svm;
+                loadPropertiesLabelRegHogLeNet5Svm();
+                break;
+            case "LabelRegHogLeNet5SvmBeam":
+                method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam;
+                loadPropertiesLabelRegHogLeNet5SvmBeam();
+                break;
+            case "LabelRegHogLeNet5SvmAlignment":
+                method = PanelSeg.Method.LabelRegHogLeNet5SvmAlignment;
+                break;
+
+            case "PanelSplitSantosh":
+                method = PanelSeg.Method.PanelSplitSantosh;
+                break;
+            case "PanelSplitJaylene":
+                method = PanelSeg.Method.PanelSplitJaylene;
+                break;
             default: throw new Exception("Method " + propMethod + " is Unknown");
         }
         waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
@@ -103,6 +107,26 @@ public class ExpPanelSeg1 extends Exp
         getProperty("LabelSvmModel");
     }
 
+    private void loadPropertiesLabelRegHogSvmThreshold() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelSvmModel");
+    }
+
+    private void loadPropertiesLabelRegHogSvmBeam() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelSvmModel");
+    }
+
     private void loadPropertiesLabelDetHogLeNet5() throws Exception
     {
         propThreads = getProperty("Threads");
@@ -111,6 +135,28 @@ public class ExpPanelSeg1 extends Exp
         getProperty("LabelSetsHOG");
         getProperty("LabelHogModel");
         getProperty("LabelLeNet5Model");
+    }
+
+    private void loadPropertiesLabelRegHogLeNet5Svm() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelLeNet5Model");
+        getProperty("LabelSvmModel");
+    }
+
+    private void loadPropertiesLabelRegHogLeNet5SvmBeam() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelLeNet5Model");
+        getProperty("LabelSvmModel");
     }
 
     @Override

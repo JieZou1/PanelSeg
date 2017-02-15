@@ -106,6 +106,8 @@ public class PanelSeg
                 LabelDetectHog.initialize(properties);
                 return;
             case LabelRegHogSvm:
+            case LabelRegHogSvmThreshold:
+            case LabelRegHogSvmBeam:
                 LabelDetectHog.initialize(properties);
                 LabelClassifyHogSvm.initialize(properties);
                 return;
@@ -115,6 +117,31 @@ public class PanelSeg
                 LabelClassifyLeNet5.initialize(properties);
                 return;
             }
+            case LabelRegHogLeNet5Svm:
+            {
+                LabelDetectHog.initialize(properties);
+                LabelClassifyLeNet5.initialize(properties);
+                LabelClassifyHogSvm.initialize(properties);
+                return;
+            }
+            case LabelRegHogLeNet5SvmBeam:
+            {
+                LabelDetectHog.initialize(properties);
+                LabelClassifyLeNet5.initialize(properties);
+                LabelClassifyHogSvm.initialize(properties);
+                LabelSequenceClassify.initialize();
+                return;
+            }
+            case LabelRegHogLeNet5SvmAlignment:
+            {
+                LabelDetectHog.initialize(properties);
+                LabelClassifyLeNet5.initialize(properties);
+                LabelClassifyHogSvm.initialize(properties);
+                return;
+            }
+
+            case PanelSplitSantosh: return;
+            case PanelSplitJaylene: return;
         }
     }
 

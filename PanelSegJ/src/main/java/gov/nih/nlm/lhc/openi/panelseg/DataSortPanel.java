@@ -35,7 +35,8 @@ final class DataSortPanel extends Data
      *
      * @param annotationFolder
      */
-    protected DataSortPanel(String annotationFolder) {
+    protected DataSortPanel(String annotationFolder) throws Exception
+    {
         super(annotationFolder);
     }
 

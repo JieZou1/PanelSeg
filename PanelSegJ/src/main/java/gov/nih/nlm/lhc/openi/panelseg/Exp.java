@@ -101,7 +101,8 @@ abstract class Exp
      * @param targetFolder
      * @param clearTargetFolder
      */
-    protected Exp(String listFile, String targetFolder, boolean clearTargetFolder) {
+    protected Exp(String listFile, String targetFolder, boolean clearTargetFolder) throws Exception
+    {
         this.targetFolder = Paths.get(targetFolder);
         this.listFile = Paths.get(listFile);
 

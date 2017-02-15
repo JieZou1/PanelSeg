@@ -17,7 +17,7 @@ import java.util.List;
  */
 final class LibSvmEx
 {
-    static void SaveInLibSVMFormat(String filename, double[] targets, float[][] features)
+    static void SaveInLibSVMFormat(String filename, double[] targets, float[][] features) throws Exception
     {
         try (PrintWriter pw = new PrintWriter(filename))
         {
@@ -33,13 +33,10 @@ final class LibSvmEx
                 }
                 pw.println();
             }
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 
-    static void SaveInLibSVMFormat(String filename, List<Double> targets, List<float[]> features)
+    static void SaveInLibSVMFormat(String filename, List<Double> targets, List<float[]> features) throws Exception
     {
         try (PrintWriter pw = new PrintWriter(filename))
         {
@@ -56,9 +53,6 @@ final class LibSvmEx
                 }
                 pw.println();
             }
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 
@@ -67,25 +61,14 @@ final class LibSvmEx
      * @param svModel
      * @return svm_model.SV
      */
-    public static libsvm.svm_node[][] getSV(svm_model svModel)
+    public static libsvm.svm_node[][] getSV(svm_model svModel) throws Exception
     {
         Field svField = null;
 
-        try {
-            svField = svModel.getClass().getDeclaredField("SV");
-        } catch (NoSuchFieldException | SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        svField = svModel.getClass().getDeclaredField("SV");
         svField.setAccessible(true);
 
-        svm_node[][] sv = null;
-        try {
-            sv = (svm_node[][]) svField.get(svModel);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        svm_node[][] sv = (svm_node[][]) svField.get(svModel);
 
         return sv;
     }
@@ -112,26 +95,13 @@ final class LibSvmEx
      * @param svModel
      * @return svm_model.rho
      */
-    public static double[] getRho(svm_model svModel)
+    public static double[] getRho(svm_model svModel) throws Exception
     {
-        Field rhoField = null;
+        Field rhoField = svModel.getClass().getDeclaredField("rho");
 
-        try
-        {
-            rhoField = svModel.getClass().getDeclaredField("rho");
-        } catch (NoSuchFieldException | SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         rhoField.setAccessible(true);
 
-        double[] rho = null;
-        try {
-            rho = (double[]) rhoField.get(svModel);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        double[] rho = (double[]) rhoField.get(svModel);
 
         return rho;
     }
@@ -141,26 +111,13 @@ final class LibSvmEx
      * @param svModel
      * @return svm_model.nr_class
      */
-    public static int getNrClass(svm_model svModel)
+    public static int getNrClass(svm_model svModel) throws Exception
     {
-        Field nrClassField = null;
+        Field nrClassField = svModel.getClass().getDeclaredField("nr_class");
 
-        try
-        {
-            nrClassField = svModel.getClass().getDeclaredField("nr_class");
-        } catch (NoSuchFieldException | SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         nrClassField.setAccessible(true);
 
-        int nrClass = 0;
-        try {
-            nrClass = (int) nrClassField.get(svModel);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        int nrClass = (int) nrClassField.get(svModel);
 
         return nrClass;
     }
@@ -170,26 +127,13 @@ final class LibSvmEx
      * @param svModel
      * @return svm_model.sv_coef
      */
-    public static double[][] getSvCoef(svm_model svModel)
+    public static double[][] getSvCoef(svm_model svModel) throws Exception
     {
-        Field svCoefField = null;
+        Field svCoefField = svModel.getClass().getDeclaredField("sv_coef");
 
-        try
-        {
-            svCoefField = svModel.getClass().getDeclaredField("sv_coef");
-        } catch (NoSuchFieldException | SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         svCoefField.setAccessible(true);
 
-        double[][] svCoef = null;
-        try {
-            svCoef = (double[][]) svCoefField.get(svModel);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        double[][] svCoef = (double[][]) svCoefField.get(svModel);
 
         return svCoef;
     }
@@ -197,16 +141,10 @@ final class LibSvmEx
     /// <summary>
     /// Convert the SVM Linear model to single vector representation
     /// </summary>
-    public static float[] ToSingleVector(String svm_model_file)
+    public static float[] ToSingleVector(String svm_model_file) throws Exception
     {
-        svm_model svModel = null;
+        svm_model svModel = svm.svm_load_model(svm_model_file);
         System.out.println("Model file is: " + svm_model_file);
-        try {
-            svModel = svm.svm_load_model(svm_model_file);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
         svm_node[][] support_vectors = getSV(svModel);
         double rho = getRho(svModel)[0];

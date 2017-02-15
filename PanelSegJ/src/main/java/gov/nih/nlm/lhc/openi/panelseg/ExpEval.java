@@ -244,7 +244,7 @@ final class ExpEval extends Exp
         return sum;
     }
 
-    private void reportLabelRegEval()
+    private void reportLabelRegEval() throws Exception
     {
         //Sum up the individual results
         int countTotalLabelsGT = sum(countIndividualLabelGT);
@@ -309,9 +309,6 @@ final class ExpEval extends Exp
                 }
             }
 
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 

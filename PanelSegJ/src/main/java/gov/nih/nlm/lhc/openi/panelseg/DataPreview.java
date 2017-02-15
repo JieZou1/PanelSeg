@@ -33,7 +33,7 @@ final class DataPreview extends Data
      * It also clears the preview folder.
      * @param annotationFolder
      */
-    DataPreview(String annotationFolder)
+    DataPreview(String annotationFolder) throws Exception
     {
         super(annotationFolder);
 

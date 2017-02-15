@@ -40,7 +40,7 @@ final class AlgMiscEx
      * @param folder
      * @return ArrayList of Paths of images.
      */
-    static ArrayList<Path> collectImageFiles(Path folder)
+    static ArrayList<Path> collectImageFiles(Path folder) throws Exception
     {
         ArrayList<Path> imagePaths = new ArrayList<>();
         try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder))
@@ -53,11 +53,6 @@ final class AlgMiscEx
                 imagePaths.add(path);
             }
         }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         return imagePaths;
     }
 
@@ -66,7 +61,7 @@ final class AlgMiscEx
      * @param folder
      * @return ArrayList of Paths of images.
      */
-    static ArrayList<Path> collectXmlFiles(Path folder)
+    static ArrayList<Path> collectXmlFiles(Path folder) throws Exception
     {
         ArrayList<Path> xmlPaths = new ArrayList<>();
         try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder))
@@ -79,11 +74,6 @@ final class AlgMiscEx
                 xmlPaths.add(path);
             }
         }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         return xmlPaths;
     }
 
@@ -92,7 +82,7 @@ final class AlgMiscEx
      * @param folder
      * @return ArrayList of Paths of images.
      */
-    static ArrayList<Path> collectSubfolders(Path folder)
+    static ArrayList<Path> collectSubfolders(Path folder) throws Exception
     {
         ArrayList<Path> folderPaths = new ArrayList<>();
         try (DirectoryStream<Path> dirStrm = Files.newDirectoryStream(folder))
@@ -103,11 +93,6 @@ final class AlgMiscEx
                     folderPaths.add(path);
             }
         }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         return folderPaths;
     }
 
@@ -116,19 +101,11 @@ final class AlgMiscEx
      * If it exists, clear it.
      * @param folder
      */
-    static void createClearFolder(Path folder)
+    static void createClearFolder(Path folder) throws Exception
     {
         //Clean the folder
         if (!Files.exists(folder)) folder.toFile().mkdir();
-
-        //Remove all file in preview folder
-        try {
-            FileUtils.cleanDirectory(folder.toFile());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
+        FileUtils.cleanDirectory(folder.toFile());
     }
 
     /**

@@ -28,12 +28,12 @@ final class DataSortPanelAll extends DataAll
      * ctor, set dataFolder and then collect all setFolders
      * @param dataFolder
      */
-    private DataSortPanelAll(String dataFolder)
+    private DataSortPanelAll(String dataFolder) throws Exception
     {
         super(dataFolder);
     }
 
-    private void sort()
+    private void sort() throws Exception
     {
         for (Path annotation_folder : setFolders)
         {

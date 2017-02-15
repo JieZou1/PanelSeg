@@ -42,7 +42,7 @@ class MiscCopyOriginalImage
      * @param src_list_file
      * @param dst_folder
      */
-    private MiscCopyOriginalImage(String src_list_file, String dst_folder)
+    private MiscCopyOriginalImage(String src_list_file, String dst_folder) throws Exception
     {
         dstFolder = dst_folder;
 
@@ -67,9 +67,6 @@ class MiscCopyOriginalImage
                     String[] words = line.split("##");
                     mapping.put(words[0], words[1]);
                 }
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
         System.out.println(Integer.toString(mapping.size()) + " key-value pairs are loaded.");
@@ -84,9 +81,6 @@ class MiscCopyOriginalImage
             {
                 srcList.add(line.trim());
             }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         System.out.println(Integer.toString(srcList.size()) + " figures in " + src_list_file);
     }

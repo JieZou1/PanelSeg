@@ -25,7 +25,7 @@ final class LabelBeamSearch
         this.figure = figure;
     }
 
-    void search()
+    void search() throws Exception
     {
         List<Panel> panels = figure.panels;
         if (panels.size() == 0) return;
@@ -112,7 +112,7 @@ final class LabelBeamSearch
     /**
      * Classify sequence, assign item.p2 and item.score
      */
-    private void sequenceClassify(BeamItem item)
+    private void sequenceClassify(BeamItem item) throws Exception
     {
         List<Panel> labelPanels = new ArrayList<>();
         for (int i = 0; i < item.labelIndexes.size(); i++)

@@ -26,7 +26,7 @@ final class DataStatistics extends DataAll
      * ctor, set dataFolder and then collect all setFolders
      * @param dataFolder
      */
-    private DataStatistics(String dataFolder)
+    private DataStatistics(String dataFolder) throws Exception
     {
         super(dataFolder);
     }
@@ -34,7 +34,7 @@ final class DataStatistics extends DataAll
     /**
      * Entry function for generating annotation statistics
      */
-    private void generateStatistics()
+    private void generateStatistics() throws Exception
     {
         int figureCount = 0, singleCount = 0, multiCount = 0; //Total figures, total single panel figures, total multi-panel figures.
         int panelCount = 0;
@@ -67,7 +67,6 @@ final class DataStatistics extends DataAll
                 try {
                     panels = iPhotoDraw.loadPanelSegGt(xml_path.toFile());
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                     System.out.println("Load annotation error for " + filename);
                     continue;

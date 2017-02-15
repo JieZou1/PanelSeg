@@ -26,12 +26,12 @@ final class DataPreviewAll extends DataAll
      * ctor, set dataFolder and then collect all setFolders
      * @param dataFolder
      */
-    private DataPreviewAll(String dataFolder)
+    private DataPreviewAll(String dataFolder) throws Exception
     {
         super(dataFolder);
     }
 
-    private void generatePreview()
+    private void generatePreview() throws Exception
     {
         for (Path annotation_folder : setFolders)
         {

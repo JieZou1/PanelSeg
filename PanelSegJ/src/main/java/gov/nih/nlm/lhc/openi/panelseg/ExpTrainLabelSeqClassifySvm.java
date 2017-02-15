@@ -17,7 +17,7 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  *
  * Created by jzou on 2/15/2017.
  */
-public class ExpTrainLabelSeqClassifySvm extends Exp
+final class ExpTrainLabelSeqClassifySvm extends Exp
 {
     public static void main(String args[])
     {

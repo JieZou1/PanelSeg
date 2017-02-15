@@ -42,7 +42,7 @@ import java.util.Random;
 /**
  * Created by jzou on 2/14/2017.
  */
-public class ExpTrainLabelClassifyLeNet5 extends Exp
+final class ExpTrainLabelClassifyLeNet5 extends Exp
 {
     public static void main(String args[])
     {

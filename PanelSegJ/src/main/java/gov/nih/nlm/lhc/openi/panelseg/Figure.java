@@ -106,10 +106,10 @@ class Figure
      */
     void cropLabelPatches()
     {
-        //Pad the original image, such that we could be sure the patch is cropped.
-        int padding = 150;
-        opencv_core.Mat imgPadded = new opencv_core.Mat();
-        opencv_core.copyMakeBorder(imageColor, imgPadded, padding, padding, padding, padding, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
+        //The image has already been padded, such that after expanding the label rects, we still could crop the image.
+//        int padding = 150;
+//        opencv_core.Mat imgPadded = new opencv_core.Mat();
+//        opencv_core.copyMakeBorder(imageGray, imgPadded, padding, padding, padding, padding, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
 
         for (Panel panel : panels) {
             if (panel.labelRect == null || panel.labelRect.isEmpty()) continue;
@@ -136,7 +136,7 @@ class Figure
 
             x += padding; y += padding;
 
-            panel.labelPatch = imgPadded.apply(new Rect(x, y, w, h));
+            panel.labelPatch = imageColor.apply(new Rect(x, y, w, h));
         }
     }
 

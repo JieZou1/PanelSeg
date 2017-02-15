@@ -10,7 +10,7 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 /**
  * Created by jzou on 2/8/2017.
  */
-public class ExpPanelSeg1 extends Exp
+final class ExpPanelSeg1 extends Exp
 {
     public static void main(String args[])
     {

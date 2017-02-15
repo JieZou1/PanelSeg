@@ -8,44 +8,67 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 /**
- * Created by jzou on 8/30/2016.
+ * This is a utility program to generate preview of label patches.
+ * It can also be used for generate positive training samples for label detection.
+ *
+ * Created by jzou on 2/15/2017.
  */
-final class ExpLabelPreview extends Exp {
-    public static void main(String args[]) throws Exception {
-        //Stop and print error msg if no arguments passed.
-        if (args.length != 2) {
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpLabelDetectHogPos <Sample List File> <target folder>");
-            System.out.println("	This is a utility program to doWork preview of label patches.");
-            System.out.println("	It can also be used for doWork positive training samples for label detection.");
-            System.exit(0);
+final class ExpGenLabelPatchPreview extends Exp
+{
+    public static void main(String args[])
+    {
+        log.info("Crop the Ground-truth Label Patches for Preview purpose.");
+
+        ExpGenLabelPatchPreview exp = new ExpGenLabelPatchPreview();
+        try
+        {
+            exp.loadProperties();
+            exp.initialize();
+            exp.doWork();
+            log.info("Completed!");
         }
-
-        ExpLabelPreview preview = new ExpLabelPreview(args[0], args[1]);
-        preview.generateSingle(LabelPreviewType.ORIGINAL);
-        preview.generateSingle(LabelPreviewType.NORM64);
-        System.out.println("Completed!");
+        catch (Exception ex)
+        {
+            log.error(ex.getMessage());
+        }
     }
 
-    LabelPreviewType type;
-    Path typeFolder;
+    private String propPreviewType;
+    private enum LabelPreviewType {ORIGINAL, NORM64}
+    private LabelPreviewType type;
+    private Path typeFolder;
 
-    /**
-     * Ctor, set targetFolder and then collect all imagePaths
-     * It also clean the targetFolder
-     *
-     * @param trainListFile
-     * @param targetFolder
-     */
-    ExpLabelPreview(String trainListFile, String targetFolder) throws Exception
+    private void setPreviewType() throws Exception
     {
-        super(trainListFile, targetFolder, false);
+        switch (propPreviewType)
+        {
+            case "ORIGINAL": type = LabelPreviewType.ORIGINAL; break;
+            case "NORM64": type = LabelPreviewType.NORM64; break;
+            default: throw new Exception("Unknown Preview Type: " + propPreviewType);
+        }
     }
 
-    /**
-     * Generate original label preview (Single Thread)
-     */
-    void generateSingle(LabelPreviewType type) throws Exception
+    @Override
+    void loadProperties() throws Exception
     {
+        loadProperties("ExpGenLabelPatchPreview.properties");
+
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        propPreviewType = getProperty("PreviewType");
+
+        waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
+    }
+
+    @Override
+    void initialize() throws Exception
+    {
+        setMultiThreading();
+        setListFile();
+        setTargetFolder(false);
+        setPreviewType();
+
         //Clean up all the folders
         typeFolder = this.targetFolder.resolve(type.toString());
         AlgMiscEx.createClearFolder(typeFolder);
@@ -55,39 +78,24 @@ final class ExpLabelPreview extends Exp {
             Path folder = typeFolder.resolve(name);
             AlgMiscEx.createClearFolder(folder);
         }
-
-        this.type = type;
-
-        for (int i = 0; i < imagePaths.size(); i++) doWork(i);
     }
 
     @Override
-    void loadProperties() throws Exception {
-
-    }
-
-    @Override
-    void initialize() throws Exception {
-
-    }
-
-    @Override
-    void initialize(String propertyFile) throws Exception {
-
-    }
-
-    @Override
-    void doWork() throws Exception {
-
+    void doWork() throws Exception
+    {
+        if (threads > 1) doWorkMultiThread();
+        else doWorkSingleThread();
     }
 
     /**
      * Generate label preview
      */
-    void doWork(int i) {
+    void doWork(int i) throws Exception
+    {
+        super.doWork(i);
+
         Path imagePath = imagePaths.get(i);
         String imageFile = imagePath.toString();
-        //System.out.println(Integer.toString(i+1) +  ": processing " + imageFile);
 
         //Load annotation
         String xmlFile = FilenameUtils.removeExtension(imageFile) + "_data.xml";

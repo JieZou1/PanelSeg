@@ -26,8 +26,6 @@ abstract class Exp
 {
     protected static final Logger log = LoggerFactory.getLogger(Exp.class);
 
-    public enum LabelPreviewType {ORIGINAL, NORM64}
-
     protected Properties properties = null;
     protected String propThreads, propListFile, propTargetFolder, propTrainFolder, propTargetFile, propTestFolder;
 

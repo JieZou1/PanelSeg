@@ -20,7 +20,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
  *
  * Created by jzou on 2/10/2017.
  */
-public class ExpTrainLabelDetectHog extends Exp
+final class ExpTrainLabelDetectHog extends Exp
 {
     public static void main(String args[])
     {

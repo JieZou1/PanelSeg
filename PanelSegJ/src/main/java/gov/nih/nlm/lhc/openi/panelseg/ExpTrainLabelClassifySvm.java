@@ -12,7 +12,7 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 /**
  * Created by jzou on 2/14/2017.
  */
-public class ExpTrainLabelClassifySvm extends Exp
+final class ExpTrainLabelClassifySvm extends Exp
 {
     public static void main(String args[])
     {

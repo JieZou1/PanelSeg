@@ -7,6 +7,8 @@ import org.bytedeco.javacpp.FloatPointer;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_objdetect;
 import org.deeplearning4j.util.ModelSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +27,8 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
  */
 final class LabelClassifyHogSvm
 {
+    protected static final Logger log = LoggerFactory.getLogger(LabelClassifyHogSvm.class);
+
     private static svm_model svmModel;
     private static String propSvmModel;
 
@@ -35,26 +39,16 @@ final class LabelClassifyHogSvm
 
         switch (propSvmModel)
         {
+            case "svm_model_linear_0.5_94":
+            case "svm_model_rbf_8.0_0.125":
             case "svm_model_rbf_32.0_0.0078125_96.3":
                 InputStream modelStream = LabelClassifyLeNet5.class.getClassLoader().getResourceAsStream(propSvmModel);
                 BufferedReader br = new BufferedReader(new InputStreamReader(modelStream));
                 svmModel = svm.svm_load_model(br);
-                System.out.println(propSvmModel + " is loaded. nr_class is " + svmModel.nr_class);
+                log.info(propSvmModel + " is loaded. nr_class is " + svmModel.nr_class);
                 break;
             default:
                 throw new Exception("LabelSvmModel of " + propSvmModel + "is Unknown!");
-        }
-    }
-
-    static void initialize(String svm_model_file) throws Exception
-    {
-        if (svmModel == null)
-        {
-            //String svm_model_file = "svm_model_linear_0.5_94";
-            //String svm_model_file = "svm_model_rbf_8.0_0.125";
-            //String svm_model_file = "svm_model_rbf_32.0_0.0078125_96.3";
-            svmModel = svm.svm_load_model(svm_model_file);
-            System.out.println(svm_model_file + " is loaded. nr_class is " + svmModel.nr_class);
         }
     }
 
@@ -96,7 +90,6 @@ final class LabelClassifyHogSvm
         float[] features = new float[n];		descriptors.get(features);
         return features;
     }
-
 
     void svmClassification() throws Exception
     {

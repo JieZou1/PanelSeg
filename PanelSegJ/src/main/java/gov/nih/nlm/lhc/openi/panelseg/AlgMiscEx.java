@@ -6,9 +6,7 @@ package gov.nih.nlm.lhc.openi.panelseg;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.util.CombinatoricsUtils;
-import scala.Int;
 
-import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;

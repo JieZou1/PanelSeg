@@ -19,7 +19,6 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
  */
 final class LabelDetectHog
 {
-    //region static constants (labelSetsHOG)
     static String[] labelSetsHOG = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"};
     static float[][] models;
 //    static final String[] labelSetsHOG = {
@@ -77,8 +76,6 @@ final class LabelDetectHog
                 throw new Exception("labelHogModelSet of " + labelSetsHOG + "is Unknown!");
         }
     }
-
-    //endregion
 
     /**
      * load all SVM models, and initialize the HOGDescriptor

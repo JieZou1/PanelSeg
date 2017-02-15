@@ -6,10 +6,10 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,16 +23,19 @@ import java.util.Properties;
  */
 final class LabelClassifyLeNet5
 {
+    protected static final Logger log = LoggerFactory.getLogger(LabelClassifyHogSvm.class);
+
     private static MultiLayerNetwork leNet5Model = null;
     private static String propLabelLeNet5Model;
 
-    static void initialize(Properties properties) throws Exception {
+    static void initialize(Properties properties) throws Exception
+    {
         propLabelLeNet5Model = properties.getProperty("LabelLeNet5Model");
         if (propLabelLeNet5Model == null) throw new Exception("ERROR: LabelLeNet5Model property is Missing.");
 
         InputStream modelStream = LabelClassifyLeNet5.class.getClassLoader().getResourceAsStream(propLabelLeNet5Model);
         leNet5Model = ModelSerializer.restoreMultiLayerNetwork(modelStream);
-        System.out.println(propLabelLeNet5Model + " is loaded.");
+        log.info(propLabelLeNet5Model + " is loaded.");
     }
 
     private Figure figure;

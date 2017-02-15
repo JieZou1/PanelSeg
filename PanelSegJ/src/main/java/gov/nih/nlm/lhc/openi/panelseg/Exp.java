@@ -38,10 +38,7 @@ abstract class Exp
     protected List<Path> imagePaths;    //The paths to sample images.
     protected int threads;   // == 1 Single threading; > 1 multi-threading
 
-    protected void setMultiThreading() throws Exception
-    {
-        threads = Integer.parseInt(propThreads);
-    }
+    protected void setMultiThreading() throws Exception    {        threads = Integer.parseInt(propThreads);    }
     protected void setListFile()throws Exception
     {
         listFile = Paths.get(propListFile);
@@ -64,8 +61,6 @@ abstract class Exp
 
     protected void setTargetFile() {targetFile = Paths.get(propTargetFile);}
     protected void setTestFolder() {testFolder = Paths.get(propTestFolder);}
-
-    Exp() {}
 
     private void loadListFile() throws Exception
     {
@@ -91,37 +86,6 @@ abstract class Exp
         return prop;
     }
 
-    /**
-     * Ctor, set targetFolder and then collect all imagePaths
-     * It also clean the targetFolder, if clearTargetFolder is set to true
-     *
-     * @param listFile
-     * @param targetFolder
-     * @param clearTargetFolder
-     */
-    protected Exp(String listFile, String targetFolder, boolean clearTargetFolder) throws Exception
-    {
-        this.targetFolder = Paths.get(targetFolder);
-        this.listFile = Paths.get(listFile);
-
-        //Read the sample list
-        imagePaths = new ArrayList<>();
-        try {
-            try (BufferedReader br = new BufferedReader(new FileReader(listFile))) {
-                String line;
-                while ((line = br.readLine()) != null)
-                    imagePaths.add(Paths.get(line));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Total number of image is: " + imagePaths.size());
-
-        if (clearTargetFolder)
-            AlgMiscEx.createClearFolder(this.targetFolder);
-    }
-
     abstract void loadProperties() throws Exception;
 
     protected void loadProperties(String propertiesFile) throws Exception
@@ -129,8 +93,6 @@ abstract class Exp
         properties = new Properties();
         properties.load(this.getClass().getClassLoader().getResourceAsStream(propertiesFile));
     }
-
-    abstract void initialize()  throws  Exception;
 
     protected void waitKeyContinueOrQuit(String message) throws Exception
     {
@@ -143,16 +105,7 @@ abstract class Exp
             throw new Exception("User stops the process!");
     }
 
-    /**
-     * Initialization before doWork
-     * @throws Exception
-     */
-    void initialize(String propertyFile) throws Exception
-    {
-        //Load properties
-        properties = new Properties();
-        properties.load(this.getClass().getClassLoader().getResourceAsStream(propertyFile));
-    }
+    abstract void initialize()  throws  Exception;
 
     /**
      * Do work,

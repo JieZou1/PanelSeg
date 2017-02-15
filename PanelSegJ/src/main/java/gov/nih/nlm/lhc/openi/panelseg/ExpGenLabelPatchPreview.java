@@ -35,15 +35,15 @@ final class ExpGenLabelPatchPreview extends Exp
 
     private String propPreviewType;
     private enum LabelPreviewType {ORIGINAL, NORM64}
-    private LabelPreviewType type;
+    private LabelPreviewType previewType;
     private Path typeFolder;
 
     private void setPreviewType() throws Exception
     {
         switch (propPreviewType)
         {
-            case "ORIGINAL": type = LabelPreviewType.ORIGINAL; break;
-            case "NORM64": type = LabelPreviewType.NORM64; break;
+            case "ORIGINAL": previewType = LabelPreviewType.ORIGINAL; break;
+            case "NORM64": previewType = LabelPreviewType.NORM64; break;
             default: throw new Exception("Unknown Preview Type: " + propPreviewType);
         }
     }
@@ -70,7 +70,7 @@ final class ExpGenLabelPatchPreview extends Exp
         setPreviewType();
 
         //Clean up all the folders
-        typeFolder = this.targetFolder.resolve(type.toString());
+        typeFolder = this.targetFolder.resolve(previewType.toString());
         AlgMiscEx.createClearFolder(typeFolder);
         for (char c : PanelSeg.labelChars)
         {
@@ -108,7 +108,7 @@ final class ExpGenLabelPatchPreview extends Exp
         }
 
         Figure figure = new Figure(imagePath, panels);
-        switch (type) {
+        switch (previewType) {
             case ORIGINAL:
                 figure.cropLabelPatches();
                 break;
@@ -130,7 +130,7 @@ final class ExpGenLabelPatchPreview extends Exp
 
             Path file = folder.resolve(name);
 
-            switch (type) {
+            switch (previewType) {
                 case ORIGINAL:
                     opencv_imgcodecs.imwrite(file.toString(), panel.labelPatch);
                     break;

@@ -1,141 +1,160 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
-import com.google.common.io.Files;
 import org.bytedeco.javacpp.opencv_core;
-
-import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Properties;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
 /**
- * Experiments of various methods for Panel Segmentation
- *
- * Created by jzou on 11/4/2016.
+ * Created by jzou on 2/8/2017.
  */
-public class ExpPanelSeg extends Exp
+final class ExpPanelSeg extends Exp
 {
-    public static void main(String args[]) throws Exception
+    public static void main(String args[])
     {
-        //Stop and print error msg if no arguments passed.
-        if (args.length != 1 && args.length != 3) {
-            System.out.println();
+        log.info("Panel Segmentation with various methods.");
 
-            System.out.println("Usage: java -cp PanelSegJ.jar ExpPanelSeg <Method> <Sample List File> <Target Folder>");
-            System.out.println("Panel Segmentation with various methods.");
-            System.out.println("Results (iPhotoDraw XML file) and preview images are saved in target folder.");
-
-            System.out.println();
-
-            System.out.println("Method:");
-            System.out.println("LabelDetHog                 HoG method for Label Detection");
-            System.out.println("LabelRegHogSvm              HoG+SVM method for Label Recognition");
-            System.out.println("LabelRegHogSvmThreshold     HoG+SVM then followed by simple threshold for Label Recognition");
-            System.out.println("LabelRegHogSvmBeam	        HoG+SVM then followed by beam search for Label Recognition");
-
-            System.out.println("LabelDetHogLeNet5	        HoG+LeNet5 method for Label Detection");
-            System.out.println("LabelRegHogLeNet5Svm	    HoG+LeNet5+SVM method for Label Recognition");
-            System.out.println("LabelRegHogLeNet5SvmBeam    HoG+LeNet5+SVM+Beam method for Label Recognition");
-            System.out.println("LabelRegHogLeNet5SvmAlignment	HoG+LeNet5+SVM+Beam1 method for Label Recognition");
-
-            System.out.println("PanelSplitSantosh	        Santosh's method for Panel Split, based on horizontal and vertical lines");
-            System.out.println("PanelSplitJaylene	        Jaylene's method for Panel Split, based on horizontal and vertical lines");
-
-            System.out.println();
-
-            System.out.println("Default Sample List File: \\Users\\jie\\projects\\PanelSeg\\Exp\\eval.txt");
-            System.out.println("Default target folder: \\Users\\jie\\projects\\PanelSeg\\Exp\\PanelSeg\\eval");
-
-            System.out.println();
-
-            System.exit(0);
-        }
-
-
-        PanelSeg.Method method = null;
-        switch (args[0]) {
-            case "LabelDetHog":  method = PanelSeg.Method.LabelDetHog; break;
-            case "LabelRegHogSvm": method = PanelSeg.Method.LabelRegHogSvm; break;
-            case "LabelRegHogSvmThreshold": method = PanelSeg.Method.LabelRegHogSvmThreshold; break;
-            case "LabelRegHogSvmBeam": method = PanelSeg.Method.LabelRegHogSvmBeam; break;
-
-            case "LabelDetHogLeNet5": method = PanelSeg.Method.LabelDetHogLeNet5; break;
-            case "LabelRegHogLeNet5Svm": method = PanelSeg.Method.LabelRegHogLeNet5Svm; break;
-            case "LabelRegHogLeNet5SvmBeam": method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam; break;
-            case "LabelRegHogLeNet5SvmAlignment": method = PanelSeg.Method.LabelRegHogLeNet5SvmAlignment; break;
-
-            case "PanelSplitSantosh": method = PanelSeg.Method.PanelSplitSantosh; break;
-            case "PanelSplitJaylene": method = PanelSeg.Method.PanelSplitJaylene; break;
-
-            default:
-                System.out.println("Unknown method!!");
-                System.exit(0);
-        }
-
-        String trainListFile, targetFolder;
-        if (args.length == 1)
+        ExpPanelSeg expPanelSeg = new ExpPanelSeg();
+        try
         {
-            trainListFile = "\\Users\\jie\\projects\\PanelSeg\\Exp\\eval.txt";
-            targetFolder = "\\Users\\jie\\projects\\PanelSeg\\Exp\\PanelSeg\\eval";
+            expPanelSeg.loadProperties();
+            expPanelSeg.initialize();
+            expPanelSeg.doWork();
+            log.info("Completed!");
         }
-        else
+        catch (Exception ex)
         {
-            trainListFile = args[1];
-            targetFolder = args[2];
+            log.error(ex.getMessage());
         }
-
-        PanelSeg.initialize(method);
-
-        ExpPanelSeg exp = new ExpPanelSeg(trainListFile, targetFolder, method);
-        exp.doWorkSingleThread();
-        //exp.doWorkMultiThread();
-        System.out.println("Completed!");
     }
 
     private PanelSeg.Method method;
 
     /**
-     * Ctor, set targetFolder and then collect all imagePaths
-     * It also clean the targetFolder
-     *
-     * @param trainListFile
-     * @param targetFolder
+     * Load the properties from ExpPanelSeg.properties file.
+     * Also, validate all property values, throw exceptions if not valid.
+     * @throws Exception
      */
-    private ExpPanelSeg(String trainListFile, String targetFolder, PanelSeg.Method method) throws Exception
+    void loadProperties() throws Exception
     {
-        super(trainListFile, targetFolder, true);
-        this.method = method;
+        loadProperties("ExpPanelSeg.properties");
+
+        String propMethod = getProperty("Method");
+        switch (propMethod)
+        {
+            case "LabelDetHog": method = PanelSeg.Method.LabelDetHog; loadPropertiesLabelDetHog(); break;
+            case "LabelRegHogSvm": method = PanelSeg.Method.LabelRegHogSvm; loadPropertiesLabelRegHogSvm(); break;
+            case "LabelRegHogSvmThreshold": method = PanelSeg.Method.LabelRegHogSvmThreshold; loadPropertiesLabelRegHogSvmThreshold(); break;
+            case "LabelRegHogSvmBeam": method = PanelSeg.Method.LabelRegHogSvmBeam; loadPropertiesLabelRegHogSvmBeam(); break;
+
+            case "LabelDetHogLeNet5": method = PanelSeg.Method.LabelDetHogLeNet5; loadPropertiesLabelDetHogLeNet5(); break;
+            case "LabelRegHogLeNet5Svm": method = PanelSeg.Method.LabelRegHogLeNet5Svm; loadPropertiesLabelRegHogLeNet5Svm(); break;
+            case "LabelRegHogLeNet5SvmBeam": method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam; loadPropertiesLabelRegHogLeNet5SvmBeam(); break;
+            case "LabelRegHogLeNet5SvmAlignment": method = PanelSeg.Method.LabelRegHogLeNet5SvmAlignment; break;
+
+            case "PanelSplitSantosh": method = PanelSeg.Method.PanelSplitSantosh; break;
+            case "PanelSplitJaylene": method = PanelSeg.Method.PanelSplitJaylene; break;
+            default: throw new Exception("Method " + propMethod + " is Unknown");
+        }
+        waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
+    }
+
+    private void loadPropertiesLabelDetHog() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+    }
+
+    private void loadPropertiesLabelRegHogSvm() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelSvmModel");
+    }
+
+    private void loadPropertiesLabelRegHogSvmThreshold() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelSvmModel");
+    }
+
+    private void loadPropertiesLabelRegHogSvmBeam() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelSvmModel");
+    }
+
+    private void loadPropertiesLabelDetHogLeNet5() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelLeNet5Model");
+    }
+
+    private void loadPropertiesLabelRegHogLeNet5Svm() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelLeNet5Model");
+        getProperty("LabelSvmModel");
+    }
+
+    private void loadPropertiesLabelRegHogLeNet5SvmBeam() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelLeNet5Model");
+        getProperty("LabelSvmModel");
     }
 
     @Override
-    void loadProperties() throws Exception {
+    void initialize() throws Exception
+    {
+        setMultiThreading();
+        setListFile();
+        setTargetFolder(true);
 
+        PanelSeg.initialize(method, properties);
     }
 
     @Override
-    void initialize() throws Exception {
-
+    void doWork() throws Exception
+    {
+        if (threads > 1) doWorkMultiThread();
+        else doWorkSingleThread();
     }
 
     @Override
-    void initialize(String propertyFile) throws Exception {
-
-    }
-
-    @Override
-    void doWork() throws Exception {
-
-    }
-
     void doWork(int k) throws Exception
     {
-        Path imagePath = imagePaths.get(k);
-        System.out.println(Integer.toString(k) +  ": processing " + imagePath.toString());
+        super.doWork(k);
 
+        Path imagePath = imagePaths.get(k);
         //if (!imagePath.toString().endsWith("1471-2121-10-48-4.jpg")) return;
 
         opencv_core.Mat image = imread(imagePath.toString(), CV_LOAD_IMAGE_COLOR);
@@ -143,5 +162,6 @@ public class ExpPanelSeg extends Exp
 
         saveSegResult(imagePath.toFile().getName(), image, panels);
     }
+
 
 }

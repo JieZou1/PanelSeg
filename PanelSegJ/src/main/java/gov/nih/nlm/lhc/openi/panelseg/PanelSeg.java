@@ -146,61 +146,6 @@ public class PanelSeg
     }
 
     /**
-     * Initialization method, load SVM model, etc.
-     * Must call this function before call segment function.
-     * @param method
-     */
-    public static void initialize(Method method) throws Exception
-    {
-        switch (method)
-        {
-            case LabelDetHog: return;
-
-            case LabelRegHogSvm:
-            case LabelRegHogSvmThreshold:
-            case LabelRegHogSvmBeam:
-            {
-                LabelClassifyHogSvm.initialize("models\\svm_model_rbf_32.0_0.0078125_96.3");
-                return;
-            }
-
-            case LabelDetHogLeNet5:
-            {
-                //LabelClassifyLeNet5.initialize("models\\LeNet5.model");
-                return;
-            }
-
-            case LabelRegHogLeNet5Svm:
-            {
-                //LabelClassifyLeNet5.initialize("models\\LeNet5.model");
-                LabelClassifyHogSvm.initialize("models\\svm_model_rbf_8.0_0.03125");
-                return;
-            }
-            case LabelRegHogLeNet5SvmBeam:
-            {
-                //LabelClassifyLeNet5.initialize("models\\LeNet5.model");
-                LabelClassifyHogSvm.initialize("models\\svm_model_rbf_8.0_0.03125");
-                LabelSequenceClassify.initialize();
-                return;
-            }
-            case LabelRegHogLeNet5SvmAlignment:
-            {
-                //LabelClassifyLeNet5.initialize("models\\LeNet5.model");
-                LabelClassifyHogSvm.initialize("models\\svm_model_rbf_8.0_0.03125");
-                return;
-            }
-
-            case PanelSplitSantosh: return;
-            case PanelSplitJaylene: return;
-
-            default:
-            {
-                throw new Exception("Unknown Method!!");
-            }
-        }
-    }
-
-    /**
      * Entry function for all Panel Segmentation methods.
      * The consuming clients just need to know this function.
      * @param image

@@ -1,59 +1,39 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
-import javafx.scene.layout.Pane;
 import org.bytedeco.javacpp.opencv_core;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
 /**
- * To model and train label sequences
+ * Label Sequence Classification Training codes
  *
- * Created by jzou on 11/22/2016.
+ * Created by jzou on 2/15/2017.
  */
-public class TrainLabelSequenceClassify extends Exp
+public class ExpTrainLabelSeqClassifySvm extends Exp
 {
-    public static void main(String args[]) throws Exception {
-        //Stop and print error msg if no arguments passed.
-        if (args.length != 0) {
-            System.out.println();
-
-            System.out.println("Usage: java -cp PanelSegJ.jar TrainLabelSequenceClassify");
-            System.out.println("Training tasks for Label Detection.");
-
-            System.out.println();
-            System.exit(0);
-        }
-
-        String trainListFile, targetFolder;
-        trainListFile = "\\Users\\jie\\projects\\PanelSeg\\Exp\\train.txt";
-        targetFolder = "\\Users\\jie\\projects\\PanelSeg\\Exp\\PanelSeg\\Train";
-
-        TrainLabelSequenceClassify train = new TrainLabelSequenceClassify(trainListFile, targetFolder);
-
-        train.doWorkSingleThread();
-        //train.doWorkMultiThread();
-
-        //Normalize and then save the result
-        train.save();
-    }
-
-    TrainLabelSequenceClassify(String trainListFile, String targetFolder) throws Exception
+    public static void main(String args[])
     {
-        super(trainListFile, targetFolder, false);
+        log.info("Training tasks for SVM Label Sequence Classification.");
 
-        featuresAllOrder = new ArrayList<>();
-        labelsAllOrder = new ArrayList<>();
-        for (int i = 0; i < 26; i++)
+        ExpTrainLabelSeqClassifySvm exp = new ExpTrainLabelSeqClassifySvm();
+        try
         {
-            featuresAllOrder.add(new ArrayList<>());
-            labelsAllOrder.add(new ArrayList<>());
+            exp.loadProperties();
+            exp.initialize();
+            exp.doWork();
+            log.info("Completed!");
+        }
+        catch (Exception ex)
+        {
+            log.error(ex.getMessage());
         }
     }
 
@@ -67,23 +47,35 @@ public class TrainLabelSequenceClassify extends Exp
     private ArrayList<ArrayList<Double>> labelsAllOrder; //All labels of all order (2 or 3, ..., or 26)
 
     @Override
-    void loadProperties() throws Exception {
+    void loadProperties() throws Exception
+    {
+        loadProperties("ExpTrainLabelSeqClassifySvm.properties");
 
+        propTrainFolder = getProperty("TrainFolder");
+        propTargetFile = getProperty("TargetFile");
+
+        waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
     }
 
     @Override
-    void initialize() throws Exception {
+    void initialize() throws Exception
+    {
+        setListFile();
+        setTargetFolder(false);
 
-    }
-
-    @Override
-    void initialize(String propertyFile) throws Exception {
-
+        featuresAllOrder = new ArrayList<>();
+        labelsAllOrder = new ArrayList<>();
+        for (int i = 0; i < 26; i++)
+        {
+            featuresAllOrder.add(new ArrayList<>());
+            labelsAllOrder.add(new ArrayList<>());
+        }
     }
 
     @Override
     void doWork() throws Exception {
-
+        doWorkSingleThread();
+        save();
     }
 
     void doWork(int i)
@@ -255,6 +247,36 @@ public class TrainLabelSequenceClassify extends Exp
         for (int i = 0; i < negFeatures.size(); i++)    labelsAll.add(0.0);
     }
 
+    /**
+     * Find panels which overlap with panelsToMatch and sort
+     * according to the percentages of overlapping in panel in descending order
+     * @param panel
+     * @param panelsToMatch
+     */
+    private ArrayList<PanelOverlappingScore1Score2Index> sortOverlappingRects(Panel panel, ArrayList<Panel> panelsToMatch)
+    {
+        ArrayList<PanelOverlappingScore1Score2Index> sorted = new ArrayList<>();
+
+        for (int i = 0; i < panelsToMatch.size(); i++)
+        {
+            Panel panelToMatch = panelsToMatch.get(i);
+
+            Rectangle intersect = panel.labelRect.intersection(panelToMatch.labelRect);
+            double area_intersect = intersect.isEmpty() ? 0 : intersect.width * intersect.height;
+            double area_panel = panel.labelRect.width * panel.labelRect.height;
+            double area_panel_to_match = panelToMatch.labelRect.width * panelToMatch.labelRect.height;
+
+            double score1 = area_intersect / area_panel;
+            double score2 = area_intersect / area_panel_to_match;
+
+            PanelOverlappingScore1Score2Index one = new PanelOverlappingScore1Score2Index(i, panel, panelToMatch, score1, score2);
+            sorted.add(one);
+        }
+
+        sorted.sort(new PanelOverlappingScore1Descending());
+        return sorted;
+    }
+
     private void save() throws Exception
     {
         for (int k = 0; k < 26; k++)
@@ -287,34 +309,5 @@ public class TrainLabelSequenceClassify extends Exp
                     pw.println(min[i] + " " + max[i]);
             }
         }
-    }
-    /**
-     * Find panels which overlap with panelsToMatch and sort
-     * according to the percentages of overlapping in panel in descending order
-     * @param panel
-     * @param panelsToMatch
-     */
-    private ArrayList<PanelOverlappingScore1Score2Index> sortOverlappingRects(Panel panel, ArrayList<Panel> panelsToMatch)
-    {
-        ArrayList<PanelOverlappingScore1Score2Index> sorted = new ArrayList<>();
-
-        for (int i = 0; i < panelsToMatch.size(); i++)
-        {
-            Panel panelToMatch = panelsToMatch.get(i);
-
-            Rectangle intersect = panel.labelRect.intersection(panelToMatch.labelRect);
-            double area_intersect = intersect.isEmpty() ? 0 : intersect.width * intersect.height;
-            double area_panel = panel.labelRect.width * panel.labelRect.height;
-            double area_panel_to_match = panelToMatch.labelRect.width * panelToMatch.labelRect.height;
-
-            double score1 = area_intersect / area_panel;
-            double score2 = area_intersect / area_panel_to_match;
-
-            PanelOverlappingScore1Score2Index one = new PanelOverlappingScore1Score2Index(i, panel, panelToMatch, score1, score2);
-            sorted.add(one);
-        }
-
-        sorted.sort(new PanelOverlappingScore1Descending());
-        return sorted;
     }
 }

@@ -24,7 +24,7 @@ public class PanelSeg
         LabelRegHogSvm, LabelRegHogSvmThreshold, LabelRegHogSvmBeam,
         LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam, LabelRegHogLeNet5SvmAlignment,
 
-        PanelSplit, PanelSplitSantosh, PanelSplitJaylene
+        PanelSplitSantosh, PanelSplitJaylene,
     }
 
     //Below info is collected from LabelStatistics.txt
@@ -142,12 +142,6 @@ public class PanelSeg
 
             case PanelSplitSantosh: return;
             case PanelSplitJaylene: return;
-            case PanelSplit: return;
-
-            default:
-            {
-                throw new Exception("Unknown Method!!");
-            }
         }
     }
 
@@ -160,11 +154,7 @@ public class PanelSeg
      */
     public static List<Panel> segment(opencv_core.Mat image, Method method) throws Exception
     {
-        //Common initializations for all segmentation method.
-        //Keep a copy of the original image (imageOriginal)
-        //Add padding (imageColor, imageGray, imageGrayInverted)
-        //Reset panels
-        Figure figure = new Figure(image);
+        Figure figure = new Figure(image); //Common initializations for all segmentation method.
 
         switch (method) {
             case LabelDetHog: {
@@ -300,12 +290,6 @@ public class PanelSeg
                 splitJaylene.split();
                 return figure.getSegResultWithoutPadding();
             }
-            case PanelSplit:{
-                PanelSplit split = new PanelSplit(figure);
-                split.split();
-                return figure.getSegResultWithoutPadding();
-            }
-
 
             default:
             {

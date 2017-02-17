@@ -4,11 +4,11 @@ import libsvm.svm;
 import libsvm.svm_model;
 import org.apache.commons.lang.ArrayUtils;
 import org.bytedeco.javacpp.opencv_core;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -19,41 +19,52 @@ import java.util.List;
  */
 public class LabelSequenceClassify
 {
+    protected static final Logger log = LoggerFactory.getLogger(LabelSequenceClassify.class);
+
+    private static String propLabelSeqSvmModels;
     static svm_model[] svmModels = null;
     static float[][] mins = null;
     static float[][] ranges = null;
 
-    static void loadSvmScaling(int i, String svm_model_file, String scaling_file) throws Exception
+    static void initialize(Properties properties) throws Exception
     {
-        svmModels[i] = svm.svm_load_model(svm_model_file);
-        System.out.println(svm_model_file + " is loaded. nr_class is " + svmModels[i].nr_class);
+        propLabelSeqSvmModels = properties.getProperty("LabelSeqSvmModels");
+        if (propLabelSeqSvmModels == null) throw new Exception("ERROR: LabelSeqSvmModels property is Missing.");
 
-        String line; List<String> lines = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(scaling_file)))
-        {
-            while ((line = br.readLine()) != null) lines.add(line);
-        }
-        mins[i] = new float[lines.size()]; ranges[i] = new float[lines.size()];
-        for (int k = 0; k < lines.size(); k++)
-        {
-            String[] words = lines.get(k).split("\\s+");
-            float min = Float.parseFloat(words[0]), max = Float.parseFloat(words[1]);
-            mins[i][k] = min;
-            ranges[i][k] = max - min;
-        }
-    }
+        svmModels = new svm_model[26];
+        mins = new float[26][]; ranges = new float[26][];
 
-    static void initialize() throws Exception
-    {
-        if (svmModels == null)
+        String[] models = propLabelSeqSvmModels.split(";");
+        for (int i = 2; i < models.length + 2; i++)
         {
-            svmModels = new svm_model[26];
-            mins = new float[26][]; ranges = new float[26][];
-            loadSvmScaling(2, "svm_model_2_2048.0_8.0", "scaling2.txt");
-            loadSvmScaling(3, "svm_model_3_2048.0_8.0", "scaling3.txt");
-            loadSvmScaling(4, "svm_model_4_512.0_8.0", "scaling4.txt");
-            loadSvmScaling(5, "svm_model_5_128.0_8.0", "scaling5.txt");
-            loadSvmScaling(6, "svm_model_6_32.0_0.5", "scaling6.txt");
+            String model = models[i-2];
+            String[] modelParts = model.split(",");
+            String svm = modelParts[0], scale = modelParts[1];
+
+            {   //load svm model
+                InputStream modelStream = LabelSequenceClassify.class.getClassLoader().getResourceAsStream(svm);
+                BufferedReader br = new BufferedReader(new InputStreamReader(modelStream));
+                svmModels[i] = libsvm.svm.svm_load_model(br);
+                log.info(svm + " is loaded. nr_class is " + svmModels[i].nr_class);
+            }
+
+            {   //load scale
+                InputStream scaleStream = LabelSequenceClassify.class.getClassLoader().getResourceAsStream(scale);
+                String line;
+                List<String> lines = new ArrayList<>();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(scaleStream)))
+                {
+                    while ((line = br.readLine()) != null) lines.add(line);
+                }
+                mins[i] = new float[lines.size()];
+                ranges[i] = new float[lines.size()];
+                for (int k = 0; k < lines.size(); k++) {
+                    String[] words = lines.get(k).split("\\s+");
+                    float min = Float.parseFloat(words[0]), max = Float.parseFloat(words[1]);
+                    mins[i][k] = min;
+                    ranges[i][k] = max - min;
+                }
+            }
         }
     }
 

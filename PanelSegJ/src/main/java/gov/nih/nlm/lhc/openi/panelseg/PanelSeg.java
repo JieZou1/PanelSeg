@@ -129,7 +129,7 @@ public class PanelSeg
                 LabelDetectHog.initialize(properties);
                 LabelClassifyLeNet5.initialize(properties);
                 LabelClassifyHogSvm.initialize(properties);
-                LabelSequenceClassify.initialize();
+                LabelSequenceClassify.initialize(properties);
                 return;
             }
             case LabelRegHogLeNet5SvmAlignment:
@@ -226,7 +226,8 @@ public class PanelSeg
                 detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
 
                 LabelClassifyLeNet5 classifyLeNet5 = new LabelClassifyLeNet5(figure);
-                classifyLeNet5.LeNet5Classification();    //SVM classification of each detected patch in figure.panels.
+                classifyLeNet5.LeNet5Classification();    //LeNet5 classification of each detected patch in figure.panels.
+                classifyLeNet5.removeFalseAlarms(0.02);
 
                 //Do label classification with HoG-SVM
                 LabelClassifyHogSvm classifySvm = new LabelClassifyHogSvm(figure);
@@ -242,7 +243,8 @@ public class PanelSeg
                 detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
 
                 LabelClassifyLeNet5 classifyLeNet5 = new LabelClassifyLeNet5(figure);
-                classifyLeNet5.LeNet5Classification();    //SVM classification of each detected patch in figure.panels.
+                classifyLeNet5.LeNet5Classification();    //LeNet5 classification of each detected patch in figure.panels.
+                classifyLeNet5.removeFalseAlarms(0.02);
 
                 //Do label classification with HoG-SVM
                 LabelClassifyHogSvm classifySvm = new LabelClassifyHogSvm(figure);

@@ -40,11 +40,11 @@ final class LabelClassifyHogSvm
         switch (propSvmModel)
         {
             case "svm_model_linear_0.5_94":
-            case "svm_model_rbf_8.0_0.125":
             case "svm_model_rbf_32.0_0.0078125_96.3":
-                InputStream modelStream = LabelClassifyLeNet5.class.getClassLoader().getResourceAsStream(propSvmModel);
+            case "svm_model_rbf_8.0_0.03125":
+                InputStream modelStream = LabelClassifyHogSvm.class.getClassLoader().getResourceAsStream(propSvmModel);
                 BufferedReader br = new BufferedReader(new InputStreamReader(modelStream));
-                svmModel = svm.svm_load_model(br);
+                svmModel = libsvm.svm.svm_load_model(br);
                 log.info(propSvmModel + " is loaded. nr_class is " + svmModel.nr_class);
                 break;
             default:

@@ -130,6 +130,7 @@ final class ExpPanelSeg extends Exp
         getProperty("LabelHogModel");
         getProperty("LabelLeNet5Model");
         getProperty("LabelSvmModel");
+        getProperty("LabelSeqSvmModels");
     }
 
     @Override

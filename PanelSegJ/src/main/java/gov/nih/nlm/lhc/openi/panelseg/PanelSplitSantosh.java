@@ -1,5 +1,8 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import org.bytedeco.javacpp.DoublePointer;
+import org.bytedeco.javacpp.FloatPointer;
+import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.opencv_core;
 
 import java.awt.*;
@@ -50,7 +53,11 @@ public class PanelSplitSantosh
     private int median(opencv_core.Mat img)
     {
         opencv_core.Mat hist = new opencv_core.Mat();
-        calcHist(img, 1, new int[] {0}, new opencv_core.Mat(), hist, 1, new int[] {256}, new float[] {0, 256}, true, false);
+        IntPointer channels = new IntPointer(new int[] {0});
+        Mat mask = new Mat();
+        IntPointer histSize = new IntPointer(new int[] {256});
+        FloatPointer ranges = new FloatPointer(new float[] {0, 256});
+        calcHist(img, 1, channels, mask, hist, 1, histSize, ranges, true, false);
 
         int med = -1, bin = 0;
         double m=(img.rows()*img.cols())/2;
@@ -265,7 +272,9 @@ public class PanelSplitSantosh
             Mat horProfileNorm = normalizeProfile(horProfile);
 
             double[] max_value = new double[1]; int[] max_index = new int[1];
-            minMaxIdx(horProfileNorm, null, max_value, null, max_index, noArray());
+            DoublePointer max_value_p = new DoublePointer(max_value); IntPointer max_index_p = new IntPointer(max_index);
+            minMaxIdx(horProfileNorm, null, max_value_p, null, max_index_p, noArray());
+            max_value_p.get(max_value); max_index_p.get(max_index);
             double thresh = (max_value[0]/2)* 0.4;
             int distance = horProfileNorm.cols() < 50 ? horProfileNorm.cols()-10 : 50;
 
@@ -281,7 +290,9 @@ public class PanelSplitSantosh
             Mat verProfileNorm = normalizeProfile(verProfile);
 
             double[] max_value = new double[1]; int[] max_index = new int[1];
-            minMaxIdx(verProfileNorm, null, max_value, null, max_index, noArray());
+            DoublePointer max_value_p = new DoublePointer(max_value); IntPointer max_index_p = new IntPointer(max_index);
+            minMaxIdx(verProfileNorm, null, max_value_p, null, max_index_p, noArray());
+            max_value_p.get(max_value); max_index_p.get(max_index);
             double thresh = (max_value[0]/2)* 0.4;
             int distance = verProfileNorm.rows() < 50 ? verProfileNorm.rows() - 10 : 50;
 

@@ -54,8 +54,8 @@ final class ExpPanelSeg extends Exp
             case "LabelRegHogLeNet5SvmBeam": method = PanelSeg.Method.LabelRegHogLeNet5SvmBeam; loadPropertiesLabelRegHogLeNet5SvmBeam(); break;
             case "LabelRegHogLeNet5SvmAlignment": method = PanelSeg.Method.LabelRegHogLeNet5SvmAlignment; break;
 
-            case "PanelSplitSantosh": method = PanelSeg.Method.PanelSplitSantosh; break;
-            case "PanelSplitJaylene": method = PanelSeg.Method.PanelSplitJaylene; break;
+            case "PanelSplitSantosh": method = PanelSeg.Method.PanelSplitSantosh; loadPropertiesPanelSplitSantosh(); break;
+            case "PanelSplitJaylene": method = PanelSeg.Method.PanelSplitJaylene; loadPropertiesPanelSplitJaylene(); break;
             default: throw new Exception("Method " + propMethod + " is Unknown");
         }
         waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
@@ -131,6 +131,20 @@ final class ExpPanelSeg extends Exp
         getProperty("LabelLeNet5Model");
         getProperty("LabelSvmModel");
         getProperty("LabelSeqSvmModels");
+    }
+
+    private void loadPropertiesPanelSplitSantosh() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+    }
+
+    private void loadPropertiesPanelSplitJaylene() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
     }
 
     @Override

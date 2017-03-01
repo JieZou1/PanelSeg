@@ -56,6 +56,7 @@ final class ExpPanelSeg extends Exp
 
             case "PanelSplitSantosh": method = PanelSeg.Method.PanelSplitSantosh; loadPropertiesPanelSplitSantosh(); break;
             case "PanelSplitJaylene": method = PanelSeg.Method.PanelSplitJaylene; loadPropertiesPanelSplitJaylene(); break;
+            case "PanelSplitEdgeBoxes": method = PanelSeg.Method.PanelSplitEdgeBoxes; loadPropertiesPanelSplitEdgeBoxes(); break;
             default: throw new Exception("Method " + propMethod + " is Unknown");
         }
         waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
@@ -141,6 +142,13 @@ final class ExpPanelSeg extends Exp
     }
 
     private void loadPropertiesPanelSplitJaylene() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+    }
+
+    private void loadPropertiesPanelSplitEdgeBoxes() throws Exception
     {
         propThreads = getProperty("Threads");
         propListFile = getProperty("ListFile");

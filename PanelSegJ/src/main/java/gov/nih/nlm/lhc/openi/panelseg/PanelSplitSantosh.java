@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.javacpp.opencv_highgui.imshow;
+import static org.bytedeco.javacpp.opencv_highgui.waitKey;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
 
 /**
@@ -39,6 +41,11 @@ public class PanelSplitSantosh
     {
         imagePreprocessed = preProcess();
         imageLines = detectLineSegments();
+
+        imshow("Preprocessed", imagePreprocessed);
+        imshow("Lines", imageLines);
+        waitKey();
+
         imageLinesCleaned = cleanLineSegments();
         lineProfileAnalysis();
 
@@ -102,7 +109,7 @@ public class PanelSplitSantosh
 
             imageSharpened = new opencv_core.Mat(imageResized.size());
             addWeighted(imageResized, 1.5, imageBlurred, -0.5, 0, imageSharpened);
-            //imwrite("sharpened.bmp", imageSharpened);
+            imshow("sharpened.bmp", imageSharpened);
         }
 
         //Convert to gray scale image
@@ -117,7 +124,7 @@ public class PanelSplitSantosh
             imageCanny = new opencv_core.Mat(imageResized.size());
             int median = median(imageSharpened);
             Canny(imageSharpened, imageCanny, 0.66 * median, 1.33 * median);
-            //imwrite("canny.bmp", imageCanny);
+            //imshow("Canny", imageCanny);
         }
 
         {//Border Crop
@@ -126,7 +133,7 @@ public class PanelSplitSantosh
             roi = boundingRect(points);
             //Rectangle rect = new Rectangle(roi.x(), roi.y(), roi.width(), roi.height());
             imageCropped = new opencv_core.Mat(imageSharpened, roi);
-            //imwrite("cropped.bmp", imageCropped);
+            imshow("cropped", imageCropped);
         }
 
         return imageCropped;
@@ -134,7 +141,7 @@ public class PanelSplitSantosh
 
     /**
      * Detect line segments with LSD method
-     * @return the detected line segments drawn on a binary image. (black backgraound, white lines)
+     * @return the detected line segments drawn on a binary image. (black background, white lines)
      */
     private opencv_core.Mat detectLineSegments()
     {
@@ -142,11 +149,11 @@ public class PanelSplitSantosh
         opencv_core.Mat lines = new opencv_core.Mat();		lsd.detect(imagePreprocessed, lines);
 
         Mat imageLines = new Mat(imagePreprocessed.rows(), imagePreprocessed.cols(), CV_8UC1, Scalar.all(0));
-        //imwrite("lines.bmp", imageLines);
+        //imshow("lines.bmp", imageLines);
         lsd.drawSegments(imageLines, lines);
         cvtColor(imageLines, imageLines, COLOR_BGRA2GRAY);
         threshold(imageLines, imageLines, 1, 255, THRESH_BINARY_INV);
-        //imwrite("lines.bmp", imageLines);
+        //imshow("lines.bmp", imageLines);
 
         return imageLines;
     }

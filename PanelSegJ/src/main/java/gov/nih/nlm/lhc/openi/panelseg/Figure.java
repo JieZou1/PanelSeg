@@ -30,6 +30,7 @@ class Figure
     Mat imageColor;		//The figure image after padding,
     Mat imageGray;	//The gray image converted from imageColor
     Mat imageGrayInverted;	//The inverted gray image
+    Mat imageStructuredEdge;    //The edges detected by StructuredEdgeDetection
     int imageWidth, imageHeight;
 
     List<Panel> panels;	//The panels of this figure, either loaded from GT data or segmented by an algorithm.

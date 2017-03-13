@@ -241,6 +241,5 @@
     <orderEntry type="library" name="Maven: org.apache.directory.api:api-asn1-api:1.0.0-M20" level="project" />
     <orderEntry type="library" name="Maven: org.apache.directory.api:api-util:1.0.0-M20" level="project" />
     <orderEntry type="library" name="Maven: org.apache.curator:curator-framework:2.7.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-core:2.6.0-mr1-cdh5.9.1" level="project" />
   </component>
 </module>

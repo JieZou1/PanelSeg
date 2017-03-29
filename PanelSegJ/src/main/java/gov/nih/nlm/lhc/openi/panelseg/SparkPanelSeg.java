@@ -31,7 +31,7 @@ public class SparkPanelSeg
             System.exit(-1);
         }
 
-        final SparkConf sparkConf = new SparkConf().setSparkHome("PanelSegJ");
+        final SparkConf sparkConf = new SparkConf().setAppName("PanelSegJ");
         //sparkConf.setMaster("");
         final JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
@@ -41,6 +41,8 @@ public class SparkPanelSeg
         AlgMiscEx.createClearFolder(Paths.get("./eval/preview"));
 
         lines.foreach(new LabelDetHog());
+
+        System.out.println("Completed!");
     }
 }
 
@@ -63,7 +65,7 @@ class LabelDetHog implements VoidFunction<String> {
         //List<Panel> panels = PanelSeg.segment(image, method);
         //expPanelSeg.saveSegResult(imagePath, image, panels);
 
-        String imageFile = Paths.get("imagePath").toFile().getName();
+        String imageFile = Paths.get(imagePath).toFile().getName();
         Path origPath = expPanelSeg.targetFolder.resolve(imageFile);
         opencv_imgcodecs.imwrite(origPath.toString(), image);
     }

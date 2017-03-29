@@ -6,12 +6,15 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.api.java.function.VoidFunction2;
 import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.opencv_imgcodecs;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
 /**
  * Panel Segmentation method in Spark
@@ -28,12 +31,14 @@ public class SparkPanelSeg
             System.exit(-1);
         }
 
-        SparkConf sparkConf = new SparkConf();
+        final SparkConf sparkConf = new SparkConf().setSparkHome("PanelSegJ");
         //sparkConf.setMaster("");
-        sparkConf.setAppName("PanelSeg");
-        JavaSparkContext sc = new JavaSparkContext(sparkConf);
+        final JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
         JavaRDD<String> lines = sc.textFile(args[0]);
+
+        AlgMiscEx.createClearFolder(Paths.get("./eval"));
+        AlgMiscEx.createClearFolder(Paths.get("./eval/preview"));
 
         lines.foreach(new LabelDetHog());
     }
@@ -48,7 +53,6 @@ class LabelDetHog implements VoidFunction<String> {
 
         ExpPanelSeg expPanelSeg = new ExpPanelSeg();
         expPanelSeg.targetFolder = Paths.get("./eval");
-        //AlgMiscEx.createClearFolder(expPanelSeg.targetFolder);
 
         LabelDetectHog.labelSetsHOG = new String[1];
         LabelDetectHog.labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
@@ -56,8 +60,11 @@ class LabelDetHog implements VoidFunction<String> {
         LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
 
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
-        List<Panel> panels = PanelSeg.segment(image, method);
+        //List<Panel> panels = PanelSeg.segment(image, method);
+        //expPanelSeg.saveSegResult(imagePath, image, panels);
 
-        expPanelSeg.saveSegResult(imagePath, image, panels);
+        String imageFile = Paths.get("imagePath").toFile().getName();
+        Path origPath = expPanelSeg.targetFolder.resolve(imageFile);
+        opencv_imgcodecs.imwrite(origPath.toString(), image);
     }
 }

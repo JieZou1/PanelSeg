@@ -8,6 +8,7 @@ import org.apache.spark.api.java.function.VoidFunction2;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgcodecs;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -40,14 +41,28 @@ public class SparkPanelSeg
         AlgMiscEx.createClearFolder(Paths.get("./eval"));
         AlgMiscEx.createClearFolder(Paths.get("./eval/preview"));
 
-        lines.foreach(new LabelDetHog());
+        lines.foreach(new CopyAsBinaFile());
 
         System.out.println("Completed!");
     }
 }
 
-class LabelDetHog implements VoidFunction<String> {
+class CopyAsBinaFile implements VoidFunction<String>
+{
+    @Override
+    public void call(String imagePath) throws Exception
+    {
+        Path srcPath = Paths.get(imagePath);
+        byte[] content = Files.readAllBytes(srcPath);
 
+        String imageFile = Paths.get(imagePath).toFile().getName();
+        Path dstPath = Paths.get("./eval").resolve(imageFile);
+        Files.write(dstPath, content);
+    }
+}
+
+class LabelDetHog implements VoidFunction<String>
+{
     @Override
     public void call(String imagePath) throws Exception
     {

@@ -78,11 +78,7 @@ class LabelDetHog implements VoidFunction<String>
         LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
 
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
-        //List<Panel> panels = PanelSeg.segment(image, method);
-        //expPanelSeg.saveSegResult(imagePath, image, panels);
-
-        String imageFile = Paths.get(imagePath).toFile().getName();
-        Path origPath = expPanelSeg.targetFolder.resolve(imageFile);
-        opencv_imgcodecs.imwrite(origPath.toString(), image);
+        List<Panel> panels = PanelSeg.segment(image, method);
+        expPanelSeg.saveSegResult(imagePath, image, panels);
     }
 }

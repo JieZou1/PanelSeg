@@ -56,8 +56,8 @@ class CopyAsBinaFile implements VoidFunction<String>
         byte[] content = Files.readAllBytes(srcPath);
 
         String imageFile = Paths.get(imagePath).toFile().getName();
-        //Path dstPath = Paths.get("./eval").resolve(imageFile);
-        Path dstPath = Paths.get(imageFile);
+        Path dstPath = Paths.get("./eval").resolve(imageFile);
+        //Path dstPath = Paths.get(imageFile);
         Files.write(dstPath, content);
     }
 }

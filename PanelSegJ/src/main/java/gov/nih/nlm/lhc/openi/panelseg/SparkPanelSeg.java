@@ -41,7 +41,7 @@ public class SparkPanelSeg
         AlgMiscEx.createClearFolder(Paths.get("./eval"));
         AlgMiscEx.createClearFolder(Paths.get("./eval/preview"));
 
-        lines.foreach(new CopyAsBinaFile());
+        lines.foreach(new LabelDetHog());
 
         System.out.println("Completed!");
     }

@@ -42,24 +42,9 @@ public class SparkPanelSeg
         AlgMiscEx.createClearFolder(Paths.get("./eval"));
         AlgMiscEx.createClearFolder(Paths.get("./eval/preview"));
 
-        lines.foreach(new CopyAsBinaFile());
+        lines.foreach(new SparkPanelSegFunc());
 
         System.out.println("Completed!");
-    }
-}
-
-class CopyAsBinaFile implements VoidFunction<String>
-{
-    @Override
-    public void call(String imagePath) throws Exception
-    {
-        Path srcPath = Paths.get(imagePath);
-        byte[] content = Files.readAllBytes(srcPath);
-
-        String imageFile = Paths.get(imagePath).toFile().getName();
-        Path dstPath = Paths.get("file://lhce-hadoop/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval").resolve(imageFile);
-        //Path dstPath = Paths.get(imageFile);
-        Files.write(dstPath, content);
     }
 }
 
@@ -76,12 +61,13 @@ class SparkPanelSegFunc implements VoidFunction<String>
     public void call(String imagePath) throws Exception
     {
         this.method = PanelSeg.Method.LabelDetHog;
-        targetFolder = Paths.get("./eval");
 
         LabelDetectHog.labelSetsHOG = new String[1];
         LabelDetectHog.labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
         LabelDetectHog.models = new float[1][];
         LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
+
+        targetFolder = Paths.get("/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval");
 
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);
@@ -113,3 +99,19 @@ class SparkPanelSegFunc implements VoidFunction<String>
     }
 
 }
+
+//class CopyAsBinaFile implements VoidFunction<String>
+//{
+//    @Override
+//    public void call(String imagePath) throws Exception
+//    {
+//        Path srcPath = Paths.get(imagePath);
+//        byte[] content = Files.readAllBytes(srcPath);
+//
+//        String imageFile = Paths.get(imagePath).toFile().getName();
+//        Path dstPath = Paths.get("file://lhce-hadoop/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval").resolve(imageFile);
+//        //Path dstPath = Paths.get(imageFile);
+//        Files.write(dstPath, content);
+//    }
+//}
+

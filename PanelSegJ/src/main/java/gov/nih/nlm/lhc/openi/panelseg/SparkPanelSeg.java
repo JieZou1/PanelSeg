@@ -60,6 +60,8 @@ class SparkPanelSegFunc implements VoidFunction<String>
     @Override
     public void call(String imagePath) throws Exception
     {
+        String imageFile = Paths.get(imagePath).toFile().getName();
+
         this.method = PanelSeg.Method.LabelDetHog;
 
         LabelDetectHog.labelSetsHOG = new String[1];
@@ -71,7 +73,7 @@ class SparkPanelSegFunc implements VoidFunction<String>
 
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);
-        saveSegResult(imagePath, image, panels);
+        saveSegResult(imageFile, image, panels);
     }
 
     private void saveSegResult(String imageFile, opencv_core.Mat image, List<Panel> panels)

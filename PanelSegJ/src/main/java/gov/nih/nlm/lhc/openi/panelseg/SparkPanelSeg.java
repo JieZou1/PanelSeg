@@ -8,11 +8,14 @@ import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.api.java.function.VoidFunction2;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgcodecs;
+import org.deeplearning4j.util.ModelSerializer;
 
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Properties;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
@@ -33,16 +36,22 @@ public class SparkPanelSeg
             System.exit(-1);
         }
 
+        PanelSeg.Method method = PanelSeg.Method.LabelDetHog;
+
+        Path targetFolder = Paths.get("/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval");
+        AlgMiscEx.createClearFolder(targetFolder);
+        AlgMiscEx.createClearFolder(targetFolder.resolve("preview"));
+
+        Properties properties = new Properties();
+        properties.load(SparkPanelSeg.class.getResourceAsStream("ExpPanelSeg.properties"));
+
         final SparkConf sparkConf = new SparkConf().setAppName("PanelSegJ");
         //sparkConf.setMaster("");
         final JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
         JavaRDD<String> lines = sc.textFile(args[0]);
 
-        AlgMiscEx.createClearFolder(Paths.get("./eval"));
-        AlgMiscEx.createClearFolder(Paths.get("./eval/preview"));
-
-        lines.foreach(new SparkPanelSegFunc());
+        lines.foreach(new SparkPanelSegFunc(method, properties, targetFolder));
 
         System.out.println("Completed!");
     }
@@ -50,11 +59,16 @@ public class SparkPanelSeg
 
 class SparkPanelSegFunc implements VoidFunction<String>
 {
+    private Properties properties = null;
+
     private PanelSeg.Method method;
     private Path targetFolder;    //The folder for saving the result
 
-    public SparkPanelSegFunc()
+    public SparkPanelSegFunc(PanelSeg.Method method, Properties properties, Path targetFolder)
     {
+        this.method = method;
+        this.properties = properties;
+        this.targetFolder = targetFolder;
     }
 
     @Override
@@ -62,14 +76,16 @@ class SparkPanelSegFunc implements VoidFunction<String>
     {
         String imageFile = Paths.get(imagePath).toFile().getName();
 
-        this.method = PanelSeg.Method.LabelDetHog;
+//        method = PanelSeg.Method.LabelDetHog;
 
-        LabelDetectHog.labelSetsHOG = new String[1];
-        LabelDetectHog.labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
-        LabelDetectHog.models = new float[1][];
-        LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
+//        properties = new Properties();
+//        properties.load(this.getClass().getClassLoader().getResourceAsStream("ExpPanelSeg.properties"));
+        PanelSeg.initialize(method, properties);
 
-        targetFolder = Paths.get("/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval");
+//        LabelDetectHog.labelSetsHOG = new String[1];
+//        LabelDetectHog.labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
+//        LabelDetectHog.models = new float[1][];
+//        LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
 
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);

@@ -77,14 +77,14 @@ class SparkPanelSegFunc implements VoidFunction<String>
 
 //        method = PanelSeg.Method.LabelDetHog;
 
-        properties = new Properties();
-        properties.load(this.getClass().getClassLoader().getResourceAsStream("SparkPanelSeg.properties"));
-        PanelSeg.initialize(method, properties);
+//        properties = new Properties();
+//        properties.load(this.getClass().getClassLoader().getResourceAsStream("SparkPanelSeg.properties"));
+//        PanelSeg.initialize(method, properties);
 
-//        LabelDetectHog.labelSetsHOG = new String[1];
-//        LabelDetectHog.labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
-//        LabelDetectHog.models = new float[1][];
-//        LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
+        LabelDetectHog.labelSetsHOG = new String[1];
+        LabelDetectHog.labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
+        LabelDetectHog.models = new float[1][];
+        LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
 
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);

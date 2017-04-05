@@ -42,8 +42,8 @@ public class SparkPanelSeg
         AlgMiscEx.createClearFolder(targetFolder);
         AlgMiscEx.createClearFolder(targetFolder.resolve("preview"));
 
-        Properties properties = new Properties();
-        properties.load(SparkPanelSeg.class.getResourceAsStream("SparkPanelSeg.properties"));
+//        Properties properties = new Properties();
+//        properties.load(SparkPanelSeg.class.getResourceAsStream("SparkPanelSeg.properties"));
 
         final SparkConf sparkConf = new SparkConf().setAppName("PanelSegJ");
         //sparkConf.setMaster("");
@@ -51,7 +51,7 @@ public class SparkPanelSeg
 
         JavaRDD<String> lines = sc.textFile(args[0]);
 
-        lines.foreach(new SparkPanelSegFunc(method, properties, targetFolder));
+        lines.foreach(new SparkPanelSegFunc(method, targetFolder));
 
         System.out.println("Completed!");
     }
@@ -64,10 +64,9 @@ class SparkPanelSegFunc implements VoidFunction<String>
     private PanelSeg.Method method;
     private Path targetFolder;    //The folder for saving the result
 
-    public SparkPanelSegFunc(PanelSeg.Method method, Properties properties, Path targetFolder)
+    public SparkPanelSegFunc(PanelSeg.Method method, Path targetFolder)
     {
         this.method = method;
-        this.properties = properties;
         this.targetFolder = targetFolder;
     }
 
@@ -78,8 +77,8 @@ class SparkPanelSegFunc implements VoidFunction<String>
 
 //        method = PanelSeg.Method.LabelDetHog;
 
-//        properties = new Properties();
-//        properties.load(this.getClass().getClassLoader().getResourceAsStream("ExpPanelSeg.properties"));
+        properties = new Properties();
+        properties.load(this.getClass().getClassLoader().getResourceAsStream("SparkPanelSeg.properties"));
         PanelSeg.initialize(method, properties);
 
 //        LabelDetectHog.labelSetsHOG = new String[1];

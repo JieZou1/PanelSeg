@@ -43,7 +43,7 @@ public class SparkPanelSeg
         AlgMiscEx.createClearFolder(targetFolder.resolve("preview"));
 
         Properties properties = new Properties();
-        properties.load(SparkPanelSeg.class.getResourceAsStream("ExpPanelSeg.properties"));
+        properties.load(SparkPanelSeg.class.getResourceAsStream("SparkPanelSeg.properties"));
 
         final SparkConf sparkConf = new SparkConf().setAppName("PanelSegJ");
         //sparkConf.setMaster("");

@@ -51,7 +51,7 @@ public class SparkPanelSeg
         AlgMiscEx.createClearFolder(targetFolder.resolve("preview"));
         System.out.println(targetFolder.toString() + "is cleaned!");
 
-        Broadcast<Path> TargetFolder = sc.broadcast(targetFolder);
+        Broadcast<String> TargetFolder = sc.broadcast(targetFolder.toString());
         System.out.println("TargetFolder is broad casted: " + targetFolder);
 
         //Set and broadcast method
@@ -105,8 +105,8 @@ public class SparkPanelSeg
 
 class SparkPanelSegFunc implements VoidFunction<String>
 {
+    private Broadcast<String> TargetFolder;    //The folder for saving the result
     private Broadcast<PanelSeg.Method> Method;
-    private Broadcast<Path> TargetFolder;    //The folder for saving the result
 
     private Broadcast<String[]> LabelDetectHog_labelSetsHOG;
     private Broadcast<float[][]> LabelDetectHog_models;
@@ -121,7 +121,7 @@ class SparkPanelSegFunc implements VoidFunction<String>
     private PanelSeg.Method method;
 
     public SparkPanelSegFunc(
-            Broadcast<Path> TargetFolder,
+            Broadcast<String> TargetFolder,
             Broadcast<PanelSeg.Method> Method,
             Broadcast<String[]> LabelDetectHog_labelSetsHOG,
             Broadcast<float[][]> LabelDetectHog_models,
@@ -147,7 +147,7 @@ class SparkPanelSegFunc implements VoidFunction<String>
     @Override
     public void call(String imagePath) throws Exception
     {
-        targetFolder = TargetFolder.value();
+        targetFolder = Paths.get(TargetFolder.value());
         method = Method.value();
 
         LabelDetectHog.labelSetsHOG = LabelDetectHog_labelSetsHOG.value();

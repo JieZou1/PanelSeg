@@ -29,14 +29,11 @@ final class LabelClassifyHogSvm
 {
     protected static final Logger log = LoggerFactory.getLogger(LabelClassifyHogSvm.class);
 
-    private static svm_model svmModel;
+    static svm_model svmModel;
     private static String propSvmModel;
 
-    static void initialize(Properties properties) throws Exception
+    static void initialize(String propSvmModel) throws Exception
     {
-        propSvmModel = properties.getProperty("LabelSvmModel");
-        if (propSvmModel == null) throw new Exception("ERROR: LabelSvmModel property is Missing.");
-
         switch (propSvmModel)
         {
             case "svm_model_linear_0.5_94":
@@ -50,6 +47,13 @@ final class LabelClassifyHogSvm
             default:
                 throw new Exception("LabelSvmModel of " + propSvmModel + "is Unknown!");
         }
+    }
+
+    static void initialize(Properties properties) throws Exception
+    {
+        propSvmModel = properties.getProperty("LabelSvmModel");
+        if (propSvmModel == null) throw new Exception("ERROR: LabelSvmModel property is Missing.");
+        initialize(propSvmModel);
     }
 
     private Figure figure;

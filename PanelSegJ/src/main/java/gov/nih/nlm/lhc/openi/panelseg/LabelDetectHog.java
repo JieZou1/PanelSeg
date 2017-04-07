@@ -40,14 +40,8 @@ final class LabelDetectHog
         return null;
     }
 
-    static void initialize(Properties properties) throws Exception
+    static void initialize(String propLabelSetsHOG, String propLabelHogModel) throws Exception
     {
-        String propLabelSetsHOG = properties.getProperty("LabelSetsHOG");
-        if (propLabelSetsHOG == null) throw new Exception("ERROR: LabelSetsHOG property is Missing.");
-
-        String propLabelHogModel = properties.getProperty("LabelHogModel");
-        if (propLabelHogModel == null) throw new Exception("ERROR: LabelHogModel property is Missing.");
-
         switch (propLabelSetsHOG)
         {
             case "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789":
@@ -75,6 +69,17 @@ final class LabelDetectHog
             default:
                 throw new Exception("labelHogModelSet of " + labelSetsHOG + "is Unknown!");
         }
+    }
+
+    static void initialize(Properties properties) throws Exception
+    {
+        String propLabelSetsHOG = properties.getProperty("LabelSetsHOG");
+        if (propLabelSetsHOG == null) throw new Exception("ERROR: LabelSetsHOG property is Missing.");
+
+        String propLabelHogModel = properties.getProperty("LabelHogModel");
+        if (propLabelHogModel == null) throw new Exception("ERROR: LabelHogModel property is Missing.");
+
+        initialize(propLabelSetsHOG, propLabelHogModel);
     }
 
     /**

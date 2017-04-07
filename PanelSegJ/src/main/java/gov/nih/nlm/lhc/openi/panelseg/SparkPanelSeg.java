@@ -1,5 +1,6 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import libsvm.svm_model;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -13,7 +14,9 @@ import org.deeplearning4j.util.ModelSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,8 +34,6 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
  */
 public class SparkPanelSeg
 {
-    protected static final Logger log = LoggerFactory.getLogger(SparkPanelSeg.class);
-
     public static void main(String[] args) throws Exception
     {
         if (args.length != 1)
@@ -44,31 +45,59 @@ public class SparkPanelSeg
         final SparkConf sparkConf = new SparkConf().setAppName("Panel Segmentation");
         final JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
-
+        //Clear and broadcast targetFolder
         Path targetFolder = Paths.get("/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval");
         AlgMiscEx.createClearFolder(targetFolder);
         AlgMiscEx.createClearFolder(targetFolder.resolve("preview"));
-        log.info(targetFolder.toString() + "is cleaned!");
+        System.out.println(targetFolder.toString() + "is cleaned!");
 
-        LabelDetectHog.labelSetsHOG = new String[1];
-        LabelDetectHog.labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
-        LabelDetectHog.models = new float[1][];
-        LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
-        log.info("LabelDetectHog model is loaded!");
+        Broadcast<Path> TargetFolder = sc.broadcast(targetFolder);
+        System.out.println("TargetFolder is broad casted: " + targetFolder);
+
+        //Set and broadcast method
+        PanelSeg.Method method = PanelSeg.Method.LabelRegHogSvmThreshold;
+        Broadcast<PanelSeg.Method> Method = sc.broadcast(method);
+        System.out.println("Method is broad casted: " + method);
+
+        //Set and broadcast LabelDetectHog models
+        String propLabelSetsHOG = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
+        String propLabelHogModel = "svmModel_19409_17675";
+        LabelDetectHog.initialize(propLabelSetsHOG, propLabelHogModel);
+        System.out.println("LabelDetectHog model is loaded!");
 
         Broadcast<String[]> LabelDetectHog_labelSetsHOG = sc.broadcast(LabelDetectHog.labelSetsHOG);
         Broadcast<float[][]> LabelDetectHog_models = sc.broadcast(LabelDetectHog.models);
-        log.info("LabelDetectHog model is broad-casted!");
+        System.out.println("LabelDetectHog model is broad-casted!");
 
-        PanelSeg.Method method = PanelSeg.Method.LabelDetHog;
+        //Load and broadcast LabelClassifyHogSvm model
+        String propSvmModel = "svm_model_rbf_8.0_0.03125";
+        LabelClassifyHogSvm.initialize(propSvmModel);
+        System.out.println("LabelClassifyHogSvm model is loaded!");
 
+        Broadcast<svm_model> LabelClassifyHogSvm_svmModel = sc.broadcast(LabelClassifyHogSvm.svmModel);
+        System.out.println("LabelClassifyHogSvm model is broad-casted!");
 
-//        Properties properties = new Properties();
-//        properties.load(SparkPanelSeg.class.getResourceAsStream("SparkPanelSeg.properties"));
+        //Load and broadcast LabelSequenceClassify models
+        String propLabelSeqSvmModels = "svm_model_2_2048.0_8.0,scaling2.txt;svm_model_3_2048.0_8.0,scaling3.txt;svm_model_4_512.0_8.0,scaling4.txt;svm_model_5_128.0_8.0,scaling5.txt;svm_model_6_32.0_0.5,scaling6.txt";
+        LabelSequenceClassify.initialize(propLabelSeqSvmModels);
+        System.out.println("LabelSequenceClassify models are loaded!");
+
+        Broadcast<svm_model[]> LabelSequenceClassify_svmModels = sc.broadcast(LabelSequenceClassify.svmModels);
+        Broadcast<float[][]> LabelSequenceClassify_mins = sc.broadcast(LabelSequenceClassify.mins);
+        Broadcast<float[][]> LabelSequenceClassify_ranges = sc.broadcast(LabelSequenceClassify.ranges);
+        System.out.println("LabelSequenceClassify models are broad-casted!");
 
         JavaRDD<String> lines = sc.textFile(args[0]);
 
-        lines.foreach(new SparkPanelSegFunc(LabelDetectHog_labelSetsHOG, LabelDetectHog_models));
+        lines.foreach(new SparkPanelSegFunc(
+                TargetFolder,
+                Method,
+                LabelDetectHog_labelSetsHOG,
+                LabelDetectHog_models,
+                LabelClassifyHogSvm_svmModel,
+                LabelSequenceClassify_svmModels,
+                LabelSequenceClassify_mins,
+                LabelSequenceClassify_ranges));
 
         System.out.println("Completed!");
     }
@@ -76,30 +105,61 @@ public class SparkPanelSeg
 
 class SparkPanelSegFunc implements VoidFunction<String>
 {
-    private PanelSeg.Method method;
-    private Path targetFolder;    //The folder for saving the result
+    private Broadcast<PanelSeg.Method> Method;
+    private Broadcast<Path> TargetFolder;    //The folder for saving the result
 
     private Broadcast<String[]> LabelDetectHog_labelSetsHOG;
     private Broadcast<float[][]> LabelDetectHog_models;
 
-    public SparkPanelSegFunc(Broadcast<String[]> LabelDetectHog_labelSetsHOG,
-                             Broadcast<float[][]> LabelDetectHog_models)
+    private Broadcast<svm_model> LabelClassifyHogSvm_svmModel;
+
+    private Broadcast<svm_model[]> LabelSequenceClassify_svmModels;
+    private Broadcast<float[][]> LabelSequenceClassify_mins;
+    private Broadcast<float[][]> LabelSequenceClassify_ranges;
+
+    private Path targetFolder;
+    private PanelSeg.Method method;
+
+    public SparkPanelSegFunc(
+            Broadcast<Path> TargetFolder,
+            Broadcast<PanelSeg.Method> Method,
+            Broadcast<String[]> LabelDetectHog_labelSetsHOG,
+            Broadcast<float[][]> LabelDetectHog_models,
+            Broadcast<svm_model> LabelClassifyHogSvm_svmModel,
+            Broadcast<svm_model[]> LabelSequenceClassify_svmModels,
+            Broadcast<float[][]> LabelSequenceClassify_mins,
+            Broadcast<float[][]> LabelSequenceClassify_ranges
+                            )
     {
+        this.TargetFolder = TargetFolder;
+        this.Method = Method;
+
         this.LabelDetectHog_labelSetsHOG = LabelDetectHog_labelSetsHOG;
         this.LabelDetectHog_models = LabelDetectHog_models;
+
+        this.LabelClassifyHogSvm_svmModel = LabelClassifyHogSvm_svmModel;
+
+        this.LabelSequenceClassify_svmModels = LabelSequenceClassify_svmModels;
+        this.LabelSequenceClassify_mins = LabelSequenceClassify_mins;
+        this.LabelSequenceClassify_ranges = LabelSequenceClassify_ranges;
     }
 
     @Override
     public void call(String imagePath) throws Exception
     {
-        String imageFile = Paths.get(imagePath).toFile().getName();
-
-        method = PanelSeg.Method.LabelDetHog;
-        targetFolder = Paths.get("/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval");
+        targetFolder = TargetFolder.value();
+        method = Method.value();
 
         LabelDetectHog.labelSetsHOG = LabelDetectHog_labelSetsHOG.value();
         LabelDetectHog.models = LabelDetectHog_models.value();
 
+        LabelClassifyHogSvm.svmModel = LabelClassifyHogSvm_svmModel.value();
+
+        LabelSequenceClassify.svmModels = LabelSequenceClassify_svmModels.value();
+        LabelSequenceClassify.mins = LabelSequenceClassify_mins.value();
+        LabelSequenceClassify.ranges = LabelSequenceClassify_ranges.value();
+
+        String imageFile = Paths.get(imagePath).toFile().getName();
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);
         saveSegResult(imageFile, image, panels);
@@ -128,21 +188,4 @@ class SparkPanelSegFunc implements VoidFunction<String>
         opencv_core.Mat preview = Figure.drawAnnotation(image, panels);
         opencv_imgcodecs.imwrite(previewPath.toString(), preview);
     }
-
 }
-
-//class CopyAsBinaFile implements VoidFunction<String>
-//{
-//    @Override
-//    public void call(String imagePath) throws Exception
-//    {
-//        Path srcPath = Paths.get(imagePath);
-//        byte[] content = Files.readAllBytes(srcPath);
-//
-//        String imageFile = Paths.get(imagePath).toFile().getName();
-//        Path dstPath = Paths.get("file://lhce-hadoop/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval").resolve(imageFile);
-//        //Path dstPath = Paths.get(imageFile);
-//        Files.write(dstPath, content);
-//    }
-//}
-

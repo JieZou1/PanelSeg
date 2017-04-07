@@ -26,11 +26,8 @@ public class LabelSequenceClassify
     static float[][] mins = null;
     static float[][] ranges = null;
 
-    static void initialize(Properties properties) throws Exception
+    static void initialize(String propLabelSeqSvmModels) throws Exception
     {
-        propLabelSeqSvmModels = properties.getProperty("LabelSeqSvmModels");
-        if (propLabelSeqSvmModels == null) throw new Exception("ERROR: LabelSeqSvmModels property is Missing.");
-
         svmModels = new svm_model[26];
         mins = new float[26][]; ranges = new float[26][];
 
@@ -66,6 +63,14 @@ public class LabelSequenceClassify
                 }
             }
         }
+    }
+
+    static void initialize(Properties properties) throws Exception
+    {
+        propLabelSeqSvmModels = properties.getProperty("LabelSeqSvmModels");
+        if (propLabelSeqSvmModels == null) throw new Exception("ERROR: LabelSeqSvmModels property is Missing.");
+
+        initialize(propLabelSeqSvmModels);
     }
 
     static boolean noDuplicateLabels(LabelBeamSearch.BeamItem item)

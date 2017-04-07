@@ -16,6 +16,14 @@
     <nd4j.version>0.8.0</nd4j.version>
     <dl4j.version>0.8.0</dl4j.version>
     <datavec.version>0.8.0</datavec.version>
+
+    <!-- For Spark examples: change the _1 to _2 to switch between Spark 1 and Spark 2 -->
+    <dl4j.spark.version>0.8.0_spark_1</dl4j.spark.version>
+    <datavec.spark.version>0.8.0_spark_1</datavec.spark.version>
+
+    <!-- Scala binary version: DL4J's Spark and UI functionality are released with both Scala 2.10 and 2.11 support -->
+    <scala.binary.version>2.11</scala.binary.version>
+
     <guava.version>19.0</guava.version>
     <!-- <nd4j.backend>nd4j-cuda-7.5-platform</nd4j.backend> -->
     <nd4j.backend>nd4j-native-platform</nd4j.backend>
@@ -57,6 +65,12 @@
       <groupId>org.deeplearning4j</groupId>
       <artifactId>deeplearning4j-nlp</artifactId>
       <version>${dl4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>dl4j-spark_${scala.binary.version}</artifactId>
+      <version>${dl4j.spark.version}</version>
     </dependency>
 
     <!-- deeplearning4j-ui is used for HistogramIterationListener + visualization: see http://deeplearning4j.org/visualization -->

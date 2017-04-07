@@ -6,9 +6,12 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.api.java.function.VoidFunction2;
+import org.apache.spark.broadcast.Broadcast;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.deeplearning4j.util.ModelSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -28,6 +31,8 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
  */
 public class SparkPanelSeg
 {
+    protected static final Logger log = LoggerFactory.getLogger(SparkPanelSeg.class);
+
     public static void main(String[] args) throws Exception
     {
         if (args.length != 1)
@@ -36,22 +41,34 @@ public class SparkPanelSeg
             System.exit(-1);
         }
 
-        PanelSeg.Method method = PanelSeg.Method.LabelDetHog;
+        final SparkConf sparkConf = new SparkConf().setAppName("Panel Segmentation");
+        final JavaSparkContext sc = new JavaSparkContext(sparkConf);
+
 
         Path targetFolder = Paths.get("/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval");
         AlgMiscEx.createClearFolder(targetFolder);
         AlgMiscEx.createClearFolder(targetFolder.resolve("preview"));
+        log.info(targetFolder.toString() + "is cleaned!");
+
+        LabelDetectHog.labelSetsHOG = new String[1];
+        LabelDetectHog.labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
+        LabelDetectHog.models = new float[1][];
+        LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
+        log.info("LabelDetectHog model is loaded!");
+
+        Broadcast<String[]> LabelDetectHog_labelSetsHOG = sc.broadcast(LabelDetectHog.labelSetsHOG);
+        Broadcast<float[][]> LabelDetectHog_models = sc.broadcast(LabelDetectHog.models);
+        log.info("LabelDetectHog model is broad-casted!");
+
+        PanelSeg.Method method = PanelSeg.Method.LabelDetHog;
+
 
 //        Properties properties = new Properties();
 //        properties.load(SparkPanelSeg.class.getResourceAsStream("SparkPanelSeg.properties"));
 
-        final SparkConf sparkConf = new SparkConf().setAppName("PanelSegJ");
-        //sparkConf.setMaster("");
-        final JavaSparkContext sc = new JavaSparkContext(sparkConf);
-
         JavaRDD<String> lines = sc.textFile(args[0]);
 
-        lines.foreach(new SparkPanelSegFunc(method, targetFolder));
+        lines.foreach(new SparkPanelSegFunc(LabelDetectHog_labelSetsHOG, LabelDetectHog_models));
 
         System.out.println("Completed!");
     }
@@ -59,15 +76,17 @@ public class SparkPanelSeg
 
 class SparkPanelSegFunc implements VoidFunction<String>
 {
-    private Properties properties = null;
-
     private PanelSeg.Method method;
     private Path targetFolder;    //The folder for saving the result
 
-    public SparkPanelSegFunc(PanelSeg.Method method, Path targetFolder)
+    private Broadcast<String[]> LabelDetectHog_labelSetsHOG;
+    private Broadcast<float[][]> LabelDetectHog_models;
+
+    public SparkPanelSegFunc(Broadcast<String[]> LabelDetectHog_labelSetsHOG,
+                             Broadcast<float[][]> LabelDetectHog_models)
     {
-        this.method = method;
-        this.targetFolder = targetFolder;
+        this.LabelDetectHog_labelSetsHOG = LabelDetectHog_labelSetsHOG;
+        this.LabelDetectHog_models = LabelDetectHog_models;
     }
 
     @Override
@@ -75,16 +94,11 @@ class SparkPanelSegFunc implements VoidFunction<String>
     {
         String imageFile = Paths.get(imagePath).toFile().getName();
 
-//        method = PanelSeg.Method.LabelDetHog;
+        method = PanelSeg.Method.LabelDetHog;
+        targetFolder = Paths.get("/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval");
 
-//        properties = new Properties();
-//        properties.load(this.getClass().getClassLoader().getResourceAsStream("SparkPanelSeg.properties"));
-//        PanelSeg.initialize(method, properties);
-
-        LabelDetectHog.labelSetsHOG = new String[1];
-        LabelDetectHog.labelSetsHOG[0] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789";
-        LabelDetectHog.models = new float[1][];
-        LabelDetectHog.models[0] = LabelDetectHogModels_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789.svmModel_19409_17675;
+        LabelDetectHog.labelSetsHOG = LabelDetectHog_labelSetsHOG.value();
+        LabelDetectHog.models = LabelDetectHog_models.value();
 
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);

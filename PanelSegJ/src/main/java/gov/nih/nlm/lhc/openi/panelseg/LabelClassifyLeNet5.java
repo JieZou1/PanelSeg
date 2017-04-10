@@ -26,7 +26,7 @@ final class LabelClassifyLeNet5
     protected static final Logger log = LoggerFactory.getLogger(LabelClassifyHogSvm.class);
 
     static MultiLayerNetwork leNet5Model = null;
-    private static String propLabelLeNet5Model;
+    static String propLabelLeNet5Model;
 
     static void initialize(String propLabelLeNet5Model) throws Exception
     {

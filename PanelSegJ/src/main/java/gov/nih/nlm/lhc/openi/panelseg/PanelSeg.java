@@ -142,7 +142,9 @@ public class PanelSeg
 
             case PanelSplitSantosh: return;
             case PanelSplitJaylene: return;
-            case PanelSplitEdgeBoxes: return;
+            case PanelSplitEdgeBoxes:
+                PanelSplitEdgeBox.initialize();
+                return;
 
             default:
             {

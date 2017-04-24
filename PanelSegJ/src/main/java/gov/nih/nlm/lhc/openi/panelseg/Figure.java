@@ -26,6 +26,8 @@ class Figure
     static int padding = 50;
 
     Mat imageOriginal;  //The original image, has to be BGR image
+    Mat imageOriginalGray; //The grayscale image of the original image
+    int imageOriginalWidth, imageOriginalHeight; //the original image width and height
 
     Mat imageColor;		//The figure image after padding,
     Mat imageGray;	//The gray image converted from imageColor
@@ -43,6 +45,8 @@ class Figure
     private void createFigure(Mat img)
     {
         imageOriginal = img;    //Keep a reference to the original image
+        imageOriginalGray = new Mat();		cvtColor(imageOriginal, imageOriginalGray, CV_BGR2GRAY);
+        imageOriginalWidth = imageOriginal.cols(); imageOriginalHeight = imageOriginal.rows();
 
         //We pad padding pixels in each directions of the image.
         imageColor = new opencv_core.Mat();

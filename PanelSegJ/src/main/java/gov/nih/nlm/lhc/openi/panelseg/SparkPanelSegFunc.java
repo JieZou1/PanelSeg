@@ -22,6 +22,19 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 class SparkPanelSegFunc implements VoidFunction<String>
 {
     private Broadcast<String> TargetFolder;
+    private Broadcast<PanelSeg.Method> Method;
+
+    private Broadcast<String[]> LabelDetectHog_labelSetsHOG;
+    private Broadcast<float[][]> LabelDetectHog_models;
+
+    private Broadcast<svm_model> LabelClassifyHogSvm_svmModel;
+
+    private Broadcast<svm_model[]> LabelSequenceClassify_svmModels;
+    private Broadcast<float[][]> LabelSequenceClassify_mins;
+    private Broadcast<float[][]> LabelSequenceClassify_ranges;
+
+    private Broadcast<MultiLayerNetwork> LabelClassifyLeNet5_leNet5Model;
+    private Broadcast<String> LabelClassifyLeNet5_propLabelLeNet5Model;
 
     private Path targetFolder;          //The folder for saving the result
     private PanelSeg.Method method;
@@ -40,7 +53,26 @@ class SparkPanelSegFunc implements VoidFunction<String>
     )
     {
         this.TargetFolder = TargetFolder;
-        this.method = Method.value();
+        this.Method = Method;
+
+        this.LabelDetectHog_labelSetsHOG = LabelDetectHog_labelSetsHOG;
+        this.LabelDetectHog_models = LabelDetectHog_models;
+
+        this.LabelClassifyHogSvm_svmModel = LabelClassifyHogSvm_svmModel;
+
+        this.LabelSequenceClassify_svmModels = LabelSequenceClassify_svmModels;
+        this.LabelSequenceClassify_mins = LabelSequenceClassify_mins;
+        this.LabelSequenceClassify_ranges = LabelSequenceClassify_ranges;
+
+        this.LabelClassifyLeNet5_leNet5Model = LabelClassifyLeNet5_leNet5Model;
+        this.LabelClassifyLeNet5_propLabelLeNet5Model = LabelClassifyLeNet5_propLabelLeNet5Model;
+    }
+
+    @Override
+    public void call(String imagePath) throws Exception
+    {
+        targetFolder = Paths.get(TargetFolder.value());
+        method = Method.value();
 
         LabelDetectHog.labelSetsHOG = LabelDetectHog_labelSetsHOG.value();
         LabelDetectHog.models = LabelDetectHog_models.value();
@@ -53,12 +85,6 @@ class SparkPanelSegFunc implements VoidFunction<String>
 
         LabelClassifyLeNet5.leNet5Model = LabelClassifyLeNet5_leNet5Model.value();
         LabelClassifyLeNet5.propLabelLeNet5Model = LabelClassifyLeNet5_propLabelLeNet5Model.value();
-    }
-
-    @Override
-    public void call(String imagePath) throws Exception
-    {
-        targetFolder = Paths.get(TargetFolder.value());
 
         String imageFile = Paths.get(imagePath).toFile().getName();
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);

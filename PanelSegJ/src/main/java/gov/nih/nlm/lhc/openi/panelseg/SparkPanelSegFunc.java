@@ -21,6 +21,8 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  */
 class SparkPanelSegFunc implements VoidFunction<String>
 {
+    private Broadcast<String> TargetFolder;
+
     private Path targetFolder;          //The folder for saving the result
     private PanelSeg.Method method;
 
@@ -37,7 +39,7 @@ class SparkPanelSegFunc implements VoidFunction<String>
             Broadcast<String> LabelClassifyLeNet5_propLabelLeNet5Model
     )
     {
-        this.targetFolder = Paths.get(TargetFolder.value());
+        this.TargetFolder = TargetFolder;
         this.method = Method.value();
 
         LabelDetectHog.labelSetsHOG = LabelDetectHog_labelSetsHOG.value();
@@ -56,6 +58,8 @@ class SparkPanelSegFunc implements VoidFunction<String>
     @Override
     public void call(String imagePath) throws Exception
     {
+        targetFolder = Paths.get(TargetFolder.value());
+
         String imageFile = Paths.get(imagePath).toFile().getName();
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);

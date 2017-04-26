@@ -42,7 +42,8 @@ final class PanelSplitEdgeBox
     Mat edgeCCStats;        //The binary edge connected components statistics
     Mat edgeCCCentroids;    //The binary edge connected components centroids
 
-    List<Rect> separatorBands;   //The separatorBands (vertical and horizontal uniform bands or high gradient lines) detected.
+    List<Rect> separatorBands;  //The separatorBands (vertical and horizontal uniform bands) detected.
+    List<Rect> separatorLines;  //The separatorLines (vertical and horizontal high gradient edges) detected.
     List<CCInfo> edgeConnectedComponents; //The connected components after some merging
 
     void split()
@@ -53,7 +54,10 @@ final class PanelSplitEdgeBox
         createBinaryEdgeMap();
         imshow("Binary Edges", binaryEdgeMap);
 
-        splitByEdgeMap();
+        Rect roi = new Rect(0, 0, binaryEdgeMap.cols(), binaryEdgeMap.rows());
+        separatorBands = new ArrayList<>();
+        separatorLines = new ArrayList<>();
+        split(roi);
 
         collectEdgeConnectedComponents();
         mergeCompletelyEnclosedCCs();
@@ -86,69 +90,63 @@ final class PanelSplitEdgeBox
         threshold(grayEdge, binaryEdgeMap, 0, 255, THRESH_BINARY | THRESH_OTSU);
     }
 
-    void splitByEdgeMap()
-    {
-        Rect roi = new Rect(0, 0, binaryEdgeMap.cols(), binaryEdgeMap.rows());
-
-        separatorBands = new ArrayList<>();
-        splitByEdgeMap(roi);
-    }
-
-    void splitByEdgeMap(Rect roi_orig)
+    void split(Rect roi_orig)
     {
         //Before we do any analysis, we update its bounding box.
         Mat edges = new Mat(binaryEdgeMap, roi_orig); //Work on ROI only
         Rect roi_inside = AlgOpenCVEx.findBoundingbox(edges);
         Rect roi = new Rect(roi_orig.x()+roi_inside.x(), roi_orig.y() + roi_inside.y(), roi_inside.width(), roi_inside.height());
 
-        Rect verCut = verticalCut(roi);
-        Rect horCut = horizontalCut(roi);
+        Rect verBand = verticalCutByBand(roi);
+        Rect horBand = horizontalCutByBand(roi);
+        Rect verLine = verticalCutByLine(roi);
+        Rect horLine = horizontalCutByLine(roi);
 
-        if (verCut == null && horCut == null) return;
+        if (verBand == null && horBand == null) return;
 
         boolean toCutVertical = true;
-        if (verCut == null && horCut !=null) toCutVertical = false;
-        else if (verCut != null && horCut != null)
+        if (verBand == null && horBand !=null) toCutVertical = false;
+        else if (verBand != null && horBand != null)
         {
-            if (verCut.width() < horCut.height()) toCutVertical = false;
+            if (verBand.width() < horBand.height()) toCutVertical = false;
         }
 
         if (toCutVertical)
         {
             //Recover to original roi
-            verCut = new Rect(verCut.x(), roi_orig.y(), verCut.width(), roi_orig.height());
-            separatorBands.add(verCut);
+            verBand = new Rect(verBand.x(), roi_orig.y(), verBand.width(), roi_orig.height());
+            separatorBands.add(verBand);
 
             //Break into 2 zones vertically
             int left, top, right, bottom;
-            left = roi_orig.x(); top = roi_orig.y(); right = verCut.x()+verCut.width()/2; bottom = top + roi_orig.height();
+            left = roi_orig.x(); top = roi_orig.y(); right = verBand.x()+verBand.width()/2; bottom = top + roi_orig.height();
             Rect roi1 = new Rect(left, top, right-left, bottom-top);
-            splitByEdgeMap(roi1);
+            split(roi1);
 
-            left = verCut.x()+verCut.width()/2; top = roi_orig.y(); right = roi_orig.x()+roi_orig.width(); bottom = top + roi_orig.height();
+            left = verBand.x()+verBand.width()/2; top = roi_orig.y(); right = roi_orig.x()+roi_orig.width(); bottom = top + roi_orig.height();
             Rect roi2 = new Rect(left, top, right-left, bottom-top);
-            splitByEdgeMap(roi2);
+            split(roi2);
         }
         else
         {
             //Recover to original roi
-            horCut = new Rect(roi_orig.x(), horCut.y(), roi_orig.width(), horCut.height());
-            separatorBands.add(horCut);
+            horBand = new Rect(roi_orig.x(), horBand.y(), roi_orig.width(), horBand.height());
+            separatorBands.add(horBand);
 
             //Break into 2 zones horizontally
             int left, top, right, bottom;
-            left = roi_orig.x(); top = roi_orig.y(); right = roi_orig.x() + roi.width(); bottom = horCut.y()+horCut.height()/2;
+            left = roi_orig.x(); top = roi_orig.y(); right = roi_orig.x() + roi.width(); bottom = horBand.y()+horBand.height()/2;
             Rect roi1 = new Rect(left, top, right-left, bottom-top);
-            splitByEdgeMap(roi1);
+            split(roi1);
 
-            left = roi_orig.x(); top = horCut.y()+horCut.height()/2; right = roi_orig.x()+roi_orig.width(); bottom = roi_orig.y() + roi_orig.height();
+            left = roi_orig.x(); top = horBand.y()+horBand.height()/2; right = roi_orig.x()+roi_orig.width(); bottom = roi_orig.y() + roi_orig.height();
             Rect roi2 = new Rect(left, top, right-left, bottom-top);
-            splitByEdgeMap(roi2);
+            split(roi2);
         }
     }
 
     @Nullable
-    Rect horizontalCut(Rect roi)
+    Rect horizontalCutByBand(Rect roi)
     {
         List<Rect> bands = collectHorizontalBands(roi);
 
@@ -236,7 +234,7 @@ final class PanelSplitEdgeBox
     }
 
     @Nullable
-    Rect verticalCut(Rect roi)
+    Rect verticalCutByBand(Rect roi)
     {
         List<Rect> bands = collectVerticalBands(roi);
 
@@ -332,12 +330,147 @@ final class PanelSplitEdgeBox
         DoubleRawIndexer meanIndexer = meanMat.createIndexer();
         DoubleRawIndexer stddevIndexer = stddevMat.createIndexer();
 
-        double mean = meanIndexer.get(0);
+        //double mean = meanIndexer.get(0);
         double stddev = stddevIndexer.get(0);
 
         if (stddev > 15.0) return false;
 
         return true;
+    }
+
+    void splitByLines()
+    {
+        Rect roi = new Rect(0, 0, binaryEdgeMap.cols(), binaryEdgeMap.rows());
+
+        separatorLines = new ArrayList<>();
+        splitByLines(roi);
+    }
+
+    void splitByLines(Rect roi_orig)
+    {
+        //Before we do any analysis, we update its bounding box.
+        Mat edges = new Mat(binaryEdgeMap, roi_orig); //Work on ROI only
+        Rect roi_inside = AlgOpenCVEx.findBoundingbox(edges);
+        Rect roi = new Rect(roi_orig.x()+roi_inside.x(), roi_orig.y() + roi_inside.y(), roi_inside.width(), roi_inside.height());
+
+        Rect horCut = horizontalCutByLine(roi);
+        Rect verCut = verticalCutByLine(roi);
+
+        if (horCut != null)
+        {
+            //Recover to original roi
+            horCut = new Rect(roi_orig.x(), horCut.y(), roi_orig.width(), horCut.height());
+            separatorLines.add(horCut);
+        }
+
+        //detectLineSegments(roi);
+    }
+
+    @Nullable
+    Rect horizontalCutByLine(Rect roi)
+    {
+        List<Rect> lines = collectHorizontalLines(roi);
+
+        if (lines.size() > 0)
+        {
+            //We find the maximum width
+            Rect maxRect = lines.get(0);
+            for (int i = 1; i < lines.size(); i++)
+            {
+                Rect rect = lines.get(i);
+                if (rect.height() > maxRect.height())
+                    maxRect = rect;
+            }
+            return maxRect;
+        }
+
+        return null;
+    }
+
+    List<Rect> collectHorizontalLines(Rect roi)
+    {
+        Mat edges = new Mat(binaryEdgeMap, roi); //Work on ROI only
+        int height = edges.rows(), width = edges.cols();
+
+        //horizontal projection
+        Mat verProfile = new Mat(height, 1, CV_32FC1);
+        reduce(edges, verProfile, 1, CV_REDUCE_SUM, CV_32FC1); //Horizontal projection generate vertical profile
+
+        //Find all >0.9 runs (high gradient separatorLines)
+        int[] profile = new int[height];
+        FloatRawIndexer verProfileIndex = verProfile.createIndexer();
+        for (int i = 0; i < height; i++)
+        {
+            float f = verProfileIndex.get(0, i);
+            profile[i] = (f/255)/width > 0.8 ? 1 : 0;
+        }
+        //Calculate Gradients
+        int[] grads = new int[height];
+        for (int i = 1; i < height; i++)
+        {
+            int p1 = profile[i], p0 = profile[i-1];
+            grads[i] = p1 - p0;
+        }
+        List<Integer> tops = new ArrayList<>(); List<Integer> bottoms = new ArrayList<>();
+        for (int i = 1; i < height; i++)
+        {
+            int grad = grads[i];
+            if (grad > 0)
+            {
+                int top = i; int j;
+                for (j = i+1; j <height; j++)
+                {
+                    grad = grads[j];
+                    if (grad < 0)
+                    {
+                        int bottom = j;
+                        tops.add(top); bottoms.add(bottom);
+                        break;
+                    }
+                }
+                i = j;
+            }
+        }
+
+        List<Rect> rects = new ArrayList<>();
+        for (int i = 0; i < tops.size(); i++)
+        {
+            int top = tops.get(i), bottom = bottoms.get(i);
+
+            //Ignore some simple cases
+            if (top < 60 || height - bottom < 60) continue; //If the line is too close to the top and bottom boundary, we ignore
+
+            Rect rect = new Rect(roi.x(), roi.y()+ top, roi.width(), bottom - top);
+            rects.add(rect);
+        }
+
+        return rects;
+    }
+
+    Rect verticalCutByLine(Rect roi)
+    {
+        return null;
+    }
+
+
+    void detectLineSegments(Rect roi)
+    {
+        Mat edges = new Mat(structuredEdge, roi); //Work on ROI only
+        Mat imgEdge = new Mat(edges.rows(), edges.cols(), CV_8UC1);
+        threshold(edges, imgEdge, 0.1, 255, THRESH_BINARY_INV);
+        imshow("Binary Edges", imgEdge);
+
+        opencv_core.Mat lines = new opencv_core.Mat();		lsd.detect(imgEdge, lines);
+
+        opencv_core.Mat imageLines = new opencv_core.Mat(imgEdge.rows(), imgEdge.cols(), CV_8UC1, opencv_core.Scalar.all(0));
+        lsd.drawSegments(imageLines, lines);
+        cvtColor(imageLines, imageLines, COLOR_BGRA2GRAY);
+        imshow("Gray Lines", imageLines);
+
+        threshold(imageLines, imageLines, 1, 255, THRESH_BINARY_INV);
+        imshow("Binary Lines", imageLines);
+
+        //return imageLines;
     }
 
     void collectEdgeConnectedComponents()
@@ -416,25 +549,14 @@ final class PanelSplitEdgeBox
             rectangle(img, rect, new Scalar(0, 255, 0, 0), CV_FILLED, 8, 0);
         }
 
+        //Draw separatorLines
+        for (int i = 0; i < separatorLines.size(); i++)
+        {
+            Rect rect = separatorLines.get(i);
+            rectangle(img, rect, new Scalar(0, 0, 255, 0), CV_FILLED, 8, 0);
+        }
+
         imshow("Panel Candidates", img);
     }
 
-    void detectLineSegments()
-    {
-        Mat imgEdge = new Mat(structuredEdge.rows(), structuredEdge.cols(), CV_8UC1);
-        threshold(structuredEdge, imgEdge, 0.1, 255, THRESH_BINARY_INV);
-        imshow("Binary Edges", imgEdge);
-
-        opencv_core.Mat lines = new opencv_core.Mat();		lsd.detect(imgEdge, lines);
-
-        opencv_core.Mat imageLines = new opencv_core.Mat(imgEdge.rows(), imgEdge.cols(), CV_8UC1, opencv_core.Scalar.all(0));
-        lsd.drawSegments(imageLines, lines);
-        cvtColor(imageLines, imageLines, COLOR_BGRA2GRAY);
-        imshow("Gray Lines", imageLines);
-
-        threshold(imageLines, imageLines, 1, 255, THRESH_BINARY_INV);
-        imshow("Binary Lines", imageLines);
-
-        //return imageLines;
-    }
 }

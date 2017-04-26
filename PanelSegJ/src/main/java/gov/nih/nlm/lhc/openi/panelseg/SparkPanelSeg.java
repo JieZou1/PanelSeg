@@ -176,7 +176,7 @@ class SparkPanelSegFunc implements VoidFunction<String>
         String imageFile = Paths.get(imagePath).toFile().getName();
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);
-        saveSegResult(imageFile, image, panels);
+        //saveSegResult(imageFile, image, panels);
     }
 
     private void saveSegResult(String imageFile, opencv_core.Mat image, List<Panel> panels)

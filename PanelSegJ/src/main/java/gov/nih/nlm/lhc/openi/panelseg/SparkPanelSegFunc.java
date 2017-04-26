@@ -74,17 +74,29 @@ class SparkPanelSegFunc implements VoidFunction<String>
         targetFolder = Paths.get(TargetFolder.value());
         method = Method.value();
 
-        LabelDetectHog.labelSetsHOG = LabelDetectHog_labelSetsHOG.value();
-        LabelDetectHog.models = LabelDetectHog_models.value();
+        if (LabelDetectHog.models == null)
+        {
+            LabelDetectHog.labelSetsHOG = LabelDetectHog_labelSetsHOG.value();
+            LabelDetectHog.models = LabelDetectHog_models.value();
+        }
 
-        LabelClassifyHogSvm.svmModel = LabelClassifyHogSvm_svmModel.value();
+        if (LabelClassifyHogSvm.svmModel == null)
+        {
+            LabelClassifyHogSvm.svmModel = LabelClassifyHogSvm_svmModel.value();
+        }
 
-        LabelSequenceClassify.svmModels = LabelSequenceClassify_svmModels.value();
-        LabelSequenceClassify.mins = LabelSequenceClassify_mins.value();
-        LabelSequenceClassify.ranges = LabelSequenceClassify_ranges.value();
+        if (LabelSequenceClassify.svmModels == null)
+        {
+            LabelSequenceClassify.svmModels = LabelSequenceClassify_svmModels.value();
+            LabelSequenceClassify.mins = LabelSequenceClassify_mins.value();
+            LabelSequenceClassify.ranges = LabelSequenceClassify_ranges.value();
+        }
 
-        LabelClassifyLeNet5.leNet5Model = LabelClassifyLeNet5_leNet5Model.value();
-        LabelClassifyLeNet5.propLabelLeNet5Model = LabelClassifyLeNet5_propLabelLeNet5Model.value();
+        if (LabelClassifyLeNet5.leNet5Model == null)
+        {
+            LabelClassifyLeNet5.leNet5Model = LabelClassifyLeNet5_leNet5Model.value();
+            LabelClassifyLeNet5.propLabelLeNet5Model = LabelClassifyLeNet5_propLabelLeNet5Model.value();
+        }
 
         String imageFile = Paths.get(imagePath).toFile().getName();
         opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);

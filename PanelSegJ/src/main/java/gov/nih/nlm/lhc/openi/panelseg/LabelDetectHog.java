@@ -20,7 +20,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
 final class LabelDetectHog
 {
     static String[] labelSetsHOG = {"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"};
-    static float[][] models;
+    static float[][] models = null;
 //    static final String[] labelSetsHOG = {
 //        "A", "a", "B", "bh", "CceG", "D", "d", "E", "F", "f", "gq", "H", "IiJjlrt", "Kk", "L", "Mm", "Nn", "OoQ", "Pp", "R", "Ss", "T", "UuVvWw", "XxYyZz"
 //    };

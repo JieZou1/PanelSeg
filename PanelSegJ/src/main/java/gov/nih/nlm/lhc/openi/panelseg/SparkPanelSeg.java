@@ -34,6 +34,12 @@ public class SparkPanelSeg
             System.exit(-1);
         }
 
+        panelSeg(args);
+        //panelSegSimple(args);
+    }
+
+    static void panelSeg(String[] args) throws Exception
+    {
         final SparkConf sparkConf = new SparkConf().setAppName("Panel Segmentation");
         final JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
@@ -104,102 +110,24 @@ public class SparkPanelSeg
 
         System.out.println("Completed!");
     }
+
+    static void panelSegSimple(String[] args) throws Exception
+    {
+        final SparkConf sparkConf = new SparkConf().setAppName("Panel Segmentation");
+        final JavaSparkContext sc = new JavaSparkContext(sparkConf);
+
+        //Clear and broadcast targetFolder
+        Path targetFolder = Paths.get("/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval");
+        AlgMiscEx.createClearFolder(targetFolder);
+        AlgMiscEx.createClearFolder(targetFolder.resolve("preview"));
+        System.out.println(targetFolder.toString() + "is cleaned!");
+
+        //Processing images
+        JavaRDD<String> lines = sc.textFile(args[0]);
+        lines.foreach(new SparkPanelSegFuncSimple());
+
+        System.out.println("Completed!");
+    }
+
 }
 
-class SparkPanelSegFunc implements VoidFunction<String>
-{
-    private Broadcast<String> TargetFolder;    //The folder for saving the result
-    private Broadcast<PanelSeg.Method> Method;
-
-    private Broadcast<String[]> LabelDetectHog_labelSetsHOG;
-    private Broadcast<float[][]> LabelDetectHog_models;
-
-    private Broadcast<svm_model> LabelClassifyHogSvm_svmModel;
-
-    private Broadcast<svm_model[]> LabelSequenceClassify_svmModels;
-    private Broadcast<float[][]> LabelSequenceClassify_mins;
-    private Broadcast<float[][]> LabelSequenceClassify_ranges;
-
-    private Broadcast<MultiLayerNetwork> LabelClassifyLeNet5_leNet5Model;
-    private Broadcast<String> LabelClassifyLeNet5_propLabelLeNet5Model;
-
-    private Path targetFolder;
-    private PanelSeg.Method method;
-
-    public SparkPanelSegFunc(
-            Broadcast<String> TargetFolder,
-            Broadcast<PanelSeg.Method> Method,
-            Broadcast<String[]> LabelDetectHog_labelSetsHOG,
-            Broadcast<float[][]> LabelDetectHog_models,
-            Broadcast<svm_model> LabelClassifyHogSvm_svmModel,
-            Broadcast<svm_model[]> LabelSequenceClassify_svmModels,
-            Broadcast<float[][]> LabelSequenceClassify_mins,
-            Broadcast<float[][]> LabelSequenceClassify_ranges,
-            Broadcast<MultiLayerNetwork> LabelClassifyLeNet5_leNet5Model,
-            Broadcast<String> LabelClassifyLeNet5_propLabelLeNet5Model
-                            )
-    {
-        this.TargetFolder = TargetFolder;
-        this.Method = Method;
-
-        this.LabelDetectHog_labelSetsHOG = LabelDetectHog_labelSetsHOG;
-        this.LabelDetectHog_models = LabelDetectHog_models;
-
-        this.LabelClassifyHogSvm_svmModel = LabelClassifyHogSvm_svmModel;
-
-        this.LabelSequenceClassify_svmModels = LabelSequenceClassify_svmModels;
-        this.LabelSequenceClassify_mins = LabelSequenceClassify_mins;
-        this.LabelSequenceClassify_ranges = LabelSequenceClassify_ranges;
-
-        this.LabelClassifyLeNet5_leNet5Model = LabelClassifyLeNet5_leNet5Model;
-        this.LabelClassifyLeNet5_propLabelLeNet5Model = LabelClassifyLeNet5_propLabelLeNet5Model;
-    }
-
-    @Override
-    public void call(String imagePath) throws Exception
-    {
-        targetFolder = Paths.get(TargetFolder.value());
-        method = Method.value();
-
-        LabelDetectHog.labelSetsHOG = LabelDetectHog_labelSetsHOG.value();
-        LabelDetectHog.models = LabelDetectHog_models.value();
-
-        LabelClassifyHogSvm.svmModel = LabelClassifyHogSvm_svmModel.value();
-
-        LabelSequenceClassify.svmModels = LabelSequenceClassify_svmModels.value();
-        LabelSequenceClassify.mins = LabelSequenceClassify_mins.value();
-        LabelSequenceClassify.ranges = LabelSequenceClassify_ranges.value();
-
-        LabelClassifyLeNet5.leNet5Model = LabelClassifyLeNet5_leNet5Model.value();
-        LabelClassifyLeNet5.propLabelLeNet5Model = LabelClassifyLeNet5_propLabelLeNet5Model.value();
-
-        String imageFile = Paths.get(imagePath).toFile().getName();
-        opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
-        List<Panel> panels = PanelSeg.segment(image, method);
-        saveSegResult(imageFile, image, panels);
-    }
-
-    private void saveSegResult(String imageFile, opencv_core.Mat image, List<Panel> panels)
-    {
-        //Save result in iPhotoDraw XML file
-        String xmlFile = FilenameUtils.removeExtension(imageFile) + "_data.xml";
-        Path xmlPath = targetFolder.resolve(xmlFile);
-        try {
-            iPhotoDraw.savePanelSeg(xmlPath.toFile(), panels);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //Save original jpg file
-        Path origPath = targetFolder.resolve(imageFile);
-        opencv_imgcodecs.imwrite(origPath.toString(), image);
-
-        //Save preview in jpg file
-        Path previewFolder = targetFolder.resolve("preview");
-        if (!Files.exists(previewFolder)) previewFolder.toFile().mkdir();
-
-        Path previewPath = previewFolder.resolve(imageFile);
-        opencv_core.Mat preview = Figure.drawAnnotation(image, panels);
-        opencv_imgcodecs.imwrite(previewPath.toString(), preview);
-    }
-}

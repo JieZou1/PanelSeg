@@ -29,7 +29,7 @@ final class LabelClassifyHogSvm
 {
     protected static final Logger log = LoggerFactory.getLogger(LabelClassifyHogSvm.class);
 
-    static svm_model svmModel;
+    static svm_model svmModel = null;
     private static String propSvmModel;
 
     static void initialize(String propSvmModel) throws Exception

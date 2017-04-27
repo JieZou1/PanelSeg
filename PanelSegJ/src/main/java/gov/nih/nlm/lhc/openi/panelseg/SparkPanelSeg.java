@@ -1,22 +1,15 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
 import libsvm.svm_model;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.broadcast.Broadcast;
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_imgcodecs;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
-import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
 /**
@@ -34,8 +27,8 @@ public class SparkPanelSeg
             System.exit(-1);
         }
 
-        panelSeg(args);
-        //panelSegSimple(args);
+        //panelSeg(args);
+        test(args);
     }
 
     static void panelSeg(String[] args) throws Exception
@@ -111,9 +104,9 @@ public class SparkPanelSeg
         System.out.println("Completed!");
     }
 
-    static void panelSegSimple(String[] args) throws Exception
+    static void test(String[] args) throws Exception
     {
-        final SparkConf sparkConf = new SparkConf().setAppName("Panel Segmentation");
+        final SparkConf sparkConf = new SparkConf().setAppName("Test");
         final JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
         //Clear and broadcast targetFolder
@@ -124,7 +117,7 @@ public class SparkPanelSeg
 
         //Processing images
         JavaRDD<String> lines = sc.textFile(args[0]);
-        lines.foreach(new SparkPanelSegFuncSimple());
+        lines.foreach(new SparkTestFunc());
 
         System.out.println("Completed!");
     }

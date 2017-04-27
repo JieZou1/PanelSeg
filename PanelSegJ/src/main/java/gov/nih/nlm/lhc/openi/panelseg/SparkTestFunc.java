@@ -10,13 +10,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static org.bytedeco.javacpp.opencv_core.CV_8U;
+import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
+import static org.bytedeco.javacpp.opencv_imgproc.rectangle;
 
 /**
  * Created by jzou on 4/26/2017.
  */
-class SparkPanelSegFuncSimple implements VoidFunction<String>
+class SparkTestFunc implements VoidFunction<String>
 {
     private Path targetFolder;
     private PanelSeg.Method method;
@@ -25,12 +29,22 @@ class SparkPanelSegFuncSimple implements VoidFunction<String>
     public void call(String imagePath) throws Exception
     {
         targetFolder = Paths.get("/hadoop/storage/user/jzou/projects/PanelSeg/Exp/eval");
-        method = PanelSeg.Method.LabelDetHog;
+        //method = PanelSeg.Method.LabelDetHog;
 
         String imageFile = Paths.get(imagePath).toFile().getName();
-        opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
-        List<Panel> panels = PanelSeg.segment(image, method);
-        saveSegResult(imageFile, image, panels);
+        //opencv_core.Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
+        opencv_core.Mat image = null;
+        for (int i = 0; i < 100; i++)
+        {
+            image = new opencv_core.Mat(1000, 1000, CV_8UC3);
+            rectangle(image, new opencv_core.Rect(100, 100, 100, 100), new opencv_core.Scalar(0, 0, 255, 0));
+        }
+
+        Path origPath = targetFolder.resolve(imageFile);
+        opencv_imgcodecs.imwrite(origPath.toString(), image);
+
+//        List<Panel> panels = PanelSeg.segment(image, method);
+//        saveSegResult(imageFile, image, panels);
     }
 
     private void saveSegResult(String imageFile, opencv_core.Mat image, List<Panel> panels)

@@ -27,8 +27,8 @@ public class SparkPanelSeg
             System.exit(-1);
         }
 
-        //panelSeg(args);
-        test(args);
+        panelSeg(args);
+        //test(args);
     }
 
     static void panelSeg(String[] args) throws Exception
@@ -88,7 +88,7 @@ public class SparkPanelSeg
         System.out.println("LabelClassifyLeNet5 model is broad-casted!");
 
         //Processing images
-        JavaRDD<String> lines = sc.textFile(args[0]);
+        JavaRDD<String> lines = sc.textFile(args[0], 100);
         lines.foreach(new SparkPanelSegFunc(
                 TargetFolder,
                 Method,

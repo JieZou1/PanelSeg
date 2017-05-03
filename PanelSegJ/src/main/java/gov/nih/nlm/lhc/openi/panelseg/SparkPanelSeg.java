@@ -116,7 +116,7 @@ public class SparkPanelSeg
         System.out.println(targetFolder.toString() + "is cleaned!");
 
         //Processing images
-        JavaRDD<String> lines = sc.textFile(args[0]);
+        JavaRDD<String> lines = sc.textFile(args[0], 10);
         lines.foreach(new SparkTestFunc());
 
         System.out.println("Completed!");

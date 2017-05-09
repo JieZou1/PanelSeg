@@ -25,7 +25,9 @@ public class PanelSeg
         LabelRegHogLeNet5Svm, LabelRegHogLeNet5SvmBeam, LabelRegHogLeNet5SvmAlignment,
 
         PanelSplitSantosh, PanelSplitJaylene,
-        PanelSplitEdgeBox
+        PanelSplitEdgeBox,
+
+        PanelSeg1
     }
 
     //Below info is collected from LabelStatistics.txt
@@ -145,6 +147,9 @@ public class PanelSeg
             case PanelSplitJaylene: return;
             case PanelSplitEdgeBox:
                 PanelSplitEdgeBox.initialize();
+                return;
+            case PanelSeg1:
+                PanelSeg1.initialize(properties);
                 return;
 
             default:
@@ -308,7 +313,11 @@ public class PanelSeg
                 split.split();
                 return figure.getSegResultWithoutPadding();
             }
-
+            case PanelSeg1:{
+                PanelSeg1 seg = new PanelSeg1(figure);
+                seg.segment();
+                return figure.getSegResultWithoutPadding();
+            }
 
             default:
             {

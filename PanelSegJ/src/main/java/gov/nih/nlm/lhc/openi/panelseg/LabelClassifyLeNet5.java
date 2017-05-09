@@ -39,6 +39,7 @@ final class LabelClassifyLeNet5
     {
         propLabelLeNet5Model = properties.getProperty("LabelLeNet5Model");
         if (propLabelLeNet5Model == null) throw new Exception("ERROR: LabelLeNet5Model property is Missing.");
+        initialize(propLabelLeNet5Model);
     }
 
     private Figure figure;

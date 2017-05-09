@@ -102,46 +102,89 @@ final class PanelSplitEdgeBox
         Rect verLine = verticalCutByLine(roi);
         Rect horLine = horizontalCutByLine(roi);
 
-        if (verBand == null && horBand == null) return;
+        if (verBand != null || horBand != null)
+        {   //Cut by bands
+            boolean toCutVertical = true;
+            if (verBand == null && horBand !=null) toCutVertical = false;
+            else if (verBand != null && horBand != null)
+            {
+                if (verBand.width() < horBand.height()) toCutVertical = false;
+            }
 
-        boolean toCutVertical = true;
-        if (verBand == null && horBand !=null) toCutVertical = false;
-        else if (verBand != null && horBand != null)
-        {
-            if (verBand.width() < horBand.height()) toCutVertical = false;
+            if (toCutVertical)
+            {
+                //Recover to original roi
+                verBand = new Rect(verBand.x(), roi_orig.y(), verBand.width(), roi_orig.height());
+                separatorBands.add(verBand);
+
+                //Break into 2 zones vertically
+                int left, top, right, bottom;
+                left = roi_orig.x(); top = roi_orig.y(); right = verBand.x()+verBand.width()/2; bottom = top + roi_orig.height();
+                Rect roi1 = new Rect(left, top, right-left, bottom-top);
+                split(roi1);
+
+                left = verBand.x()+verBand.width()/2; top = roi_orig.y(); right = roi_orig.x()+roi_orig.width(); bottom = top + roi_orig.height();
+                Rect roi2 = new Rect(left, top, right-left, bottom-top);
+                split(roi2);
+            }
+            else
+            {
+                //Recover to original roi
+                horBand = new Rect(roi_orig.x(), horBand.y(), roi_orig.width(), horBand.height());
+                separatorBands.add(horBand);
+
+                //Break into 2 zones horizontally
+                int left, top, right, bottom;
+                left = roi_orig.x(); top = roi_orig.y(); right = roi_orig.x() + roi.width(); bottom = horBand.y()+horBand.height()/2;
+                Rect roi1 = new Rect(left, top, right-left, bottom-top);
+                split(roi1);
+
+                left = roi_orig.x(); top = horBand.y()+horBand.height()/2; right = roi_orig.x()+roi_orig.width(); bottom = roi_orig.y() + roi_orig.height();
+                Rect roi2 = new Rect(left, top, right-left, bottom-top);
+                split(roi2);
+            }
         }
+        else if (verLine != null || horLine != null)
+        {   //Cut by lines
+            boolean toCutVertical = true;
+            if (verLine == null && horLine != null) toCutVertical = false;
+            else if (verLine != null && horLine != null)
+            {
+                if (verLine.width() < horLine.height()) toCutVertical = false;
+            }
 
-        if (toCutVertical)
-        {
-            //Recover to original roi
-            verBand = new Rect(verBand.x(), roi_orig.y(), verBand.width(), roi_orig.height());
-            separatorBands.add(verBand);
+            if (toCutVertical)
+            {
+                //Recover to original roi
+                verLine = new Rect(verLine.x(), roi_orig.y(), verLine.width(), roi_orig.height());
+                separatorLines.add(verLine);
 
-            //Break into 2 zones vertically
-            int left, top, right, bottom;
-            left = roi_orig.x(); top = roi_orig.y(); right = verBand.x()+verBand.width()/2; bottom = top + roi_orig.height();
-            Rect roi1 = new Rect(left, top, right-left, bottom-top);
-            split(roi1);
+                //Break into 2 zones vertically
+                int left, top, right, bottom;
+                left = roi_orig.x(); top = roi_orig.y(); right = verLine.x()+verLine.width()/2; bottom = top + roi_orig.height();
+                Rect roi1 = new Rect(left, top, right-left, bottom-top);
+                split(roi1);
 
-            left = verBand.x()+verBand.width()/2; top = roi_orig.y(); right = roi_orig.x()+roi_orig.width(); bottom = top + roi_orig.height();
-            Rect roi2 = new Rect(left, top, right-left, bottom-top);
-            split(roi2);
-        }
-        else
-        {
-            //Recover to original roi
-            horBand = new Rect(roi_orig.x(), horBand.y(), roi_orig.width(), horBand.height());
-            separatorBands.add(horBand);
+                left = verLine.x()+verLine.width()/2; top = roi_orig.y(); right = roi_orig.x()+roi_orig.width(); bottom = top + roi_orig.height();
+                Rect roi2 = new Rect(left, top, right-left, bottom-top);
+                split(roi2);
+            }
+            else
+            {
+                //Recover to original roi
+                horLine = new Rect(roi_orig.x(), horLine.y(), roi_orig.width(), horLine.height());
+                separatorLines.add(horLine);
 
-            //Break into 2 zones horizontally
-            int left, top, right, bottom;
-            left = roi_orig.x(); top = roi_orig.y(); right = roi_orig.x() + roi.width(); bottom = horBand.y()+horBand.height()/2;
-            Rect roi1 = new Rect(left, top, right-left, bottom-top);
-            split(roi1);
+                //Break into 2 zones horizontally
+                int left, top, right, bottom;
+                left = roi_orig.x(); top = roi_orig.y(); right = roi_orig.x() + roi.width(); bottom = horLine.y()+horLine.height()/2;
+                Rect roi1 = new Rect(left, top, right-left, bottom-top);
+                split(roi1);
 
-            left = roi_orig.x(); top = horBand.y()+horBand.height()/2; right = roi_orig.x()+roi_orig.width(); bottom = roi_orig.y() + roi_orig.height();
-            Rect roi2 = new Rect(left, top, right-left, bottom-top);
-            split(roi2);
+                left = roi_orig.x(); top = horLine.y()+horLine.height()/2; right = roi_orig.x()+roi_orig.width(); bottom = roi_orig.y() + roi_orig.height();
+                Rect roi2 = new Rect(left, top, right-left, bottom-top);
+                split(roi2);
+            }
         }
     }
 
@@ -343,7 +386,7 @@ final class PanelSplitEdgeBox
         Rect roi = new Rect(0, 0, binaryEdgeMap.cols(), binaryEdgeMap.rows());
 
         separatorLines = new ArrayList<>();
-        splitByLines(roi);
+        //splitByLines(roi);
     }
 
     void splitByLines(Rect roi_orig)
@@ -447,11 +490,85 @@ final class PanelSplitEdgeBox
         return rects;
     }
 
+    @Nullable
     Rect verticalCutByLine(Rect roi)
     {
+        List<Rect> lines = collectVerticalLines(roi);
+
+        if (lines.size() > 0)
+        {
+            //We find the maximum height
+            Rect maxRect = lines.get(0);
+            for (int i = 1; i < lines.size(); i++)
+            {
+                Rect rect = lines.get(i);
+                if (rect.width() > maxRect.width())
+                    maxRect = rect;
+            }
+            return maxRect;
+        }
+
         return null;
     }
 
+    List<Rect> collectVerticalLines(Rect roi)
+    {
+        Mat edges = new Mat(binaryEdgeMap, roi); //Work on ROI only
+        int height = edges.rows(), width = edges.cols();
+
+        //vertical projection
+        Mat horProfile = new Mat(1, width, CV_32FC1);
+        reduce(edges, horProfile, 0, CV_REDUCE_SUM, CV_32FC1); //vertical projection generate horizontal profile
+
+        //Find all >0.8 runs (high gradient separatorLines)
+        int[] profile = new int[width];
+        FloatRawIndexer horProfileIndex = horProfile.createIndexer();
+        for (int i = 0; i < width; i++)
+        {
+            float f = horProfileIndex.get(0, i);
+            profile[i] = (f/255)/height > 0.8 ? 1 : 0;
+        }
+        //Calculate Gradients
+        int[] grads = new int[width];
+        for (int i = 1; i < width; i++)
+        {
+            int p1 = profile[i], p0 = profile[i-1];
+            grads[i] = p1 - p0;
+        }
+        List<Integer> lefts = new ArrayList<>(); List<Integer> rights = new ArrayList<>();
+        for (int i = 1; i < width; i++)
+        {
+            int grad = grads[i];
+            if (grad > 0)
+            {
+                int left = i; int j;
+                for (j = i+1; j <width; j++)
+                {
+                    grad = grads[j];
+                    if (grad < 0)
+                    {
+                        int right = j;
+                        lefts.add(left); rights.add(right);
+                        break;
+                    }
+                }
+                i = j;
+            }
+        }
+
+        List<Rect> rects = new ArrayList<>();
+        for (int i = 0; i < lefts.size(); i++)
+        {
+            int left = lefts.get(i), right = rights.get(i);
+
+            //Ignore some simple cases
+            if (left < 60 || width - right < 60) continue; //If the line is too close to the left and right boundary, we ignore
+
+            Rect rect = new Rect(roi.x() + left, roi.y(), right - left, roi.height());
+            rects.add(rect);
+        }
+        return rects;
+    }
 
     void detectLineSegments(Rect roi)
     {

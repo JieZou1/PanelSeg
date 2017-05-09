@@ -57,6 +57,7 @@ final class ExpPanelSeg extends Exp
             case "PanelSplitSantosh": method = PanelSeg.Method.PanelSplitSantosh; loadPropertiesPanelSplitSantosh(); break;
             case "PanelSplitJaylene": method = PanelSeg.Method.PanelSplitJaylene; loadPropertiesPanelSplitJaylene(); break;
             case "PanelSplitEdgeBox": method = PanelSeg.Method.PanelSplitEdgeBox; loadPropertiesPanelSplitEdgeBox(); break;
+            case "PanelSeg1": method = PanelSeg.Method.PanelSeg1; loadPropertiesPanelSeg1(); break;
             default: throw new Exception("Method " + propMethod + " is Unknown");
         }
         waitKeyContinueOrQuit("Configuration Okay? Press any key to continue, press N to quit");
@@ -155,6 +156,17 @@ final class ExpPanelSeg extends Exp
         propTargetFolder = getProperty("TargetFolder");
     }
 
+    private void loadPropertiesPanelSeg1() throws Exception
+    {
+        propThreads = getProperty("Threads");
+        propListFile = getProperty("ListFile");
+        propTargetFolder = getProperty("TargetFolder");
+        getProperty("LabelSetsHOG");
+        getProperty("LabelHogModel");
+        getProperty("LabelLeNet5Model");
+        getProperty("LabelSvmModel");
+    }
+
     @Override
     void initialize() throws Exception
     {
@@ -178,7 +190,7 @@ final class ExpPanelSeg extends Exp
         super.doWork(k);
 
         Path imagePath = imagePaths.get(k);
-        //if (!imagePath.toString().endsWith("PMC4588850_ogs-58-418-g001.jpg")) return;
+        //if (!imagePath.toString().endsWith("PMC3538770_pone.0053237.g003.jpg")) return;
 
         opencv_core.Mat image = imread(imagePath.toString(), CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);

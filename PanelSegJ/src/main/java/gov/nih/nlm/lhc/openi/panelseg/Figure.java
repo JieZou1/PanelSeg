@@ -324,7 +324,7 @@ class Figure
     static opencv_core.Mat drawAnnotation(opencv_core.Mat img, List<Panel> panels, String style)
     {
         opencv_core.Mat imgAnnotated = new opencv_core.Mat();
-        opencv_core.copyMakeBorder(img, imgAnnotated, 0, 100, 0, 50, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
+        opencv_core.copyMakeBorder(img, imgAnnotated, 0, 50, 0, 50, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
 
         //Draw bounding box first
         for (int i = 0; i < panels.size(); i++)
@@ -332,10 +332,13 @@ class Figure
             Panel panel = panels.get(i);
             opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
 
-            opencv_core.Rect panel_rect = AlgOpenCVEx.Rectangle2Rect(panel.panelRect);
-            opencv_imgproc.rectangle(imgAnnotated, panel_rect, color, 3, 8, 0);
+            if (panel.panelRect != null && !panel.panelRect.isEmpty())
+            {
+                opencv_core.Rect panel_rect = AlgOpenCVEx.Rectangle2Rect(panel.panelRect);
+                opencv_imgproc.rectangle(imgAnnotated, panel_rect, color, 3, 8, 0);
+            }
 
-            if (panel.panelLabel.length() != 0)
+            if (panel.labelRect != null && !panel.labelRect.isEmpty())
             {
                 opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
                 opencv_imgproc.rectangle(imgAnnotated, label_rect, color, 1, 8, 0);
@@ -348,17 +351,19 @@ class Figure
             Panel panel = panels.get(i);
             opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
 
-            if (panel.panelLabel.length() != 0)
+            if (panel.panelLabel != null && panel.panelLabel.length() != 0)
             {
+                String label = panel.panelLabel;
+                double score = ((int)(panel.labelScore*1000+0.5))/1000.0;
                 opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(panel.labelRect);
-                opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 50);
-                opencv_imgproc.putText(imgAnnotated, panel.panelLabel, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 5, color, 3, 8, false);
+                opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 10);
+                opencv_imgproc.putText(imgAnnotated, label + " " + Double.toString(score), bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 1, color, 1, 8, false);
             }
         }
 
         {//Draw Style Data
             opencv_core.Scalar scalar = AlgOpenCVEx.getColor(1);
-            opencv_core.Point bottom_left = new opencv_core.Point(0, img.rows() + 100);
+            opencv_core.Point bottom_left = new opencv_core.Point(0, img.rows() + 30);
             opencv_imgproc.putText(imgAnnotated, style, bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 2, scalar, 3, 8, false);
         }
 

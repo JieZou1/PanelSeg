@@ -38,6 +38,12 @@ class Figure
     List<Panel> panels;	//The panels of this figure, either loaded from GT data or segmented by an algorithm.
     List<List<LabelBeamSearch.BeamItem>> beams; //The beam search results,
 
+    List<Panel> panelsUniformBand;  //Panel candidates based on uniform bands
+    List<Panel> panelsLabelHoGSvm;  //Panel label candidates based on HoG detection + LeNet5 + SVM + Beam Search
+
+    opencv_core.Mat structuredEdge;     //The edges detected by StructuredEdgeDetection
+    opencv_core.Mat binaryEdgeMap;      //The binary edge map after Otsu thresholding
+
     /**
      * Constructor help function, used by all ctors.
      * @param img BGR image

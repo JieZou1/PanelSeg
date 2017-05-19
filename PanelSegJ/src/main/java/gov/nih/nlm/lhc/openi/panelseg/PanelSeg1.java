@@ -26,11 +26,11 @@ import static org.bytedeco.javacpp.opencv_highgui.waitKey;
 public class PanelSeg1
 {
     Figure figure;
-    private List<Panel> panelsUniformBand;  //Panel candidates based on uniform bands
-    private List<Panel> panelsLabelHoGSvm;  //Panel label candidates based on HoG detection + LeNet5 + SVM
 
     List<Panel> panels;         //The panels
-    List<List<Panel>> labels;   //The list of labels assigned to each of the panels
+    List<List<Panel>> labelSets; //The list of labels assigned to each of the panels
+    private List<Panel> panelsT;         //Temp panels
+    private List<List<Panel>> labelSetsT; //Temp list of labels assigned to each of the panels
 
     static void initialize(Properties properties) throws Exception
     {
@@ -38,6 +38,8 @@ public class PanelSeg1
         LabelClassifyLeNet5.initialize(properties);
         LabelClassifyHogSvm.initialize(properties);
         LabelSequenceClassify.initialize(properties);
+
+        PanelSplitStructuredEdge.initialize();
     }
 
     PanelSeg1(Figure figure) {this.figure = figure; }
@@ -45,13 +47,34 @@ public class PanelSeg1
     void segment() throws Exception
     {
         //Split based on Uniform Bands
-        panelsUniformBand = splitUniformBands();
+        figure.panelsUniformBand = splitUniformBands();
 
         //Label Recognize using HoG + SVM + Beam Search
-        panelsLabelHoGSvm = labelRegHogSvm();
+        figure.panelsLabelHoGSvm = labelRegHogSvm();
 
-        //Merge panels with labels to generate final result
-        mergePanels();
+        //No labelSets are detected, and there is only one panel.
+        //This is reasonable to be a single panel figure without labelSets
+        if (figure.panelsLabelHoGSvm.size() == 0 && figure.panelsUniformBand.size() == 1)
+        {
+            figure.panels = figure.panelsUniformBand;
+        }
+        else
+        {   //Merge/split panels with labelSets to generate final result
+            panels = new ArrayList<>(); labelSets = new ArrayList<>();
+            for (int i = 0; i < figure.panelsUniformBand.size(); i++)
+            {
+                panels.add(figure.panelsUniformBand.get(i));
+                labelSets.add(new ArrayList<>());
+            }
+
+            //Merge split-panels and recognized-panel-labelSets
+            matchPanels();
+
+            //Reach Here: panels and labelSets are merged and saved in this.panels and this.labelSets
+            //1. Handle panels with matching labelSets, remove or further splitting
+            //2. Handle panels without matching labelSets, merge to the closet one or adding a label
+            //structuredEdgeAnalysis();
+        }
 
         displayResults();
     }
@@ -90,33 +113,12 @@ public class PanelSeg1
         return figure.getSegResultWithPadding();
     }
 
-    void mergePanels()
-    {
-        panels = new ArrayList<>(); labels = new ArrayList<>();
-        for (int i = 0; i < panelsUniformBand.size(); i++)
-        {
-            panels.add(panelsUniformBand.get(i));
-            labels.add(new ArrayList<>());
-        }
-
-        if (panelsLabelHoGSvm.size() == 0 && panelsUniformBand.size() == 1)
-        {   //No labels are detected, and there is only one panel.
-            //This is reasonable to be a single panel figure without labels
-            figure.panels = panelsUniformBand;
-            return;
-        }
-
-        //Merge split panels and recognized panel labels
-        matchPanels();
-
-    }
-
     void matchPanels()
     {
-        //Assign labels to the closet panels
-        for (int i = 0; i < panelsLabelHoGSvm.size(); i++)
+        //Assign labelSets to the closet panels
+        for (int i = 0; i < figure.panelsLabelHoGSvm.size(); i++)
         {
-            Panel label = panelsLabelHoGSvm.get(i);
+            Panel label = figure.panelsLabelHoGSvm.get(i);
 
             //find max overlapping
             int maxIndex = -1; double maxSize = -1;
@@ -133,7 +135,7 @@ public class PanelSeg1
             }
             if (maxIndex != -1)
             {
-                labels.get(maxIndex).add(label);
+                labelSets.get(maxIndex).add(label);
                 continue;
             }
 
@@ -169,57 +171,106 @@ public class PanelSeg1
                     minDistance = distance; minIndex = j;
                 }
             }
-            labels.get(minIndex).add(label);
+            labelSets.get(minIndex).add(label);
         }
     }
+
+    void structuredEdgeAnalysis()
+    {
+        PanelSplitStructuredEdge splitStructuredEdge = new PanelSplitStructuredEdge(figure);
+        splitStructuredEdge.detectEdges();
+
+        //Process panels which has matching labels.
+        // We either remove the extra labels, or split into more panels
+        panelsT = new ArrayList<>(); labelSetsT = new ArrayList<>();
+        for (int i = 0; i < this.panels.size(); i++)
+        {
+            Panel panel = this.panels.get(i);
+            List<Panel> labelSet = this.labelSets.get(i);
+
+            if (labelSet.size() == 0 || labelSet.size() == 1) {
+                panelsT.add(panel);
+                labelSetsT.add(labelSet);
+                continue;
+            }
+
+            splitStructuredEdge.split(AlgOpenCVEx.Rectangle2Rect(panel.panelRect));
+        }
+
+        //complete analysis, save the result
+//        panels = panelsT;
+//        labelSets = labelSetsT;
+
+        //Process panels which has no matching labels.
+        //We either merge it into the existing panel or add labels
+
+        for (int i = 0; i < this.panels.size(); i++)
+        {
+            Panel panel = this.panels.get(i);
+            List<Panel> labelSet = this.labelSets.get(i);
+        }
+
+        //complete analysis, save the result
+//        panels = panelsT;
+//        labelSets = labelSetsT;
+    }
+
+    void handlePanelWithLabels(Panel panel, List<Panel> labelSet)
+    {
+
+    }
+
 
     void displayResults()
     {
         imshow("Image", figure.imageOriginal);
 
-        opencv_core.Mat uniformPanels = Figure.drawAnnotation(figure.imageColor, panelsUniformBand);
+        opencv_core.Mat uniformPanels = Figure.drawAnnotation(figure.imageColor, figure.panelsUniformBand);
         imshow("Uniform Panels", uniformPanels);
 
-        opencv_core.Mat labelPanels = Figure.drawAnnotation(figure.imageColor, panelsLabelHoGSvm);
+        opencv_core.Mat labelPanels = Figure.drawAnnotation(figure.imageColor, figure.panelsLabelHoGSvm);
         imshow("Panel Labels", labelPanels);
 
         opencv_core.Mat matchingResult = new opencv_core.Mat();
         opencv_core.copyMakeBorder(figure.imageColor, matchingResult, 0, 50, 0, 50, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());
-        for (int i = 0; i < panels.size(); i++)
-        {
-            Panel panel = panels.get(i);
-            List<Panel> labels = this.labels.get(i);
-            opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
+        if (panels != null) {
+            for (int i = 0; i < panels.size(); i++) {
+                Panel panel = panels.get(i);
+                List<Panel> labels = this.labelSets.get(i);
+                opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
 
-            if (panel.panelRect != null && !panel.panelRect.isEmpty())
-            {
-                opencv_core.Rect panel_rect = AlgOpenCVEx.Rectangle2Rect(panel.panelRect);
-                opencv_imgproc.rectangle(matchingResult, panel_rect, color, 3, 8, 0);
+                if (panel.panelRect != null && !panel.panelRect.isEmpty()) {
+                    opencv_core.Rect panel_rect = AlgOpenCVEx.Rectangle2Rect(panel.panelRect);
+                    opencv_imgproc.rectangle(matchingResult, panel_rect, color, 3, 8, 0);
+                }
+                for (int j = 0; j < labels.size(); j++) {
+                    Panel label = labels.get(j);
+                    opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(label.labelRect);
+                    opencv_imgproc.rectangle(matchingResult, label_rect, color, 1, 8, 0);
+                }
             }
-            for (int j = 0; j < labels.size(); j++)
-            {
-                Panel label = labels.get(j);
-                opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(label.labelRect);
-                opencv_imgproc.rectangle(matchingResult, label_rect, color, 1, 8, 0);
-            }
-        }
 
-        for (int i = 0; i < this.panels.size(); i++)
-        {
-            List<Panel> labels = this.labels.get(i);
-            opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
-            for (int j = 0; j < labels.size(); j++)
-            {
-                Panel label = labels.get(j);
-                opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(label.labelRect);
+            for (int i = 0; i < this.panels.size(); i++) {
+                List<Panel> labels = this.labelSets.get(i);
+                opencv_core.Scalar color = AlgOpenCVEx.getColor(i);
+                for (int j = 0; j < labels.size(); j++) {
+                    Panel label = labels.get(j);
+                    opencv_core.Rect label_rect = AlgOpenCVEx.Rectangle2Rect(label.labelRect);
 
-                String labelStr = label.panelLabel;
-                double score = ((int)(label.labelScore*1000+0.5))/1000.0;
-                opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 10);
-                opencv_imgproc.putText(matchingResult, labelStr + " " + Double.toString(score), bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 1, color, 1, 8, false);
+                    String labelStr = label.panelLabel;
+                    double score = ((int) (label.labelScore * 1000 + 0.5)) / 1000.0;
+                    opencv_core.Point bottom_left = new opencv_core.Point(label_rect.x() + label_rect.width(), label_rect.y() + label_rect.height() + 10);
+                    opencv_imgproc.putText(matchingResult, labelStr + " " + Double.toString(score), bottom_left, opencv_imgproc.CV_FONT_HERSHEY_PLAIN, 1, color, 1, 8, false);
+                }
             }
         }
         imshow("Matching Result", matchingResult);
+
+        if (figure.structuredEdge != null)
+        {
+            imshow("StructuredEdges", figure.structuredEdge);
+            imshow("Binary Edges", figure.binaryEdgeMap);
+        }
 
         opencv_core.Mat segResult = new opencv_core.Mat();
         opencv_core.copyMakeBorder(figure.imageColor, segResult, 0, 50, 0, 50, opencv_core.BORDER_CONSTANT, new opencv_core.Scalar());

@@ -4,12 +4,13 @@ import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgproc;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Properties;
 
 import static org.bytedeco.javacpp.opencv_highgui.imshow;
 import static org.bytedeco.javacpp.opencv_highgui.waitKey;
+import static org.bytedeco.javacpp.opencv_imgproc.CV_FILLED;
+import static org.bytedeco.javacpp.opencv_imgproc.rectangle;
 
 /**
  * The complete Panel Segmentation algorithm (Panel Label Recognition + Panel Splitting)
@@ -52,28 +53,34 @@ public class PanelSeg1
         //Label Recognize using HoG + SVM + Beam Search
         figure.panelsLabelHoGSvm = labelRegHogSvm();
 
-        //No labelSets are detected, and there is only one panel.
-        //This is reasonable to be a single panel figure without labelSets
         if (figure.panelsLabelHoGSvm.size() == 0 && figure.panelsUniformBand.size() == 1)
         {
+            //No labelSets are detected, and there is only one panel.
+            //This is reasonable to be a single panel figure without labelSets
             figure.panels = figure.panelsUniformBand;
         }
         else
         {   //Merge/split panels with labelSets to generate final result
-            panels = new ArrayList<>(); labelSets = new ArrayList<>();
-            for (int i = 0; i < figure.panelsUniformBand.size(); i++)
-            {
-                panels.add(figure.panelsUniformBand.get(i));
-                labelSets.add(new ArrayList<>());
-            }
+            this.panels = new ArrayList<>();
+            this.panels.addAll(figure.panelsUniformBand);
 
             //Merge split-panels and recognized-panel-labelSets
-            matchPanels();
+            this.labelSets = matchPanels(panels, figure.panelsLabelHoGSvm); //each panel in panels corresponds to an element in labelSets
 
-            //Reach Here: panels and labelSets are merged and saved in this.panels and this.labelSets
-            //1. Handle panels with matching labelSets, remove or further splitting
-            //2. Handle panels without matching labelSets, merge to the closet one or adding a label
-            //structuredEdgeAnalysis();
+            //check matched result. If valid (one-to-one matching is found), conclude the segmentation)
+            if (isOne2OneMatch(panels, labelSets))
+            {
+                //Labels and Panels are one-to-one matched, we conclude the segmentation
+                setFigurePanels();
+            }
+            else
+            {
+                //Reach Here: panels and labelSets are merged and saved in this.panels and this.labelSets
+                //1. Handle panels with matching labelSets, remove or further splitting
+                //2. Handle panels without matching labelSets, merge to the closet one or adding a label
+                structuredEdgeAnalysis();
+            }
+
         }
 
         displayResults();
@@ -113,12 +120,15 @@ public class PanelSeg1
         return figure.getSegResultWithPadding();
     }
 
-    void matchPanels()
+    List<List<Panel>> matchPanels(List<Panel> panels, List<Panel> labels)
     {
+        List<List<Panel>> labelSets = new ArrayList<>();
+        for (int i = 0; i < panels.size(); i++)  labelSets.add(new ArrayList<>());
+
         //Assign labelSets to the closet panels
-        for (int i = 0; i < figure.panelsLabelHoGSvm.size(); i++)
+        for (int i = 0; i < labels.size(); i++)
         {
-            Panel label = figure.panelsLabelHoGSvm.get(i);
+            Panel label = labels.get(i);
 
             //find max overlapping
             int maxIndex = -1; double maxSize = -1;
@@ -173,20 +183,58 @@ public class PanelSeg1
             }
             labelSets.get(minIndex).add(label);
         }
+        return labelSets;
+    }
+
+    boolean isOne2OneMatch(List<Panel> panels, List<List<Panel>> labelSets)
+    {
+        for (int i = 0; i < panels.size(); i++)
+        {
+            List<Panel> labelSet = labelSets.get(i);
+            if (labelSet == null) return false;
+            if (labelSet.size() != 1) return false;
+        }
+        return true;
+    }
+
+    boolean isValidSplit(List<Panel> panels, List<List<Panel>> labelSets)
+    {
+        for (int i = 0; i < panels.size(); i++)
+        {
+            List<Panel> labelSet = labelSets.get(i);
+            if (labelSet == null || labelSet.size() == 0) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Conclude the segmentation by setting figure.panels.
+     * panels and labelSets are assumed to be one-to-one match.
+     */
+    void setFigurePanels()
+    {
+        figure.panels = new ArrayList<>();
+        for (int i = 0; i < panels.size(); i++)
+        {
+            Panel panel = panels.get(i);
+            Panel label = labelSets.get(i).get(0);
+            label.panelRect = panel.panelRect;
+            figure.panels.add(label);
+        }
     }
 
     void structuredEdgeAnalysis()
     {
         PanelSplitStructuredEdge splitStructuredEdge = new PanelSplitStructuredEdge(figure);
         splitStructuredEdge.detectEdges();
+        splitStructuredEdge.ccAnalysis();
 
         //Process panels which has matching labels.
         // We either remove the extra labels, or split into more panels
         panelsT = new ArrayList<>(); labelSetsT = new ArrayList<>();
         for (int i = 0; i < this.panels.size(); i++)
         {
-            Panel panel = this.panels.get(i);
-            List<Panel> labelSet = this.labelSets.get(i);
+            Panel panel = this.panels.get(i);   List<Panel> labelSet = this.labelSets.get(i);
 
             if (labelSet.size() == 0 || labelSet.size() == 1) {
                 panelsT.add(panel);
@@ -194,16 +242,60 @@ public class PanelSeg1
                 continue;
             }
 
-            splitStructuredEdge.split(AlgOpenCVEx.Rectangle2Rect(panel.panelRect));
+            //Recursively try splitting the panel if more than one labels are linked to this panel
+            //If the split panel contains no labels, we reject this split.
+            Queue<Panel> toSplitPanels = new LinkedList<>();            toSplitPanels.add(panel);
+            Queue<List<Panel>> toSplitLabelSets = new LinkedList<>();   toSplitLabelSets.add(labelSet);
+            while (toSplitPanels.size() > 0)
+            {
+                Panel toSplitPanel = toSplitPanels.poll();  List<Panel> toSplitLabelSet = toSplitLabelSets.poll();
+
+                List<Panel> panelsSplit = splitStructuredEdge.splitByBandAndLine(toSplitPanel);
+                if (panelsSplit.size() != 0)
+                {   //Able to split by structured edges
+                    List<List<Panel>> labelSetsSplit = matchPanels(panelsSplit, toSplitLabelSet);
+                    if (isValidSplit(panelsSplit, labelSetsSplit))
+                    {   //Valid split means no newly created panels without labels
+                        for (int k = 0; k < panelsSplit.size(); k++)
+                        {
+                            Panel panelSplit = panelsSplit.get(k);
+                            List<Panel> labelSetSplit = labelSetsSplit.get(k);
+                            if (labelSetSplit.size() == 1)
+                            {
+                                panelsT.add(panelSplit); labelSetsT.add(labelSetSplit);
+                            }
+                            else
+                            {
+                                toSplitPanels.add(panelSplit); toSplitLabelSets.add(labelSetSplit);
+                            }
+                        }
+                        continue;
+                    }
+                }
+
+                //Reach Here: Not able to split by BandAndLine analysis of structured edges
+                panelsSplit = splitStructuredEdge.splitByCCAnalysis(toSplitPanel, toSplitLabelSet);
+
+                //For now, we simply keep the smaller label
+                List<Panel> smallestLabel = new  ArrayList();
+                smallestLabel.add(smallestLabel(toSplitLabelSet));
+                panelsT.add(toSplitPanel); labelSetsT.add(smallestLabel);
+            }
         }
 
         //complete analysis, save the result
-//        panels = panelsT;
-//        labelSets = labelSetsT;
+        panels = panelsT; labelSets = labelSetsT;
 
-        //Process panels which has no matching labels.
+        //Check again
+        if (isOne2OneMatch(panels, labelSets))
+        {
+            //Labels and Panels are one-to-one matched, we conclude the segmentation
+            setFigurePanels();
+            return;
+        }
+
+        //ToDo: Process panels which has no matching labels.
         //We either merge it into the existing panel or add labels
-
         for (int i = 0; i < this.panels.size(); i++)
         {
             Panel panel = this.panels.get(i);
@@ -213,6 +305,18 @@ public class PanelSeg1
         //complete analysis, save the result
 //        panels = panelsT;
 //        labelSets = labelSetsT;
+    }
+
+    Panel smallestLabel(List<Panel> labels)
+    {
+        Panel smallest = labels.get(0);
+        for (int k = 1; k < labels.size(); k++)
+        {
+            Panel label = labels.get(k);
+            if (label.panelLabel.compareToIgnoreCase(smallest.panelLabel) < 0)
+                smallest =label;
+        }
+        return smallest;
     }
 
     void handlePanelWithLabels(Panel panel, List<Panel> labelSet)

@@ -7,6 +7,7 @@ package gov.nih.nlm.lhc.openi.panelseg;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 
+import java.awt.*;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -247,6 +248,113 @@ final class AlgMiscEx
         return -1;
     }
 
+    static int maxOverlappingPanel(Rectangle rect, List<Panel> panels)
+    {
+        //find max overlapping
+        int maxIndex = -1; double maxSize = -1;
+        for (int j = 0; j < panels.size(); j++)
+        {
+            Panel panel = panels.get(j);
+            Rectangle intersection = panel.panelRect.intersection(rect);
+            if (intersection.isEmpty()) continue;
+            double size = intersection.width * intersection.height;
+            if (size > maxSize)
+            {
+                maxIndex = j; maxSize = size;
+            }
+        }
+        return maxIndex;
+    }
+
+    static int maxOverlappingCC(Rectangle rect, List<CCInfo> ccs)
+    {
+        //find max overlapping
+        int maxIndex = -1; double maxSize = -1;
+        for (int j = 0; j < ccs.size(); j++)
+        {
+            CCInfo cc = ccs.get(j);
+            Rectangle intersection = cc.rectangle.intersection(rect);
+            if (intersection.isEmpty()) continue;
+            double size = intersection.width * intersection.height;
+            if (size > maxSize)
+            {
+                maxIndex = j; maxSize = size;
+            }
+        }
+        return maxIndex;
+    }
+
+    static int closestPanel(Rectangle rect, List<Panel> panels)
+    {
+        int minIndex = -1; int minDistance = Integer.MAX_VALUE;
+        for (int j = 0; j < panels.size(); j++)
+        {
+            Panel panel = panels.get(j);
+            int horDistance, verDistance, distance;
+            if (rect.x < panel.panelRect.x)
+            {
+                horDistance = panel.panelRect.x - (rect.x + rect.width);
+                if (horDistance < 0) horDistance = 0;
+            }
+            else
+            {
+                horDistance = rect.x - (panel.panelRect.x + panel.panelRect.width);
+                if (horDistance < 0) horDistance = 0;
+            }
+            if (rect.y < panel.panelRect.y)
+            {
+                verDistance = panel.panelRect.y - (rect.y + rect.height);
+                if (verDistance < 0) verDistance = 0;
+            }
+            else
+            {
+                verDistance = rect.y - (panel.panelRect.y + panel.panelRect.height);
+                if (verDistance < 0) verDistance = 0;
+            }
+            distance = verDistance + horDistance;
+            if (distance < minDistance)
+            {
+                minDistance = distance; minIndex = j;
+            }
+        }
+        return minIndex;
+    }
+
+    static int closestCC(Rectangle rect, List<CCInfo> ccs)
+    {
+        int minIndex = -1; int minDistance = Integer.MAX_VALUE;
+        for (int j = 0; j < ccs.size(); j++)
+        {
+            CCInfo cc = ccs.get(j);
+            int horDistance, verDistance, distance;
+            if (rect.x < cc.rectangle.x)
+            {
+                horDistance = cc.rectangle.x - (rect.x + rect.width);
+                if (horDistance < 0) horDistance = 0;
+            }
+            else
+            {
+                horDistance = rect.x - (cc.rectangle.x + cc.rectangle.width);
+                if (horDistance < 0) horDistance = 0;
+            }
+            if (rect.y < cc.rectangle.y)
+            {
+                verDistance = cc.rectangle.y - (rect.y + rect.height);
+                if (verDistance < 0) verDistance = 0;
+            }
+            else
+            {
+                verDistance = rect.y - (cc.rectangle.y + cc.rectangle.height);
+                if (verDistance < 0) verDistance = 0;
+            }
+            distance = verDistance + horDistance;
+            if (distance < minDistance)
+            {
+                minDistance = distance; minIndex = j;
+            }
+        }
+        return minIndex;
+    }
 }
 
 

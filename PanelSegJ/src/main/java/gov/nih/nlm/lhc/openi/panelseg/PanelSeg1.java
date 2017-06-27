@@ -131,56 +131,15 @@ public class PanelSeg1
             Panel label = labels.get(i);
 
             //find max overlapping
-            int maxIndex = -1; double maxSize = -1;
-            for (int j = 0; j < panels.size(); j++)
-            {
-                Panel panel = panels.get(j);
-                Rectangle intersection = panel.panelRect.intersection(label.labelRect);
-                if (intersection.isEmpty()) continue;
-                double size = intersection.width * intersection.height;
-                if (size > maxSize)
-                {
-                    maxIndex = j; maxSize = size;
-                }
-            }
+            int maxIndex = AlgMiscEx.maxOverlappingPanel(label.labelRect, panels);
             if (maxIndex != -1)
             {
                 labelSets.get(maxIndex).add(label);
                 continue;
             }
 
-            //No overlapping, we find the closet panel
-            int minIndex = -1; int minDistance = Integer.MAX_VALUE;
-            for (int j = 0; j < panels.size(); j++)
-            {
-                Panel panel = panels.get(j);
-                int horDistance, verDistance, distance;
-                if (label.labelRect.x < panel.panelRect.x)
-                {
-                    horDistance = panel.panelRect.x - (label.labelRect.x + label.labelRect.width);
-                    if (horDistance < 0) horDistance = 0;
-                }
-                else
-                {
-                    horDistance = label.labelRect.x - (panel.panelRect.x + panel.panelRect.width);
-                    if (horDistance < 0) horDistance = 0;
-                }
-                if (label.labelRect.y < panel.panelRect.y)
-                {
-                    verDistance = panel.panelRect.y - (label.labelRect.y + label.labelRect.height);
-                    if (verDistance < 0) verDistance = 0;
-                }
-                else
-                {
-                    verDistance = label.labelRect.y - (panel.panelRect.y + panel.panelRect.height);
-                    if (verDistance < 0) verDistance = 0;
-                }
-                distance = verDistance + horDistance;
-                if (distance < minDistance)
-                {
-                    minDistance = distance; minIndex = j;
-                }
-            }
+            //No overlapping, we find the closest panel
+            int minIndex = AlgMiscEx.closestPanel(label.labelRect, panels);
             labelSets.get(minIndex).add(label);
         }
         return labelSets;
@@ -275,9 +234,20 @@ public class PanelSeg1
 
                 //Reach Here: Not able to split by BandAndLine analysis of structured edges
                 panelsSplit = splitStructuredEdge.splitByCCAnalysis(toSplitPanel, toSplitLabelSet);
+                if (panelsSplit.size() > 0)
+                {
+                    panelsT.addAll(panelsSplit);
+                    for (Panel p : panelsSplit)
+                    {
+                        List<Panel> set = new ArrayList<>(); set.add(p);
+                        labelSetsT.add(set);
+                    }
+                    continue;
+                }
 
-                //For now, we simply keep the smaller label
-                List<Panel> smallestLabel = new  ArrayList();
+                //Reach Here: Not able to split by both BandAndLine and CC analysis of structured edges
+                //We simple keep the smaller label for now.
+                List<Panel> smallestLabel = new  ArrayList<>();
                 smallestLabel.add(smallestLabel(toSplitLabelSet));
                 panelsT.add(toSplitPanel); labelSetsT.add(smallestLabel);
             }

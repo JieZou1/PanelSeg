@@ -144,19 +144,66 @@ public class PanelSplitStructuredEdge
         opencv_core.Rect roi_inside = AlgOpenCVEx.findBoundingbox(edges);
         opencv_core.Rect roi = new opencv_core.Rect(roi_orig.x() + roi_inside.x(), roi_orig.y() + roi_inside.y(), roi_inside.width(), roi_inside.height());
 
-        //ToDO: Split by CC analysis
-        // 1. Collect all cc's in panel
+        //Split by CC analysis
+        // 1. Collect all qualified cc's in panel
         List<CCInfo> ccs = new ArrayList<>();
-        for (int i = 0; i < edgeConnectedComponents.size(); i++)
+        for (CCInfo cc : edgeConnectedComponents)
         {
-            CCInfo cc = edgeConnectedComponents.get(i);
+            Rectangle ccRect = cc.rectangle;
+            if (ccRect.width < 100 || ccRect.height < 100) continue;
             if (panel.panelRect.contains(cc.rectangle)) ccs.add(cc);
         }
         // 2. For each label, find one qualified cc to form a qualified panel. If not able to find, remove that label
-        
-        // 3. For the remaining cc, from max to min, merge them into the closet qualified panel
+        List<Panel> panelsNew = new ArrayList<>();
+        for (Panel label : labels)
+        {
+            //find max overlapping
+            int maxIndex = AlgMiscEx.maxOverlappingCC(label.labelRect, ccs);
+            if (maxIndex != -1)
+            {
+                label.panelRect = ccs.get(maxIndex).rectangle;
+                panelsNew.add(label);
+                ccs.remove(maxIndex);
+                continue;
+            }
 
-        return null;
+            //No overlapping, we find the closest panel
+            int minIndex = AlgMiscEx.closestCC(label.labelRect, ccs);
+            if (minIndex != -1)
+            {
+                label.panelRect = ccs.get(minIndex).rectangle;
+                panelsNew.add(label);
+                ccs.remove(minIndex);
+                continue;
+            }
+            //Reach here, no CC matches to the label, remove the label
+        }
+
+        // 3. For the remaining cc, from max to min, merge them into the closet qualified panel
+        for (CCInfo cc : edgeConnectedComponents)
+        {
+            Rectangle ccRect = cc.rectangle;
+            //find max overlapping
+            int maxIndex = AlgMiscEx.maxOverlappingPanel(ccRect, panelsNew);
+            if (maxIndex != -1)
+            {
+                Panel panelNew = panelsNew.get(maxIndex);
+                Rectangle rectangle = panelNew.panelRect.union(ccRect);
+                panelsNew.get(maxIndex).panelRect = rectangle;
+                continue;
+            }
+
+            //No overlapping, we find the closest panel
+            int minIndex = AlgMiscEx.closestPanel(ccRect, panelsNew);
+            if (minIndex != -1)
+            {
+                Panel panelNew = panelsNew.get(minIndex);
+                Rectangle rectangle = panelNew.panelRect.union(ccRect);
+                panelsNew.get(minIndex).panelRect = rectangle;
+            }
+        }
+
+        return panelsNew;
     }
 
     List<Panel> splitByBandAndLine(Panel panel)

@@ -70,8 +70,8 @@ public class PanelSeg1
             //check matched result. If valid (one-to-one matching is found), conclude the segmentation)
             if (isOne2OneMatch(panels, labelSets))
             {
-                //Labels and Panels are one-to-one matched, we conclude the segmentation
-                setFigurePanels();
+                //Labels and Panels are one-to-one matched, we conclude the segmentation by setting figure.panels.
+                figure.panels = setFigurePanels(panels, labelSets);
             }
             else
             {
@@ -80,7 +80,6 @@ public class PanelSeg1
                 //2. Handle panels without matching labelSets, merge to the closet one or adding a label
                 structuredEdgeAnalysis();
             }
-
         }
 
         displayResults();
@@ -167,19 +166,24 @@ public class PanelSeg1
     }
 
     /**
-     * Conclude the segmentation by setting figure.panels.
-     * panels and labelSets are assumed to be one-to-one match.
      */
-    void setFigurePanels()
+    List<Panel> setFigurePanels(List<Panel> panels, List<List<Panel>> labelSets)
     {
-        figure.panels = new ArrayList<>();
+        List<Panel> panelsNew = new ArrayList<>();
         for (int i = 0; i < panels.size(); i++)
         {
             Panel panel = panels.get(i);
-            Panel label = labelSets.get(i).get(0);
-            label.panelRect = panel.panelRect;
-            figure.panels.add(label);
+            List<Panel> labelSet = labelSets.get(i);
+            if (labelSet!=null && labelSet.size() >= 1)
+            {
+                Panel label = labelSet.get(0);
+                label.panelRect = panel.panelRect;
+                panelsNew.add(label);
+            }
+            else
+                panelsNew.add(panel);
         }
+        return panelsNew;
     }
 
     void structuredEdgeAnalysis()
@@ -259,22 +263,23 @@ public class PanelSeg1
         //Check again
         if (isOne2OneMatch(panels, labelSets))
         {
-            //Labels and Panels are one-to-one matched, we conclude the segmentation
-            setFigurePanels();
+            //Labels and Panels are one-to-one matched, we conclude the segmentation by setting figure.panels.
+            figure.panels = setFigurePanels(panels, labelSets);
             return;
         }
 
         //ToDo: Process panels which has no matching labels.
         //We either merge it into the existing panel or add labels
-        for (int i = 0; i < this.panels.size(); i++)
-        {
-            Panel panel = this.panels.get(i);
-            List<Panel> labelSet = this.labelSets.get(i);
-        }
+        panelsT = setFigurePanels(panels, labelSets);
+        tryRowFirst(panelsT);
 
         //complete analysis, save the result
-//        panels = panelsT;
-//        labelSets = labelSetsT;
+        figure.panels = panelsT;
+    }
+
+    void tryRowFirst(List<Panel> panels)
+    {
+        panels.sort(new PanelRectRowFirst());
     }
 
     Panel smallestLabel(List<Panel> labels)

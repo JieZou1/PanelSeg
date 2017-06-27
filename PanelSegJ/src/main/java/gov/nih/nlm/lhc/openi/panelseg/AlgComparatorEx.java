@@ -117,6 +117,45 @@ class PanelOverlappingScore1Score2Index
 }
 
 /**
+ * Comparator for sorting Panel Rect in Row first order
+ * @author Jie Zou
+ */
+
+class PanelRectRowFirst implements Comparator<Panel>
+{
+    @Override
+    public int compare(Panel o1, Panel o2)
+    {
+        int left1 = o1.panelRect.x, left2 = o2.panelRect.x;
+//        int right1 = o1.panelRect.x + o1.panelRect.width, right2 = o2.panelRect.x + o2.panelRect.width;
+//        int width1 = o1.panelRect.width, width2 = o2.panelRect.width;
+        int top1 = o1.panelRect.y, top2 = o2.panelRect.y;
+        int bottom1 = o1.panelRect.y + o1.panelRect.height, bottom2 = o2.panelRect.y + o2.panelRect.height;
+        int height1 = o1.panelRect.height, height2 = o2.panelRect.height;
+
+        if (top1 <= top2)
+        {
+            if (top2 - bottom1 > - height1 / 2) return -1;
+            //Same row, compare x
+            int diff = left1 - left2;
+            if (diff > 0) return 1;
+            else if (diff == 0) return 0;
+            else return -1;
+        }
+        else
+        {
+            if (top1 - bottom2 > - height2 / 2) return 1;
+            //Same row, compare x
+            int diff = left1 - left2;
+            if (diff > 0) return 1;
+            else if (diff == 0) return 0;
+            else return -1;
+        }
+    }
+}
+
+
+/**
  * Comparator for sorting score1 of PanelOverlappingIndesScores.
  * @author Jie Zou
  */

@@ -271,15 +271,107 @@ public class PanelSeg1
         //ToDo: Process panels which has no matching labels.
         //We either merge it into the existing panel or add labels
         panelsT = setFigurePanels(panels, labelSets);
-        tryRowFirst(panelsT);
+
+        if (tryRowFirst(panelsT))
+        {
+            return;
+        }
 
         //complete analysis, save the result
         figure.panels = panelsT;
     }
 
-    void tryRowFirst(List<Panel> panels)
+    /**
+     * For the case when panels are aligned row by row.
+     * @param panels
+     */
+    boolean tryRowFirst(List<Panel> panels)
     {
         panels.sort(new PanelRectRowFirst());
+
+        //Also find all panels, which has been assigned labels, and their rect statistics
+        List<Integer> assignedIndexes = new ArrayList<>();
+        double maxW = -Double.MAX_VALUE, minW = Double.MAX_VALUE, meanW = 0;
+        double maxH = -Double.MAX_VALUE, minH = Double.MAX_VALUE, meanH = 0;
+        for (int i = 0; i < panels.size(); i++)
+        {
+            Panel panel = panels.get(i);
+            if (panel.panelLabel != null && !panel.panelLabel.isEmpty())
+            {
+                assignedIndexes.add(i);
+                int w = panel.panelRect.width, h = panel.panelRect.height;
+
+                if (w > maxW) maxW = w;                if (w < minW) minW = w;                meanW += w;
+                if (h > maxH) maxH = h;                if (h < minH) minH = h;                meanH += h;
+            }
+        }
+        meanW = meanW / assignedIndexes.size();        meanH = meanH / assignedIndexes.size();
+
+        //check whether labels in ascending order
+        for (int i = 1; i < assignedIndexes.size(); i++)
+        {
+            String label0 = panels.get(assignedIndexes.get(i - 1)).panelLabel;
+            String label1 = panels.get(assignedIndexes.get(i)).panelLabel;
+            if (label1.compareToIgnoreCase(label0) <= 0) return false;
+        }
+
+        //Reach Here: the panel labels are in ascending order, looks like RowFirst case
+        //Before the first assigned panel
+        for (int i = 0; i <= assignedIndexes.size(); i++)
+        {
+            int start = i == 0 ? 0 : assignedIndexes.get(i-1) + 1;
+            int end = i == assignedIndexes.size() ? panels.size() : assignedIndexes.get(i);
+
+            if (start >= end) continue;
+
+            char startC, endC;
+            if (start == 0)
+            {
+                int index = assignedIndexes.get(0);
+                char c = panels.get(index).panelLabel.toUpperCase().charAt(0);
+                startC = (char)((int)c - (end - start));
+                if (Character.isDigit(c))
+                {
+                    if (startC < '0') startC = '0';
+                }
+                else
+                {
+                    if (startC < 'A') startC = 'A';
+                }
+            }
+            else startC = (char)((int)(panels.get(start-1).panelLabel.toUpperCase().charAt(0)) + 1);
+
+            if (end == panels.size())
+            {
+                int index = assignedIndexes.get(assignedIndexes.size()-1);
+                char c = panels.get(index).panelLabel.toUpperCase().charAt(0);
+                endC = (char)((int)c + (end - start));
+                if (Character.isDigit(c))
+                {
+                    if (endC > '9') endC = '9';
+                }
+                else
+                {
+                    if (endC > 'Z') endC = 'Z';
+                }
+            }
+            else endC = panels.get(end).panelLabel.toUpperCase().charAt(0);
+
+            if (end - start == (int)endC - (int)startC)
+            {
+                for (int j = start; j < end; j++)
+                {
+                    panels.get(j).panelLabel = "" + (char)((int)startC + (j-start));
+                }
+            }
+
+            for (int j = start; j < end; j++)
+            {
+
+            }
+        }
+
+        return true;
     }
 
     Panel smallestLabel(List<Panel> labels)

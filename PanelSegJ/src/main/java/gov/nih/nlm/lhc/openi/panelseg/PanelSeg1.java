@@ -9,7 +9,6 @@ import java.util.List;
 
 import static org.bytedeco.javacpp.opencv_highgui.imshow;
 import static org.bytedeco.javacpp.opencv_highgui.waitKey;
-import static org.bytedeco.javacpp.opencv_imgproc.CV_FILLED;
 import static org.bytedeco.javacpp.opencv_imgproc.rectangle;
 
 /**
@@ -52,8 +51,9 @@ public class PanelSeg1
 
         //Label Recognize using HoG + SVM + Beam Search
         figure.panelsLabelHoGSvm = labelRegHogSvm();
+        figure.panelsLabelHoGSvmBeam = labelRegHogSvmBeam();
 
-        if (figure.panelsLabelHoGSvm.size() == 0 && figure.panelsUniformBand.size() == 1)
+        if (figure.panelsLabelHoGSvmBeam.size() == 0 && figure.panelsUniformBand.size() == 1)
         {
             //No labelSets are detected, and there is only one panel.
             //This is reasonable to be a single panel figure without labelSets
@@ -65,7 +65,7 @@ public class PanelSeg1
             this.panels.addAll(figure.panelsUniformBand);
 
             //Merge split-panels and recognized-panel-labelSets
-            this.labelSets = matchPanels(panels, figure.panelsLabelHoGSvm); //each panel in panels corresponds to an element in labelSets
+            this.labelSets = matchPanels(panels, figure.panelsLabelHoGSvmBeam); //each panel in panels corresponds to an element in labelSets
 
             //check matched result. If valid (one-to-one matching is found), conclude the segmentation)
             if (isOne2OneMatch(panels, labelSets))
@@ -94,6 +94,23 @@ public class PanelSeg1
     }
 
     List<Panel> labelRegHogSvm() throws Exception
+    {
+        Figure figure = new Figure(this.figure.imageOriginal);
+        LabelDetectHog detectHog = new LabelDetectHog(figure);
+        detectHog.hoGDetect();        //HoG Detection, detected patches are stored in hogDetectionResult
+        detectHog.mergeDetectedLabelsSimple();  //Merge all hogDetectionResult to panels
+
+        LabelClassifyLeNet5 classifyLeNet5 = new LabelClassifyLeNet5(figure);
+        classifyLeNet5.LeNet5Classification();    //LeNet5 classification of each detected patch in figure.panels.
+
+        //Do label classification with HoG-SVM
+        LabelClassifyHogSvm classifySvm = new LabelClassifyHogSvm(figure);
+        classifySvm.svmClassificationWithLeNet5();
+
+        return figure.getSegResultWithPadding();
+    }
+
+    List<Panel> labelRegHogSvmBeam() throws Exception
     {
         Figure figure = new Figure(this.figure.imageOriginal);
 
@@ -274,6 +291,7 @@ public class PanelSeg1
 
         if (tryRowFirst(panelsT))
         {
+            figure.panels = panelsT;
             return;
         }
 
@@ -285,7 +303,7 @@ public class PanelSeg1
      * For the case when panels are aligned row by row.
      * @param panels
      */
-    boolean tryRowFirst(List<Panel> panels)
+    private boolean tryRowFirst(List<Panel> panels)
     {
         panels.sort(new PanelRectRowFirst());
 
@@ -324,12 +342,12 @@ public class PanelSeg1
 
             if (start >= end) continue;
 
-            char startC, endC;
+            char startC, endC; //[Start, end) but [startC, endC]
             if (start == 0)
             {
                 int index = assignedIndexes.get(0);
-                char c = panels.get(index).panelLabel.toUpperCase().charAt(0);
-                startC = (char)((int)c - (end - start));
+                int c = (int)panels.get(index).panelLabel.toUpperCase().charAt(0);
+                startC = (char)(c - (end - start));
                 if (Character.isDigit(c))
                 {
                     if (startC < '0') startC = '0';
@@ -344,8 +362,8 @@ public class PanelSeg1
             if (end == panels.size())
             {
                 int index = assignedIndexes.get(assignedIndexes.size()-1);
-                char c = panels.get(index).panelLabel.toUpperCase().charAt(0);
-                endC = (char)((int)c + (end - start));
+                int c = (int)panels.get(index).panelLabel.toUpperCase().charAt(0);
+                endC = (char)(c + (end - start));
                 if (Character.isDigit(c))
                 {
                     if (endC > '9') endC = '9';
@@ -357,21 +375,129 @@ public class PanelSeg1
             }
             else endC = panels.get(end).panelLabel.toUpperCase().charAt(0);
 
-            if (end - start == (int)endC - (int)startC)
+            if (end - start == (int)endC - (int)startC + 1) //Because [Start, end) but [startC, endC]
             {
                 for (int j = start; j < end; j++)
                 {
-                    panels.get(j).panelLabel = "" + (char)((int)startC + (j-start));
+                    char c = (char)((int)startC + (j-start));
+                    setLabelByAlignment(panels, j, c);
+
+//                    Panel panel = panels.get(j);
+//                    panel = setLabelByProb(panel, c);
+//                    panels.set(j, panel);
                 }
             }
-
-            for (int j = start; j < end; j++)
+            else
             {
-
+             //TODO: the panels and labels do not have the same number case
             }
         }
 
         return true;
+    }
+
+    void setLabelByAlignment(List<Panel> panels, int j, char c)
+    {
+        //Find the maximum aligned panel, which has labeled already
+        Panel panel = panels.get(j);
+        double minRatio = Double.MAX_VALUE; Panel minPanel = null;
+        for (Panel p : panels)
+        {
+            if (p.panelLabel == null || p.panelLabel.isEmpty()) continue;
+
+            int leftMost = Math.min(p.panelRect.x, panel.panelRect.x);
+            int rightMost = Math.max(p.panelRect.x + p.panelRect.width, panel.panelRect.x + panel.panelRect.width);
+            double xRatio = (double)(rightMost - leftMost) / (double)(p.panelRect.width + panel.panelRect.width);
+            int topMost = Math.min(p.panelRect.y, panel.panelRect.y);
+            int bottomMost = Math.max(p.panelRect.y + p.panelRect.height, panel.panelRect.y + panel.panelRect.height);
+            double yRatio = (double)(bottomMost - topMost) / (double)(p.panelRect.height + panel.panelRect.height);
+            double ratio = Math.min(xRatio, yRatio);
+            if (ratio < minRatio)
+            {
+                minPanel = p;
+                minRatio = ratio;
+            }
+        }
+
+        //Find the closest anchor point. top-left:1, top-rigth:2, bottom-left:3, bottom-right:4
+        Rectangle panelRect = minPanel.panelRect;
+        Rectangle labelRect = minPanel.labelRect;
+
+        Point[] panelPoints = new Point[4];
+        panelPoints[0] = new Point(panelRect.x, panelRect.y);
+        panelPoints[1] = new Point(panelRect.x + panelRect.width, panelRect.y);
+        panelPoints[2] = new Point(panelRect.x, panelRect.y + panelRect.height);
+        panelPoints[3] = new Point(panelRect.x + panelRect.width, panelRect.y + panelRect.height);
+
+        Point[] labelPoints = new Point[4];
+        labelPoints[0] = new Point(labelRect.x, labelRect.y);
+        labelPoints[1] = new Point(labelRect.x + labelRect.width, labelRect.y);
+        labelPoints[2] = new Point(labelRect.x, labelRect.y + labelRect.height);
+        labelPoints[3] = new Point(labelRect.x + labelRect.width, labelRect.y + labelRect.height);
+
+        int[] distances = new int[4];
+        for (int i = 0; i < 4; i++)
+            distances[0] = Math.abs(labelPoints[i].x - panelPoints[i].x) + Math.abs(labelPoints[i].y - panelPoints[i].y);
+
+        int minDistance = distances[0]; int minIndex = 0;
+        for (int i = 0; i < distances.length; i++)
+        {
+            if (distances[i] < minDistance)
+            {
+                minIndex = i; minDistance = distances[i];
+            }
+        }
+
+        int x, y; //TODO: compute x and y
+        int w = minPanel.labelRect.width;
+        int h = minPanel.labelRect.height;
+        switch (minIndex)
+        {
+            case 0:     //top-left corner
+                x = panel.panelRect.x + (labelPoints[0].x - panelPoints[0].x);
+                y = panel.panelRect.y + (labelPoints[0].y - panelPoints[0].y);
+                break;
+            case 1:     //top-right corner
+//                x = panel.panelRect.x + (labelPoints[1].x - panelPoints[0].x);
+//                y = panel.panelRect.y + (labelPoints[0].y - panelPoints[0].y);
+                break;
+            case 2:     //bottom-left corner
+                break;
+            case 3:     //bottom-right corner
+                break;
+        }
+
+        Rectangle labelRectangle = new Rectangle(x, y, w, h);
+    }
+
+    Panel setLabelByProb(Panel panel, char c)
+    {
+        //Expand the panel rect by 100 in all 4 directions
+        int l = panel.panelRect.x - 100; if ( l < 0 ) l = 0;
+        int t = panel.panelRect.y - 100; if ( t < 0 ) t = 0;
+        int r = panel.panelRect.x + panel.panelRect.width + 100; if (r > this.figure.imageWidth) r = this.figure.imageWidth;
+        int b = panel.panelRect.y + panel.panelRect.height + 100; if (b > this.figure.imageHeight) b = this.figure.imageHeight;
+
+        Rectangle panelRect = new Rectangle(l, t, r-l, b-t);
+        //Find the label, which has the highest probabilities
+        Panel maxLabel = null; double maxProb = -1.0;
+        for (Panel label : figure.panelsLabelHoGSvm)
+        {
+            Rectangle labelRect = label.labelRect;
+            if (!panelRect.intersects(labelRect)) continue;
+            int index = PanelSeg.getLabelCharIndex(c);
+            double prob = label.labelProbs[index];
+            if (prob > maxProb)
+            {
+                maxLabel = label; maxProb = prob;
+            }
+        }
+
+        Panel panelNew = maxLabel;
+        panelNew.panelLabel = "" + c;
+        panelNew.panelRect = panel.panelRect;
+
+        return panelNew;
     }
 
     Panel smallestLabel(List<Panel> labels)
@@ -399,7 +525,7 @@ public class PanelSeg1
         opencv_core.Mat uniformPanels = Figure.drawAnnotation(figure.imageColor, figure.panelsUniformBand);
         imshow("Uniform Panels", uniformPanels);
 
-        opencv_core.Mat labelPanels = Figure.drawAnnotation(figure.imageColor, figure.panelsLabelHoGSvm);
+        opencv_core.Mat labelPanels = Figure.drawAnnotation(figure.imageColor, figure.panelsLabelHoGSvmBeam);
         imshow("Panel Labels", labelPanels);
 
         opencv_core.Mat matchingResult = new opencv_core.Mat();

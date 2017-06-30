@@ -39,7 +39,8 @@ class Figure
     List<List<LabelBeamSearch.BeamItem>> beams; //The beam search results,
 
     List<Panel> panelsUniformBand;  //Panel candidates based on uniform bands
-    List<Panel> panelsLabelHoGSvm;  //Panel label candidates based on HoG detection + LeNet5 + SVM + Beam Search
+    List<Panel> panelsLabelHoGSvm;  //Panel label candidates based on HoG detection + LeNet5 + SVM
+    List<Panel> panelsLabelHoGSvmBeam;  //Panel label candidates based on HoG detection + LeNet5 + SVM + Beam Search
 
     opencv_core.Mat structuredEdge;     //The edges detected by StructuredEdgeDetection
     opencv_core.Mat binaryEdgeMap;      //The binary edge map after Otsu thresholding

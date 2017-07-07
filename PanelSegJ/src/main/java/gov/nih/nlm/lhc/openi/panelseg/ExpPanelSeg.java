@@ -190,7 +190,7 @@ final class ExpPanelSeg extends Exp
         super.doWork(k);
 
         Path imagePath = imagePaths.get(k);
-        if (!imagePath.toString().endsWith("PMC3538770_pone.0053237.g003.jpg")) return;
+        //if (!imagePath.toString().endsWith("PMC514551_1471-2407-4-46-1.jpg")) return;
 
         opencv_core.Mat image = imread(imagePath.toString(), CV_LOAD_IMAGE_COLOR);
         List<Panel> panels = PanelSeg.segment(image, method);

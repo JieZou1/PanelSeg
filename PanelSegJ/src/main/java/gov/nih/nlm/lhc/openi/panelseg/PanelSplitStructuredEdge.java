@@ -182,7 +182,10 @@ public class PanelSplitStructuredEdge
         // 3. For the remaining cc, from max to min, merge them into the closet qualified panel
         for (CCInfo cc : edgeConnectedComponents)
         {
+            if (!panel.panelRect.contains(cc.rectangle)) continue;
+
             Rectangle ccRect = cc.rectangle;
+
             //find max overlapping
             int maxIndex = AlgMiscEx.maxOverlappingPanel(ccRect, panelsNew);
             if (maxIndex != -1)

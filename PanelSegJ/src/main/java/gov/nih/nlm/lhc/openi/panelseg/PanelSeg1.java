@@ -50,14 +50,36 @@ public class PanelSeg1
         figure.panelsUniformBand = splitUniformBands();
 
         //Label Recognize using HoG + SVM + Beam Search
-        figure.panelsLabelHoGSvm = labelRegHogSvm();
+        //figure.panelsLabelHoGSvm = labelRegHogSvm();
         figure.panelsLabelHoGSvmBeam = labelRegHogSvmBeam();
 
-        if (figure.panelsLabelHoGSvmBeam.size() == 0 && figure.panelsUniformBand.size() == 1)
+        if (figure.panelsLabelHoGSvmBeam.size() == 0)
         {
-            //No labelSets are detected, and there is only one panel.
-            //This is reasonable to be a single panel figure without labelSets
-            figure.panels = figure.panelsUniformBand;
+            if (figure.panelsUniformBand.size() == 1)
+            {
+                //No labelSets are detected, and there is only one panel.
+                //This is reasonable to be a single panel figure without labelSets
+                figure.panels = figure.panelsUniformBand;
+            }
+            else
+            {
+                //Check panelsUniformBand
+                Boolean valid = true;
+                for (Panel panel : figure.panelsUniformBand)
+                {
+                    if (panel.panelRect.width < 100 && panel.panelRect.height < 100)
+                        valid = false;
+                }
+                if (!valid)
+                {
+                    Panel panel = new Panel();
+                    panel.panelRect = new Rectangle(50, 50, figure.imageOriginalWidth, figure.imageOriginalHeight);
+                    figure.panels = new ArrayList<>();
+                    figure.panels.add(panel);
+                }
+                else
+                    figure.panels = figure.panelsUniformBand; //For now, we accept uniform-band result too.
+            }
         }
         else
         {   //Merge/split panels with labelSets to generate final result
@@ -82,7 +104,7 @@ public class PanelSeg1
             }
         }
 
-        displayResults();
+        //displayResults();
     }
 
     List<Panel> splitUniformBands()
@@ -233,23 +255,59 @@ public class PanelSeg1
                 List<Panel> panelsSplit = splitStructuredEdge.splitByBandAndLine(toSplitPanel);
                 if (panelsSplit.size() != 0)
                 {   //Able to split by structured edges
-                    List<List<Panel>> labelSetsSplit = matchPanels(panelsSplit, toSplitLabelSet);
-                    if (isValidSplit(panelsSplit, labelSetsSplit))
-                    {   //Valid split means no newly created panels without labels
+                    if (panelsSplit.size() == toSplitLabelSet.size())
+                    {   //The panels happens to be the same as label set, we simply assigns the labels to each of the panels
+                        int horOverlap, verOverlap;
+                        {
+                            panelsSplit.sort(new PanelRectLeftAscending());
+                            Rectangle rect0 = panelsSplit.get(0).panelRect, rect1 = panelsSplit.get(1).panelRect;
+                            horOverlap = (rect1.x + rect1.width - rect0.x) - (rect0.width + rect1.width);
+                        }
+                        {
+                            panelsSplit.sort(new PanelRectTopAscending());
+                            Rectangle rect0 = panelsSplit.get(0).panelRect, rect1 = panelsSplit.get(1).panelRect;
+                            verOverlap = (rect1.y + rect1.height - rect0.y) - (rect0.height + rect1.height);
+                        }
+                        if (horOverlap > verOverlap)
+                        {
+                            panelsSplit.sort(new PanelRectLeftAscending());
+                            toSplitLabelSet.sort(new LabelRectLeftAscending());
+                        }
+                        else
+                        {
+                            panelsSplit.sort(new PanelRectTopAscending());
+                            toSplitLabelSet.sort(new LabelRectTopAscending());
+                        }
+
                         for (int k = 0; k < panelsSplit.size(); k++)
                         {
                             Panel panelSplit = panelsSplit.get(k);
-                            List<Panel> labelSetSplit = labelSetsSplit.get(k);
-                            if (labelSetSplit.size() == 1)
-                            {
-                                panelsT.add(panelSplit); labelSetsT.add(labelSetSplit);
-                            }
-                            else
-                            {
-                                toSplitPanels.add(panelSplit); toSplitLabelSets.add(labelSetSplit);
-                            }
+                            List<Panel> labelSetSplit = new ArrayList<>();
+                            labelSetSplit.add(toSplitLabelSet.get(k));
+                            panelsT.add(panelSplit); labelSetsT.add(labelSetSplit);
                         }
                         continue;
+                    }
+                    else
+                    {
+                        List<List<Panel>> labelSetsSplit = matchPanels(panelsSplit, toSplitLabelSet);
+                        if (isValidSplit(panelsSplit, labelSetsSplit))
+                        {   //Valid split means no newly created panels without labels
+                            for (int k = 0; k < panelsSplit.size(); k++)
+                            {
+                                Panel panelSplit = panelsSplit.get(k);
+                                List<Panel> labelSetSplit = labelSetsSplit.get(k);
+                                if (labelSetSplit.size() == 1)
+                                {
+                                    panelsT.add(panelSplit); labelSetsT.add(labelSetSplit);
+                                }
+                                else
+                                {
+                                    toSplitPanels.add(panelSplit); toSplitLabelSets.add(labelSetSplit);
+                                }
+                            }
+                            continue;
+                        }
                     }
                 }
 
@@ -326,11 +384,19 @@ public class PanelSeg1
         meanW = meanW / assignedIndexes.size();        meanH = meanH / assignedIndexes.size();
 
         //check whether labels in ascending order
-        for (int i = 1; i < assignedIndexes.size(); i++)
+        for (int i = assignedIndexes.size() - 1; i > 0; i--)
         {
-            String label0 = panels.get(assignedIndexes.get(i - 1)).panelLabel;
-            String label1 = panels.get(assignedIndexes.get(i)).panelLabel;
-            if (label1.compareToIgnoreCase(label0) <= 0) return false;
+            Panel panel0 = panels.get(assignedIndexes.get(i - 1));        String label0 = panel0.panelLabel;
+            Panel panel1 = panels.get(assignedIndexes.get(i));            String label1 = panel1.panelLabel;
+            if (label1.compareToIgnoreCase(label0) <= 0)
+            {
+                if (panel1.labelScore < 0.8)
+                {
+                    assignedIndexes.remove(i);
+                }
+                else
+                    return false;
+            }
         }
 
         //Reach Here: the panel labels are in ascending order, looks like RowFirst case
@@ -373,7 +439,7 @@ public class PanelSeg1
                     if (endC > 'Z') endC = 'Z';
                 }
             }
-            else endC = panels.get(end).panelLabel.toUpperCase().charAt(0);
+            else endC = (char)((int)panels.get(end).panelLabel.toUpperCase().charAt(0) - 1);
 
             if (end - start == (int)endC - (int)startC + 1) //Because [Start, end) but [startC, endC]
             {
@@ -381,15 +447,12 @@ public class PanelSeg1
                 {
                     char c = (char)((int)startC + (j-start));
                     setLabelByAlignment(panels, j, c);
-
-//                    Panel panel = panels.get(j);
-//                    panel = setLabelByProb(panel, c);
-//                    panels.set(j, panel);
                 }
             }
             else
             {
              //TODO: the panels and labels do not have the same number case
+                return false;
             }
         }
 
@@ -398,8 +461,9 @@ public class PanelSeg1
 
     void setLabelByAlignment(List<Panel> panels, int j, char c)
     {
+        Panel panel = panels.get(j);    //The panel to be assigned a label
+
         //Find the maximum aligned panel, which has labeled already
-        Panel panel = panels.get(j);
         double minRatio = Double.MAX_VALUE; Panel minPanel = null;
         for (Panel p : panels)
         {
@@ -419,7 +483,10 @@ public class PanelSeg1
             }
         }
 
-        //Find the closest anchor point. top-left:1, top-rigth:2, bottom-left:3, bottom-right:4
+        //Reach here: the maximum aligned panel is minPanel
+        //We are going to add in the same location as minPanel
+
+        //Find the closest anchor point. top-left:0, top-right:1, bottom-left:2, bottom-right:3
         Rectangle panelRect = minPanel.panelRect;
         Rectangle labelRect = minPanel.labelRect;
 
@@ -437,10 +504,10 @@ public class PanelSeg1
 
         int[] distances = new int[4];
         for (int i = 0; i < 4; i++)
-            distances[0] = Math.abs(labelPoints[i].x - panelPoints[i].x) + Math.abs(labelPoints[i].y - panelPoints[i].y);
+            distances[i] = Math.abs(labelPoints[i].x - panelPoints[i].x) + Math.abs(labelPoints[i].y - panelPoints[i].y);
 
         int minDistance = distances[0]; int minIndex = 0;
-        for (int i = 0; i < distances.length; i++)
+        for (int i = 1; i < distances.length; i++)
         {
             if (distances[i] < minDistance)
             {
@@ -448,7 +515,7 @@ public class PanelSeg1
             }
         }
 
-        int x, y; //TODO: compute x and y
+        int x = 0, y = 0;
         int w = minPanel.labelRect.width;
         int h = minPanel.labelRect.height;
         switch (minIndex)
@@ -458,16 +525,21 @@ public class PanelSeg1
                 y = panel.panelRect.y + (labelPoints[0].y - panelPoints[0].y);
                 break;
             case 1:     //top-right corner
-//                x = panel.panelRect.x + (labelPoints[1].x - panelPoints[0].x);
-//                y = panel.panelRect.y + (labelPoints[0].y - panelPoints[0].y);
+                x = panel.panelRect.x + panel.panelRect.width + (labelPoints[1].x - panelPoints[1].x) - w;
+                y = panel.panelRect.y + (labelPoints[0].y - panelPoints[0].y);
                 break;
             case 2:     //bottom-left corner
+                x = panel.panelRect.x + (labelPoints[0].x - panelPoints[0].x);
+                y = panel.panelRect.y + panel.panelRect.height + (labelPoints[2].y - panelPoints[2].y) - h;
                 break;
             case 3:     //bottom-right corner
+                x = panel.panelRect.x + panel.panelRect.width + (labelPoints[1].x - panelPoints[1].x) - w;
+                y = panel.panelRect.y + panel.panelRect.height + (labelPoints[2].y - panelPoints[2].y) - h;
                 break;
         }
 
-        Rectangle labelRectangle = new Rectangle(x, y, w, h);
+        panel.labelRect = new Rectangle(x, y, w, h);
+        panel.panelLabel = "" + c;
     }
 
     Panel setLabelByProb(Panel panel, char c)

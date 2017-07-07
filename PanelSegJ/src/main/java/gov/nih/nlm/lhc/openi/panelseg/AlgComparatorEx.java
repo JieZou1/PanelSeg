@@ -61,7 +61,16 @@ class LabelRectLeftAscending implements Comparator<Panel>
         else if (diff == 0) return 0;
         else return -1;
     }
-
+}
+class PanelRectLeftAscending implements Comparator<Panel>
+{
+    public int compare(Panel o1, Panel o2)
+    {
+        double diff = o1.panelRect.x - o2.panelRect.x;
+        if (diff > 0) return 1;
+        else if (diff == 0) return 0;
+        else return -1;
+    }
 }
 
 /**
@@ -77,7 +86,16 @@ class LabelRectTopAscending implements Comparator<Panel>
         else if (diff == 0) return 0;
         else return -1;
     }
-
+}
+class PanelRectTopAscending implements Comparator<Panel>
+{
+    public int compare(Panel o1, Panel o2)
+    {
+        double diff = o1.panelRect.y - o2.panelRect.y;
+        if (diff > 0) return 1;
+        else if (diff == 0) return 0;
+        else return -1;
+    }
 }
 
 /**

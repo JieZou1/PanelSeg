@@ -171,6 +171,38 @@ class PanelRectRowFirst implements Comparator<Panel>
         }
     }
 }
+class LabelRectRowFirst implements Comparator<Panel>
+{
+    @Override
+    public int compare(Panel o1, Panel o2)
+    {
+        int left1 = o1.labelRect.x, left2 = o2.labelRect.x;
+//        int right1 = o1.panelRect.x + o1.panelRect.width, right2 = o2.panelRect.x + o2.panelRect.width;
+//        int width1 = o1.panelRect.width, width2 = o2.panelRect.width;
+        int top1 = o1.labelRect.y, top2 = o2.labelRect.y;
+        int bottom1 = o1.labelRect.y + o1.labelRect.height, bottom2 = o2.labelRect.y + o2.labelRect.height;
+        int height1 = o1.labelRect.height, height2 = o2.labelRect.height;
+
+        if (top1 <= top2)
+        {
+            if (top2 - bottom1 > - height1 / 2) return -1;
+            //Same row, compare x
+            int diff = left1 - left2;
+            if (diff > 0) return 1;
+            else if (diff == 0) return 0;
+            else return -1;
+        }
+        else
+        {
+            if (top1 - bottom2 > - height2 / 2) return 1;
+            //Same row, compare x
+            int diff = left1 - left2;
+            if (diff > 0) return 1;
+            else if (diff == 0) return 0;
+            else return -1;
+        }
+    }
+}
 
 
 /**

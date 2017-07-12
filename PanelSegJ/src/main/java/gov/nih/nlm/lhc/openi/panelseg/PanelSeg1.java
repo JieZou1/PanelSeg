@@ -2,6 +2,7 @@ package gov.nih.nlm.lhc.openi.panelseg;
 
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgproc;
+import scala.Char;
 
 import java.awt.*;
 import java.util.*;
@@ -101,6 +102,47 @@ public class PanelSeg1
                 //1. Handle panels with matching labelSets, remove or further splitting
                 //2. Handle panels without matching labelSets, merge to the closet one or adding a label
                 structuredEdgeAnalysis();
+            }
+
+            //Post Processing
+            {
+                List<Panel> labels = new ArrayList<>();
+                for (Panel panel : figure.panels)
+                {
+                    if (panel.panelLabel == null || panel.panelLabel.length() == 0) continue;
+                    if (panel.labelScore <= 0.05) continue;
+                    labels.add(panel);
+                }
+                labels.sort(new PanelLabelAscending());
+
+                Boolean concluded = false;
+
+                if (!concluded)
+                {
+                    List<Character> labelChars = new ArrayList<>();
+                    for (Panel label : labels)
+                        labelChars.add(Character.toLowerCase(label.panelLabel.charAt(0)));
+
+                    Boolean invalid = false;
+                    //1. Remove single label case, we merge them into one zone with no label
+                    if (labelChars.size() == 1) invalid = true;
+
+                    //2. Remove some non-consecutive cases, we merge them into one zone with no label
+//                    int start = (int)labelChars.get(0)
+//                    int end = (int)labelChars.get(labelChars.size()-1);
+                    if (labelChars.size() == 2 && labelChars.get(labelChars.size() - 1) != 'b')
+                        invalid = true;
+
+                    if (invalid)
+                    {
+                        Panel panel = new Panel();
+                        panel.panelRect = new Rectangle(Figure.padding, Figure.padding, figure.imageOriginalWidth, figure.imageOriginalHeight);
+                        figure.panels = new ArrayList<>();
+                        figure.panels.add(panel);
+                        concluded = true;
+                    }
+                }
+
             }
         }
 
@@ -252,7 +294,21 @@ public class PanelSeg1
             {
                 Panel toSplitPanel = toSplitPanels.poll();  List<Panel> toSplitLabelSet = toSplitLabelSets.poll();
 
-                List<Panel> panelsSplit = splitStructuredEdge.splitByBandAndLine(toSplitPanel);
+                //try splitting by good label detection
+                List<Panel> panelsSplit = splitStructuredEdge.splitByLabels(toSplitPanel, toSplitLabelSet);
+                if (panelsSplit.size() != 0)
+                {
+                    panelsT.addAll(panelsSplit);
+                    for (Panel p : panelsSplit)
+                    {
+                        List<Panel> set = new ArrayList<>(); set.add(p);
+                        labelSetsT.add(set);
+                    }
+                    continue;
+                }
+
+                //try splitting by uniform band and horizontal/vertical edges
+                panelsSplit = splitStructuredEdge.splitByBandAndLine(toSplitPanel);
                 if (panelsSplit.size() != 0)
                 {   //Able to split by structured edges
                     if (panelsSplit.size() == toSplitLabelSet.size())
@@ -312,6 +368,7 @@ public class PanelSeg1
                 }
 
                 //Reach Here: Not able to split by BandAndLine analysis of structured edges
+                //Try splitting by CC analysis
                 panelsSplit = splitStructuredEdge.splitByCCAnalysis(toSplitPanel, toSplitLabelSet);
                 if (panelsSplit.size() > 0)
                 {

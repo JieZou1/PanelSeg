@@ -1,5 +1,6 @@
 package gov.nih.nlm.lhc.openi.panelseg;
 
+import akka.japi.pf.FI;
 import org.bytedeco.javacpp.indexer.DoubleRawIndexer;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.javacpp.indexer.IntRawIndexer;
@@ -218,8 +219,8 @@ public class PanelSplitStructuredEdge
         opencv_core.Rect roi_inside = AlgOpenCVEx.findBoundingbox(edges);
         opencv_core.Rect roi = new opencv_core.Rect(roi_orig.x() + roi_inside.x(), roi_orig.y() + roi_inside.y(), roi_inside.width(), roi_inside.height());
 
-        opencv_core.Rect verBand = verticalCutByBand(roi);
-        opencv_core.Rect horBand = horizontalCutByBand(roi);
+        opencv_core.Rect verBand = verticalCutByBand(roi, 60);
+        opencv_core.Rect horBand = horizontalCutByBand(roi, 60);
         opencv_core.Rect verLine = verticalCutByLine(roi);
         opencv_core.Rect horLine = horizontalCutByLine(roi);
 
@@ -352,6 +353,203 @@ public class PanelSplitStructuredEdge
         return panels;
     }
 
+    List<Panel> splitByLabels(Panel panel, List<Panel> labels)
+    {
+        List<Panel> panels = new ArrayList<>();
+
+        //Check whether labels are indeed very likely to be correct
+        //1. Every label score needs to be above certain threshold
+        for (Panel label : labels)
+        {
+            if (label.labelScore < 0.8) return panels;
+        }
+        //2. Every labels need to be consecutive
+        labels.sort(new PanelLabelAscending());
+        for (int i = 1; i < labels.size(); i++)
+        {
+            int label0 = (int)labels.get(i-1).panelLabel.toLowerCase().charAt(0);
+            int label1 = (int)labels.get(i).panelLabel.toLowerCase().charAt(0);
+
+            if (label1 - label0 != 1) return panels;
+        }
+        //3. Every label should have aligned to at least another one
+        for (int i = 0; i < labels.size(); i++)
+        {
+            Panel label0 = labels.get(i); Rectangle rect0 = label0.labelRect;
+            Boolean alignedFound = false;
+            for (int j = 0; j < labels.size(); j++)
+            {
+                if (i == j) continue;
+                Panel label1 = labels.get(j); Rectangle rect1 = label1.labelRect;
+                if (AlgMiscEx.alignedRects(rect0, rect1))
+                {
+                    alignedFound = true; break;
+                }
+            }
+            if (!alignedFound) return panels;
+        }
+
+        //Project edges horizontally or vertically
+        Rect roi = new Rect(Figure.padding, Figure.padding, figure.imageOriginalWidth, figure.imageOriginalHeight);
+        Mat edges = new Mat(figure.binaryEdgeMap, roi); //Work on ROI only
+        int height = edges.rows(), width = edges.cols();
+
+        Mat verProfile = new Mat(height, 1, CV_32FC1);
+        reduce(edges, verProfile, 1, CV_REDUCE_SUM, CV_32FC1); //Horizontal projection generate vertical profile
+        FloatRawIndexer verProfileIndex = verProfile.createIndexer();
+        Mat horProfile = new Mat(1, width, CV_32FC1);
+        reduce(edges, horProfile, 0, CV_REDUCE_SUM, CV_32FC1); //vertical projection generate horizontal profile
+        FloatRawIndexer horProfileIndex = horProfile.createIndexer();
+
+        //Reach here: labels are very likely to correct. We break the panels according to the location of labels.
+        labels.sort(new LabelRectRowFirst());
+        for (int i = 0; i < labels.size(); i++)
+        {
+            Panel label = labels.get(i);
+            //Find left, top, right, bottom adjacent labels
+            Panel adjLeft = null, adjTop = null, adjRight = null, adjBottom = null;
+            int disLeft = 0, disTop = 0, disRight = 0, disBottom = 0;
+            for (int j = 0; j < labels.size(); j++)
+            {
+                if (i == j) continue;
+
+                Panel adjLabel = labels.get(j);
+                //Check left
+                if (adjLabel.labelRect.x + adjLabel.labelRect.width < label.labelRect.x)
+                {
+                    int dis = label.labelRect.x - (adjLabel.labelRect.x + adjLabel.labelRect.width);
+                    if (adjLeft == null || dis < disLeft)
+                    {
+                        adjLeft = adjLabel; disLeft = dis;
+                    }
+                }
+                //Check right
+                if (adjLabel.labelRect.x > label.labelRect.x + label.labelRect.width)
+                {
+                    int dis = adjLabel.labelRect.x  - (label.labelRect.x + label.labelRect.width);
+                    if (adjRight == null || dis < disRight)
+                    {
+                        adjRight = adjLabel; disRight = dis;
+                    }
+                }
+                //Check top
+                if (adjLabel.labelRect.y + adjLabel.labelRect.height < label.labelRect.y)
+                {
+                    int dis = label.labelRect.y - (adjLabel.labelRect.y + adjLabel.labelRect.height);
+                    if (adjTop == null || dis < disTop)
+                    {
+                        adjTop = adjLabel; disTop = dis;
+                    }
+                }
+                //Check bottom
+                if (adjLabel.labelRect.y > label.labelRect.y + label.labelRect.height)
+                {
+                    int dis = adjLabel.labelRect.y  - (label.labelRect.y + label.labelRect.height);
+                    if (adjBottom == null || dis < disBottom)
+                    {
+                        adjBottom = adjLabel; disBottom = dis;
+                    }
+                }
+            }
+
+            //Found left, top, right, bottom adjacent labels
+            int left = 0, right = 0, top = 0, bottom = 0;
+            if (adjLeft == null) left = panel.panelRect.x;
+            else
+            {
+                int start = adjLeft.labelRect.x + adjLeft.labelRect.width;
+                int end = label.labelRect.x;
+                //start += (end-start)/3; end -= (end-start)/3; //We search in the middle 1/3 only
+
+                //Try find the uniform band
+                Rect roiBand = new Rect(start, panel.panelRect.y, end - start, panel.panelRect.height);
+                opencv_core.Rect verBand = verticalCutByBand(roiBand, 0);
+                if (verBand !=null)
+                    left = verBand.x() + verBand.width()/2;
+                else
+                {   //If not find the maximum edge
+                    float max = -1.0f;
+                    for (int k = start; k < end; k++)
+                    {
+                        float f = horProfileIndex.get(0, k - Figure.padding);
+                        if (f > max) { left = k; max = f;}
+                    }
+                }
+            }
+            if (adjRight == null) right = panel.panelRect.x + panel.panelRect.width;
+            else
+            {
+                int start = label.labelRect.x + label.labelRect.width;
+                int end = adjRight.labelRect.x;
+                //start += (end-start)/3; end -= (end-start)/3; //We search in the middle 1/3 only
+
+                //Try find the uniform band
+                Rect roiBand = new Rect(start, panel.panelRect.y, end - start, panel.panelRect.height);
+                opencv_core.Rect verBand = verticalCutByBand(roiBand, 0);
+                if (verBand !=null)
+                    right = verBand.x() + verBand.width()/2;
+                else
+                {
+                    float max = -1.0f;
+                    for (int k = start + 3; k < end - 3; k++)
+                    {
+                        float f = horProfileIndex.get(0, k - Figure.padding);
+                        if (f > max) { right = k; max = f;}
+                    }
+                }
+            }
+            if (adjTop == null) top = panel.panelRect.y;
+            else
+            {
+                int start = adjTop.labelRect.y + adjTop.labelRect.height;
+                int end = label.labelRect.y;
+                //start += (end-start)/3; end -= (end-start)/3; //We search in the middle 1/3 only
+
+                //Try find the uniform band
+                Rect roiBand = new Rect(panel.panelRect.x, start, panel.panelRect.width, end - start);
+                opencv_core.Rect horBand = horizontalCutByBand(roiBand, 0);
+                if (horBand !=null)
+                    top = horBand.x() + horBand.width()/2;
+                else
+                {
+                    float max = -1.0f;
+                    for (int k = start + 3; k < end - 3; k++)
+                    {
+                        float f = verProfileIndex.get(0, k - Figure.padding);
+                        if (f > max) { top = k; max = f;}
+                    }
+                }
+            }
+            if (adjBottom == null) bottom = panel.panelRect.y + panel.panelRect.height;
+            else
+            {
+                int start = label.labelRect.y + label.labelRect.height;
+                int end = adjBottom.labelRect.y;
+                //start += (end-start)/3; end -= (end-start)/3; //We search in the middle 1/3 only
+
+                //Try find the uniform band
+                Rect roiBand = new Rect(panel.panelRect.x, start, panel.panelRect.width, end - start);
+                opencv_core.Rect horBand = horizontalCutByBand(roiBand, 0);
+                if (horBand !=null)
+                    bottom = horBand.x() + horBand.width()/2;
+                else
+                {
+                    float max = -1.0f;
+                    for (int k = start + 3; k < end - 3; k++)
+                    {
+                        float f = verProfileIndex.get(0, k - Figure.padding);
+                        if (f > max) { bottom = k; max = f;}
+                    }
+                }
+            }
+
+            label.panelRect = new Rectangle(left, top, right-left, bottom-top);
+            panels.add(label);
+        }
+
+        return panels;
+    }
+
     void split(Rectangle roi)
     {
         //Clears out separators
@@ -383,8 +581,8 @@ public class PanelSplitStructuredEdge
         opencv_core.Rect roi_inside = AlgOpenCVEx.findBoundingbox(edges);
         opencv_core.Rect roi = new opencv_core.Rect(roi_orig.x()+roi_inside.x(), roi_orig.y() + roi_inside.y(), roi_inside.width(), roi_inside.height());
 
-        opencv_core.Rect verBand = verticalCutByBand(roi);
-        opencv_core.Rect horBand = horizontalCutByBand(roi);
+        opencv_core.Rect verBand = verticalCutByBand(roi, 60);
+        opencv_core.Rect horBand = horizontalCutByBand(roi, 60);
         opencv_core.Rect verLine = verticalCutByLine(roi);
         opencv_core.Rect horLine = horizontalCutByLine(roi);
 
@@ -484,9 +682,9 @@ public class PanelSplitStructuredEdge
     }
 
     @Nullable
-    private opencv_core.Rect horizontalCutByBand(opencv_core.Rect roi)
+    private opencv_core.Rect horizontalCutByBand(opencv_core.Rect roi, int dis_to_boundary_ignore)
     {
-        List<opencv_core.Rect> bands = collectHorizontalBands(roi);
+        List<opencv_core.Rect> bands = collectHorizontalBands(roi, dis_to_boundary_ignore);
 
         if (bands.size() > 0)
         {
@@ -504,7 +702,7 @@ public class PanelSplitStructuredEdge
         return null;
     }
 
-    private List<opencv_core.Rect> collectHorizontalBands(opencv_core.Rect roi)
+    private List<opencv_core.Rect> collectHorizontalBands(opencv_core.Rect roi, int dis_to_boundary_ignore)
     {
         opencv_core.Mat edges = new opencv_core.Mat(figure.binaryEdgeMap, roi); //Work on ROI only
         int height = edges.rows();
@@ -541,7 +739,8 @@ public class PanelSplitStructuredEdge
                 for (j = i+1; j <height; j++)
                 {
                     grad = grads[j];
-                    if (grad > 0)
+                    if (grad > 0 || (dis_to_boundary_ignore == 0 && j == height - 1)) //when we do not want to ignore boundary bands,
+                                                                                      //We set dis_to_boundary_ignore to be 0
                     {
                         int bottom = j;
                         tops.add(top); bottoms.add(bottom);
@@ -559,7 +758,7 @@ public class PanelSplitStructuredEdge
 
             //Ignore some simple cases
             if (bottom - top < 5) continue; //If the band is too narrow, we ignore
-            if (top < 60 || height - bottom < 60) continue; //If the band is too close to the top and bottom boundary, we ignore
+            if (top < dis_to_boundary_ignore || height - bottom < dis_to_boundary_ignore) continue; //If the band is too close to the top and bottom boundary, we ignore
 
             Rect rect = new Rect(roi.x(), roi.y()+ top, roi.width(), bottom - top);
 
@@ -572,9 +771,9 @@ public class PanelSplitStructuredEdge
     }
 
     @Nullable
-    Rect verticalCutByBand(Rect roi)
+    Rect verticalCutByBand(Rect roi, int dis_to_boundary_ignore)
     {
-        List<Rect> bands = collectVerticalBands(roi);
+        List<Rect> bands = collectVerticalBands(roi, dis_to_boundary_ignore);
 
         if (bands.size() > 0)
         {
@@ -592,7 +791,7 @@ public class PanelSplitStructuredEdge
         return null;
     }
 
-    List<Rect> collectVerticalBands(Rect roi)
+    List<Rect> collectVerticalBands(Rect roi, int dis_to_boundary_ignore)
     {
         Mat edges = new Mat(figure.binaryEdgeMap, roi); //Work on ROI only
 //        imshow("edges", edges);
@@ -631,7 +830,8 @@ public class PanelSplitStructuredEdge
                 for (j = i+1; j <width; j++)
                 {
                     grad = grads[j];
-                    if (grad > 0)
+                    if (grad > 0 || (dis_to_boundary_ignore == 0 && j == width - 1)) //when we do not want to ignore boundary bands,
+                                                                                     //We set dis_to_boundary_ignore to be 0
                     {
                         int right = j;
                         lefts.add(left); rights.add(right);
@@ -649,7 +849,7 @@ public class PanelSplitStructuredEdge
 
             //Ignore some simple cases
             if (right - left < 5) continue; //If the band is too narrow, we ignore
-            if (left < 60 || width - right < 60) continue; //If the band is too close to the left and right boundary, we ignore
+            if (left < dis_to_boundary_ignore || width - right < dis_to_boundary_ignore) continue; //If the band is too close to the left and right boundary, we ignore
 
             Rect rect = new Rect(roi.x() + left, roi.y(), right - left, roi.height());
 

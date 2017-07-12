@@ -355,6 +355,25 @@ final class AlgMiscEx
         }
         return minIndex;
     }
+
+    static boolean alignedRects(Rectangle rect0, Rectangle rect1)
+    {
+        Rectangle rectH = new Rectangle(rect1.x, rect0.y, rect1.width, rect0.height);
+        Rectangle intersectH = rect0.intersection(rectH);
+        int intersectHSize = intersectH.width * intersectH.height;
+        if (    intersectHSize > (rect0.width * rect0.height) /2 &&
+                intersectHSize > (rectH.width * rectH.height) /2)
+            return true; //at least 50% overlap
+
+        Rectangle rectV = new Rectangle(rect0.x, rect1.y, rect0.width, rect1.height);
+        Rectangle intersectV = rect0.intersection(rectV);
+        int intersectVSize = intersectV.width * intersectV.height;
+        if (    intersectVSize > (rect0.width * rect0.height) /2 &&
+                intersectVSize > (rectV.width * rectV.height) /2)
+            return true; //at least 50% overlap
+
+        return false;
+    }
 }
 
 

@@ -82,6 +82,11 @@ final class ExpEval extends Exp
             case "PanelSplitJaylene":
                 method = PanelSeg.Method.PanelSplitJaylene;
                 break;
+
+            case "PanelSeg1":
+                method = PanelSeg.Method.PanelSeg1;
+                break;
+
             default: throw new Exception(propMethod + " is Unknown");
         }
 

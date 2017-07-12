@@ -195,7 +195,7 @@ class iPhotoDraw
 
             if (textLower.startsWith("panel"))
             {	//It is a panel
-                throw new Exception("We don't expect panel elements in " + xml_file +  "!");
+                //throw new Exception("We don't expect panel elements in " + xml_file +  "!");
             }
             else if (textLower.startsWith("label"))
             {	//It is a label

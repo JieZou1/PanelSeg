@@ -51,7 +51,7 @@ public class PanelSeg1
         figure.panelsUniformBand = splitUniformBands();
 
         //Label Recognize using HoG + SVM + Beam Search
-        //figure.panelsLabelHoGSvm = labelRegHogSvm();
+        figure.panelsLabelHoGSvm = labelRegHogSvm();
         figure.panelsLabelHoGSvmBeam = labelRegHogSvmBeam();
 
         if (figure.panelsLabelHoGSvmBeam.size() == 0)
@@ -503,6 +503,7 @@ public class PanelSeg1
                 for (int j = start; j < end; j++)
                 {
                     char c = (char)((int)startC + (j-start));
+                    if (setLabelFromHoGSvm(panels, j, c)) continue;
                     setLabelByAlignment(panels, j, c);
                 }
             }
@@ -514,6 +515,43 @@ public class PanelSeg1
         }
 
         return true;
+    }
+
+    boolean setLabelFromHoGSvm(List<Panel> panels, int j, char c)
+    {
+        char cLower = Character.toLowerCase(c);
+        char cUpper = Character.toUpperCase(c);
+
+        Panel panel = panels.get(j);    //The panel to be assigned a label
+        Rectangle panelRect = panel.panelRect;
+
+        Panel maxLabel = null; double maxProb = -1.0f;
+        for (Panel label : figure.panelsLabelHoGSvm)
+        {
+            Rectangle labelRect = label.labelRect;
+            if (!panelRect.intersects(labelRect)) continue;
+
+            int nLower = PanelSeg.getLabelCharIndex(cLower);
+            int nUpper = PanelSeg.getLabelCharIndex(cUpper);
+
+            double probLower = nLower == -1 ? -2.0 : label.labelProbs[nLower];
+            double probUpper = nUpper == -1 ? -2.0 : label.labelProbs[nUpper];
+
+            double prob = Math.max(probLower, probUpper);
+            if (prob > maxProb)
+            {
+                maxLabel = label; maxProb = prob;
+            }
+        }
+
+        if (maxLabel != null && maxProb > 0.01) //We do not want very very low prob case
+        {
+            maxLabel.panelRect = panelRect;
+            maxLabel.panelLabel = "" + c;
+            panels.set(j, maxLabel);
+            return true;
+        }
+        return false;
     }
 
     void setLabelByAlignment(List<Panel> panels, int j, char c)

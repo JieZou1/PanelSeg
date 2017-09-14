@@ -1,7 +1,10 @@
+import random
 import xml.etree.ElementTree as ET
 
 import cv2
-from os.path import join, split
+import os
+
+import misc
 from Panel import Panel
 
 
@@ -20,8 +23,8 @@ class Figure:
 
     def __init__(self, image_path):
         self.image_path = image_path
-        path, file = split(image_path)
-        path, folder = split(path)
+        path, file = os.path.split(image_path)
+        path, folder = os.path.split(path)
         self.id = "{0}-{1}".format(folder, file)
 
         self.image_orig = None
@@ -51,22 +54,40 @@ class Figure:
 
     def crop_label_patches(self, is_gray=True):
         for panel in self.panels:
-            panel.label_rects = []
-            panel.label_patches = []
+            # Collect all squares inside +20% and -10% bands
+            square = misc.make_square(panel.label_rect)
+            square_upper, square_lower = misc.extend_square(square, 0.5, 0.1)
 
-            panel.label_rects.append(panel.label_rect);
-            patch = self.crop_patch(panel.label_rect, is_gray)
-            panel.label_patches.append(patch)
+            panel.label_rects = []
+            for x in range(square_upper[0], square_lower[0]):
+                for y in range(square_upper[1], square_lower[1]):
+                    s_min = max([square_lower[0]+square_lower[2]-x, square_lower[1]+square_lower[3]-y])
+                    s_max = min([square_upper[0]+square_upper[2]-x, square_upper[1]+square_upper[3]-y])
+                    for s in range(s_min, s_max):
+                        rect = [x, y, s, s]
+                        panel.label_rects.append(rect)
+
+            # We keep at most 50 patches
+            panel.label_patches = []
+            if len(panel.label_rects) > 50:
+                panel.label_rects = random.sample(panel.label_rects, 50)
+            for rect in panel.label_rects:
+                patch = self.crop_patch(rect, is_gray)
+                panel.label_patches.append(patch)
 
     def save_label_patches(self, target_folder):
         for panel in self.panels:
-            for i in range(0, len(panel.label_patches)):
+            for i in range(len(panel.label_patches)):
+                # if len(panel.label) != 1:   # !!! We handle 1 letter label for now only!!!
+                #     continue
                 rect = panel.label_rects[i]
                 patch = panel.label_patches[i]
                 patch_file = self.id + "_".join(str(x) for x in rect) + ".png"
-                patch_file = join(target_folder, panel.label, patch_file)
+                folder = os.path.join(target_folder, str([ord(c) for c in panel.label]))
+                if not os.path.exists(folder):
+                    os.mkdir(folder)
+                patch_file = os.path.join(folder, patch_file)
                 cv2.imwrite(patch_file, patch)
-
 
     def load_gt_annotation(self,
                            which_annotation='label',  # label: label annotation only
@@ -142,7 +163,7 @@ class Figure:
             width = extent_item.get('Width')
             x = extent_item.get('X')
             y = extent_item.get('Y')
-            label_rect = [int(x), int(y), int(width), int(height)]
+            label_rect = [round(float(x)), round(float(y)), round(float(width)), round(float(height))]
 
             panel = Panel(label, None, label_rect)
             panels.append(panel)
@@ -189,7 +210,7 @@ class Figure:
             width = extent_item.get('Width')
             x = extent_item.get('X')
             y = extent_item.get('Y')
-            panel_rect = [int(x), int(y), int(width), int(height)]
+            panel_rect = [round(float(x)), round(float(y)), round(float(width)), round(float(height))]
 
             panel = Panel(label, panel_rect, None)
             panels.append(panel)
@@ -211,7 +232,7 @@ class Figure:
                     x = extent_item.get('X')
                     y = extent_item.get('Y')
 
-                    label_rect = [int(x), int(y), int(width), int(height)]
+                    label_rect = [round(float(x)), round(float(y)), round(float(width)), round(float(height))]
                     panel.label_rect = label_rect
 
         self.panels = panels

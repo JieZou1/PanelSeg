@@ -1,9 +1,16 @@
 import keras
+import numpy as np
 import random
 import shutil
 import cv2
 import os
 import pandas as pd
+from keras import Input
+from keras.callbacks import ModelCheckpoint
+from keras.engine import Model
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten
+from keras.models import load_model
+from keras.optimizers import RMSprop
 
 from Figure import Figure
 
@@ -182,19 +189,141 @@ def normalize_nonlabel_train_samples(src_folder='/Users/jie/projects/PanelSeg/Ex
             cv2.imwrite(path, dst_img)
 
 
-def train_label_none_label_classification_lenet5():
-    pass
+def load_train_validation_data(label_folder='/Users/jie/projects/PanelSeg/Exp1/Labels-28',
+                               non_label_folder='/Users/jie/projects/PanelSeg/Exp1/NonLabels-28'):
+    all_label_files, all_non_label_files = [], []
+    folders = [dI for dI in os.listdir(label_folder) if os.path.isdir(os.path.join(label_folder, dI))]
+    for f in folders:
+        folder = os.path.join(label_folder, f)
+        src_file = [os.path.join(folder, file) for file in os.listdir(folder) if file.endswith('.png')]
+        all_label_files += src_file
+
+    all_non_label_files = [os.path.join(non_label_folder, file) for file in os.listdir(non_label_folder) if file.endswith('.png')]
+
+    # Select 100,000 for training and the remaining for validation
+    random.shuffle(all_label_files)
+    random.shuffle(all_non_label_files)
+
+    train_label_files = all_label_files[:100000]
+    train_non_label_files = all_non_label_files[:100000]
+
+    validation_label_files = all_label_files[100000]
+    validation_non_label_files = all_non_label_files[100000]
+
+    print('training label samples: {0}\n'.format(len(train_label_files)))
+    print('training nonlabel samples: {0}\n'.format(len(train_non_label_files)))
+    print('validation label samples: {0}\n'.format(len(validation_label_files)))
+    print('validation nonlabel samples: {0}\n'.format(len(validation_non_label_files)))
+
+    n_train_samples = len(train_label_files) + len(train_non_label_files)
+    n_test_samples = len(validation_label_files) + len(validation_non_label_files)
+
+    x_train = np.empty([n_train_samples, 28, 28, 1], dtype=int)
+    y_train = np.empty([n_train_samples, 1], dtype=int)
+    x_test = np.empty([n_test_samples, 28, 28, 1], dtype=int)
+    y_test = np.empty([n_test_samples, 1], dtype=int)
+
+    for i in range(len(train_label_files)):
+        file = train_label_files[i]
+        img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+        img = img.reshape(28, 28, 1)
+        x_train[i] = img
+        y_train[i] = 0
+
+    for i in range(len(train_non_label_files)):
+        file = train_non_label_files[i]
+        img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+        img = img.reshape(28, 28, 1)
+        x_train[len(train_label_files) + i] = img
+        y_train[len(train_label_files) + i] = 1
+
+    for i in range(len(validation_label_files)):
+        file = validation_label_files[i]
+        img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+        img = img.reshape(28, 28, 1)
+        x_test[i] = img
+        y_test[i] = 0
+
+    for i in range(len(validation_non_label_files)):
+        file = validation_non_label_files[i]
+        img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+        img = img.reshape(28, 28, 1)
+        x_test[len(validation_label_files) + i] = img
+        y_test[len(validation_label_files) + i] = 1
+
+    return x_train, y_train, x_test, y_test
+
+
+def train_label_none_label_classification_lenet5(model_file=None):
+
+    # Load and normalize data
+    x_train, y_train, x_test, y_test = load_train_validation_data()
+
+    x_train = x_train.astype('float32')
+    x_test = x_test.astype('float32')
+    x_train /= 255
+    x_test /= 255
+    print(x_train.shape[0], 'train samples')
+    print(x_test.shape[0], 'test samples')
+
+    x_train.reshape(x_train.shape[0], 28, 28, 1)
+    x_test.reshape(x_test.shape[0], 28, 28, 1)
+
+    # convert class vectors to binary class matrices
+    y_train = keras.utils.to_categorical(y_train, 2)
+    y_test = keras.utils.to_categorical(y_test, 2)
+
+    if model_file is None:
+        # create model
+        inputs = Input(shape=(28, 28, 1))
+        cov1 = Conv2D(32, kernel_size=(3, 3), activation='relu')(inputs)
+        pool1 = MaxPooling2D(pool_size=(2, 2))(cov1)
+        cov2 = Conv2D(64, kernel_size=(3, 3), activation='relu')(pool1)
+        pool2 = MaxPooling2D(pool_size=(2, 2))(cov2)
+        flat1 = Flatten()(pool2)
+        dense1 = Dense(128, activation='relu')(flat1)
+        predictions = Dense(2, activation='softmax')(dense1)
+
+        model = Model(inputs=inputs, outputs=predictions)
+        model.compile(loss='categorical_crossentropy', optimizer=RMSprop(), metrics=['accuracy'])
+    else:
+        model = load_model(model_file)
+
+    model.summary()
+
+    # Checkpointing is to save the network weights only when there is an improvement in classification accuracy
+    # on the validation dataset (monitor=’val_acc’ and mode=’max’).
+    file_path = "weights-improvement-{epoch:04d}-{val_acc:.4f}.hdf5"
+    checkpoint = ModelCheckpoint(file_path, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+    callbacks_list = [checkpoint]
+
+    model.fit(x_train, y_train,
+              batch_size=128,
+              epochs=10,
+              verbose=1,
+              callbacks=callbacks_list,
+              validation_data=(x_test, y_test)
+              )
+    score = model.evaluate(x_test, y_test, verbose=0)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
+
+    model.save('final_model.h5')
+    # model.save_weights('final_model_weights.h5')
 
 
 if __name__ == "__main__":
+    # Test and Generate some statistics
     # test_load_image()
     # test_crop_label_patches()
-
     # generate_statistics()
 
+    # Generate and Normalize samples
     # generate_label_train_samples()
     # normalize_label_train_samples()
     # generate_nonlabel_train_samples()
-    normalize_nonlabel_train_samples()
+    # normalize_nonlabel_train_samples()
+
+    # Training models
+    train_label_none_label_classification_lenet5('final_model.h5')
     # train_label_none_label_classification_lenet5()
-    pass

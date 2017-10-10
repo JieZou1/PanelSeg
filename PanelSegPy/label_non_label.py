@@ -10,10 +10,12 @@ import pandas as pd
 from keras import Input
 from keras.callbacks import ModelCheckpoint
 from keras.engine import Model
-from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten
 from keras.models import load_model
 from keras.optimizers import RMSprop
 
+import model_cnn_2_layer
+import model_cnn_3_layer
+import model_cnn_3_layer_2
 from Figure import Figure
 from misc import print_progress_bar
 
@@ -255,7 +257,21 @@ def load_train_validation_data(label_folder, non_label_folder):
     return x_train, y_train, x_test, y_test
 
 
-def train_label_none_label_classification_lenet5(label_folder, non_label_folder, model_file=None):
+def train_label_none_label_classification(label_folder, non_label_folder, model_file=None):
+
+    #  Build or load model
+    if model_file is None:
+        # create model
+        img_input = Input(shape=(28, 28, 1))
+        # prediction = model_cnn_2_layer.nn_classify_label_non_label(img_input)
+        # prediction = model_cnn_3_layer.nn_classify_label_non_label(img_input)
+        prediction = model_cnn_3_layer_2.nn_classify_label_non_label(img_input)
+        model = Model(inputs=img_input, outputs=prediction)
+        model.compile(loss='categorical_crossentropy', optimizer=RMSprop(), metrics=['accuracy'])
+    else:
+        model = load_model(model_file)
+
+    model.summary()
 
     # Load and normalize data
     x_train, y_train, x_test, y_test = load_train_validation_data(label_folder, non_label_folder)
@@ -273,24 +289,6 @@ def train_label_none_label_classification_lenet5(label_folder, non_label_folder,
     # convert class vectors to binary class matrices
     y_train = keras.utils.to_categorical(y_train, 2)
     y_test = keras.utils.to_categorical(y_test, 2)
-
-    if model_file is None:
-        # create model
-        inputs = Input(shape=(28, 28, 1))
-        cov1 = Conv2D(32, kernel_size=(3, 3), activation='relu')(inputs)
-        pool1 = MaxPooling2D(pool_size=(2, 2))(cov1)
-        cov2 = Conv2D(64, kernel_size=(3, 3), activation='relu')(pool1)
-        pool2 = MaxPooling2D(pool_size=(2, 2))(cov2)
-        flat1 = Flatten()(pool2)
-        dense1 = Dense(128, activation='relu')(flat1)
-        predictions = Dense(2, activation='softmax')(dense1)
-
-        model = Model(inputs=inputs, outputs=predictions)
-        model.compile(loss='categorical_crossentropy', optimizer=RMSprop(), metrics=['accuracy'])
-    else:
-        model = load_model(model_file)
-
-    model.summary()
 
     # Checkpointing is to save the network weights only when there is an improvement in classification accuracy
     # on the validation dataset (monitor=’val_acc’ and mode=’max’).
@@ -453,7 +451,7 @@ if __name__ == "__main__":
         print('train_label_none_label_classification with label_folder={0} and non_label_folder={1}'
               .format(args.label_folder, args.non_label_folder))
         input("Press Enter to continue...")
-        train_label_none_label_classification_lenet5(args.label_folder, args.non_label_folder)
+        train_label_none_label_classification(args.label_folder, args.non_label_folder)
         # train_label_none_label_classification_lenet5(label_folder="label_folder='/Users/jie/projects/PanelSeg/Exp1/Labels-28',
         #                        non_label_folder='/Users/jie/projects/PanelSeg/Exp1/NonLabels-28')
 
@@ -461,8 +459,8 @@ if __name__ == "__main__":
         print('continue_train_label_none_label_classification with label_folder={0}, non_label_folder={1} and model_file={2}'
               .format(args.label_folder, args.non_label_folder, args.model_file))
         input("Press Enter to continue...")
-        train_label_none_label_classification_lenet5(args.label_folder, args.non_label_folder, args.model_file)
-        # train_label_none_label_classification_lenet5(label_folder="label_folder='/Users/jie/projects/PanelSeg/Exp1/Labels-28',
+        train_label_none_label_classification(args.label_folder, args.non_label_folder, args.model_file)
+        # train_label_none_label_classification(label_folder="label_folder='/Users/jie/projects/PanelSeg/Exp1/Labels-28',
         #                           non_label_folder='/Users/jie/projects/PanelSeg/Exp1/NonLabels-28',
         #                           model_file='/Users/jie/projects/PanelSeg/Exp1/models/label_non_label_2_cnn_model.h5')
 

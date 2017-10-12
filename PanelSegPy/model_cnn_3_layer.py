@@ -4,6 +4,9 @@
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 
 
+RPN_SCALE = [8, 16, 32, 64]
+
+
 def nn_base(img_input=None, trainable=False):
 
     conv1 = Conv2D(32, kernel_size=(3, 3), activation='relu', name='conv1', padding='same')(img_input)
@@ -27,10 +30,24 @@ def nn_classify_label_non_label(img_input=None):
     return predictions
 
 
-def rpn(base_layers, num_anchors):
+def nn_classify_50_plus_bg(img_input=None):
+    base_layers = nn_base(img_input, True)
+    pool3 = MaxPooling2D(pool_size=(2, 2), name='pool3')(base_layers)
 
+    flat1 = Flatten(name='flat1')(pool3)
+    dense1 = Dense(128, activation='relu', name='dense1')(flat1)
+    predictions = Dense(51, activation='softmax', name='output_label_50_plus_bg')(dense1)
+
+    return predictions
+
+
+def nn_rpn(img_input=None):
+    base_layers = nn_base(img_input, True)
+
+    # 3x3 kernel maps to 26x26 pixels in the original image (3->5->10->12->24->26)
     x = Conv2D(256, (3, 3), padding='same', activation='relu', kernel_initializer='normal', name='rpn_conv1')(base_layers)
 
+    num_anchors = len(RPN_SCALE)
     x_class = Conv2D(num_anchors, (1, 1), activation='sigmoid', kernel_initializer='uniform', name='rpn_out_class')(x)
     x_regr = Conv2D(num_anchors * 4, (1, 1), activation='linear', kernel_initializer='zero', name='rpn_out_regress')(x)
 

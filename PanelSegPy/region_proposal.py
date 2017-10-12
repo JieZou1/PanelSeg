@@ -1,6 +1,12 @@
 import cv2
+from keras import Input
 from keras.engine import Model
 from keras.models import load_model
+from keras.optimizers import Adam
+
+import model_cnn_3_layer
+
+base_net_path = 'Z:\\Users\\jie\\projects\\PanelSeg\\Exp1\\models\\label50+bg_model-cnn_3_layer-0.9915.h5'
 
 
 def test_label_non_label_model():
@@ -25,6 +31,27 @@ def test_label_non_label_model():
     pass
 
 
+def train_rpn():
+    nn = model_cnn_3_layer
+
+    input_shape_img = (None, None, 1)
+    img_input = Input(shape=input_shape_img)
+    rpn = nn.nn_rpn(img_input)
+
+    # model_base = load_model(base_net_path)
+    # model_base.summary()
+
+    # create rpn model and load weights
+    model_rpn = Model(img_input, rpn[:2])
+    print('loading weights from {}'.format(base_net_path))
+    model_rpn.load_weights(base_net_path, by_name=True)
+    model_rpn.summary()
+
+    optimizer = Adam(lr=1e-5)
+    model_rpn.compile(optimizer=optimizer, loss=[losses.rpn_loss_cls(num_anchors), losses.rpn_loss_regr(num_anchors)])
+
+
 if __name__ == "__main__":
-    test_label_non_label_model()
+    # test_label_non_label_model()
+    train_rpn()
     pass

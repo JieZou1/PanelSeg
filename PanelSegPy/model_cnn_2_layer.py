@@ -25,6 +25,17 @@ def nn_classify_label_non_label(img_input=None):
     return predictions
 
 
+def nn_clasify(img_input=None):
+    base_layers = nn_base(img_input, True)
+    pool2 = MaxPooling2D(pool_size=(2, 2), name='pool2')(base_layers)
+
+    flat1 = Flatten(name='flat1')(pool2)
+    dense1 = Dense(128, activation='relu', name='dense1')(flat1)
+    predictions = Dense(2, activation='softmax', name='output_label_non_label')(dense1)
+
+    return predictions
+
+
 def rpn(base_layers, num_anchors):
 
     x = Conv2D(256, (3, 3), padding='same', activation='relu', kernel_initializer='normal', name='rpn_conv1')(base_layers)

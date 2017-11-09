@@ -12,11 +12,15 @@ from keras.engine import Model
 from keras.models import load_model
 from keras.optimizers import RMSprop
 
+import nn_cnn_3_layer
 from Panel import Panel
-import model_cnn_3_layer
+from Config import Config
 
 
-def load_train_validation_data(label_folder, non_label_folder):
+def load_train_validation_data(c):
+
+    label_folder = c.labels_normalized_folder
+    non_label_folder = c.nonlabels_normalized_folder
 
     panel_label_ordered_dict = OrderedDict(sorted(Panel.LABEL_FOLDER_MAPPING.items()))
 
@@ -61,11 +65,17 @@ def load_train_validation_data(label_folder, non_label_folder):
     y_test_all = np.array([])
 
     for i, files in enumerate(validation_files):
-        x_test = np.empty([len(files), 28, 28, 1], dtype=int)
+        if c.color_type == cv2.IMREAD_COLOR:
+            x_test = np.empty([len(files), 28, 28, 3], dtype=int)
+        else:
+            x_test = np.empty([len(files), 28, 28, 1], dtype=int)
         y_test = np.empty([len(files), 1], dtype=int)
         for k, file in enumerate(files):
-            img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
-            img = img.reshape(28, 28, 1)
+            img = cv2.imread(file, c.color_type)
+            if c.color_type == cv2.IMREAD_COLOR:
+                img = img.reshape(28, 28, 3)
+            else:
+                img = img.reshape(28, 28, 1)
             x_test[k] = img
             y_test[k] = i
         if i == 0:
@@ -76,11 +86,18 @@ def load_train_validation_data(label_folder, non_label_folder):
             y_test_all = np.vstack((y_test_all, y_test))
 
     for i, files in enumerate(train_files):
-        x_train = np.empty([len(files), 28, 28, 1], dtype=int)
+        if c.color_type == cv2.IMREAD_COLOR:
+            x_train = np.empty([len(files), 28, 28, 3], dtype=int)
+        else:
+            x_train = np.empty([len(files), 28, 28, 1], dtype=int)
+
         y_train = np.empty([len(files), 1], dtype=int)
         for k, file in enumerate(files):
-            img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
-            img = img.reshape(28, 28, 1)
+            img = cv2.imread(file, c.color_type)
+            if c.color_type == cv2.IMREAD_COLOR:
+                img = img.reshape(28, 28, 3)
+            else:
+                img = img.reshape(28, 28, 1)
             x_train[k] = img
             y_train[k] = i
         if i == 0:
@@ -93,14 +110,24 @@ def load_train_validation_data(label_folder, non_label_folder):
     return x_train_all, y_train_all, x_test_all, y_test_all
 
 
-def train_label_classification(label_folder, non_label_folder, model_file=None):
+def train_label_classification(c, model_file=None):
+
+    label_folder = c.labels_normalized_folder
+    non_label_folder = c.nonlabels_normalized_folder
+
+    print('train_label_classification with label_folder={0} and non_label_folder={1}'.format(label_folder, non_label_folder))
+    input("Press Enter to continue...")
 
     #  Build or load model
     if model_file is None:
         # create model
-        img_input = Input(shape=(28, 28, 1))
+        if c.color_type == cv2.IMREAD_COLOR:
+            img_input = Input(shape=(28, 28, 3))
+        else:
+            img_input = Input(shape=(28, 28, 1))
+
         # prediction = model_cnn_2_layer.nn_classify_50_plus_bg(img_input)
-        prediction = model_cnn_3_layer.nn_classify_50_plus_bg(img_input)
+        prediction = nn_cnn_3_layer.nn_classify_50_plus_bg(img_input)
         # prediction = model_cnn_3_layer_2.nn_classify_50_plus_bg(img_input)
         model = Model(inputs=img_input, outputs=prediction)
         model.compile(loss='categorical_crossentropy', optimizer=RMSprop(), metrics=['accuracy'])
@@ -110,17 +137,29 @@ def train_label_classification(label_folder, non_label_folder, model_file=None):
     model.summary()
 
     # Load and normalize data
-    x_train, y_train, x_test, y_test = load_train_validation_data(label_folder, non_label_folder)
+    x_train, y_train, x_test, y_test = load_train_validation_data(c)
 
-    x_train = x_train.astype('float32')
-    x_test = x_test.astype('float32')
+    x_train = x_train.astype(np.float32)
+    x_test = x_test.astype(np.float32)
+    if c.color_type == cv2.IMREAD_COLOR:
+        x_train[:, :, :, 0] -= c.img_channel_mean[0]
+        x_train[:, :, :, 1] -= c.img_channel_mean[1]
+        x_train[:, :, :, 2] -= c.img_channel_mean[2]
+        x_test[:, :, :, 0] -= c.img_channel_mean[0]
+        x_test[:, :, :, 1] -= c.img_channel_mean[1]
+        x_test[:, :, :, 2] -= c.img_channel_mean[2]
+    else:
+        x_train -= c.img_pixel_mean
+        x_test -= c.img_pixel_mean
+
     x_train /= 255
     x_test /= 255
+
     print(x_train.shape[0], 'train samples')
     print(x_test.shape[0], 'test samples')
 
-    # x_train.reshape(x_train.shape[0], 28, 28, 1)
-    # x_test.reshape(x_test.shape[0], 28, 28, 1)
+    # x_train.reshape(x_train.shape[0], 28, 28, 3)
+    # x_test.reshape(x_test.shape[0], 28, 28, 3)
 
     # convert class vectors to binary class matrices
     y_train = keras.utils.to_categorical(y_train, 51)
@@ -157,25 +196,10 @@ if __name__ == "__main__":
                             'train_label_classification',
                                  ]
                         )
-    parser.add_argument('--label_folder',
-                        help='the label folder for training the network',
-                        type=str,
-                        default='/Users/jie/projects/PanelSeg/Exp1/Labels-28')
-    parser.add_argument('--non_label_folder',
-                        help='the non-label folder for training the network',
-                        type=str,
-                        default='/Users/jie/projects/PanelSeg/Exp1/NonLabels-28')
-    parser.add_argument('--model_file',
-                        help='the network model file to load from',
-                        type=str,
-                        default='/Users/jie/projects/PanelSeg/Exp1/models/label_non_label_2_cnn_model.h5')
 
     args = parser.parse_args()
-    if args.op == 'train_label_classification':
-        print('train_label_classification with label_folder={0} and non_label_folder={1}'
-              .format(args.label_folder, args.non_label_folder))
-        input("Press Enter to continue...")
-        train_label_classification(args.label_folder, args.non_label_folder)
-        # train_label_classification(label_folder="label_folder='/Users/jie/projects/PanelSeg/Exp1/Labels-28',
-        #                        non_label_folder='/Users/jie/projects/PanelSeg/Exp1/NonLabels-28')
 
+    configure = Config()
+
+    if args.op == 'train_label_classification':
+        train_label_classification(configure)

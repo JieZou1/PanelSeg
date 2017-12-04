@@ -27,9 +27,9 @@ def train_rpn(model_file=None):
 
     parser = OptionParser()
     parser.add_option("--train_path", dest="train_path", help="Path to training data.",
-                      default='/Users/jie/projects/PanelSeg/ExpRcnn/train.txt')
+                      default='/Users/jie/projects/PanelSeg/ExpPython/train.txt')
     parser.add_option("--val_path", dest="val_path", help="Path to validation data.",
-                      default='/Users/jie/projects/PanelSeg/ExpRcnn/eval.txt')
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval.txt')
     parser.add_option("--num_rois", type="int", dest="num_rois", help="Number of RoIs to process at once.",
                       default=32)
     parser.add_option("--network", dest="network", help="Base network to use. Supports nn_cnn_3_layer.",
@@ -39,7 +39,7 @@ def train_rpn(model_file=None):
     parser.add_option("--output_weight_path", dest="output_weight_path", help="Output path for weights.",
                       default='./model_rpn.hdf5')
     parser.add_option("--input_weight_path", dest="input_weight_path",
-                      default='/Users/jie/projects/PanelSeg/ExpRcnn/models/label+bg_cnn_3_layer_color-0.9926.h5')
+                      default='/Users/jie/projects/PanelSeg/ExpPython/models/label+bg_rpn_3_layer_color-0.0389.hdf5')
 
     (options, args) = parser.parse_args()
 
@@ -273,7 +273,7 @@ def test_rpn():
     parser = OptionParser()
 
     parser.add_option("-p", "--path", dest="test_path", help="Path to test data.",
-                      default='/Users/jie/projects/PanelSeg/ExpRcnn/eval.txt')
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval.txt')
     parser.add_option("-n", "--num_rois", type="int", dest="num_rois",
                       help="Number of ROIs per iteration. Higher means more memory use.", default=32)
     parser.add_option("--config_filename", dest="config_filename",
@@ -282,11 +282,11 @@ def test_rpn():
     parser.add_option("--network", dest="network", help="Base network to use. Supports nn_cnn_3_layer.",
                       default='nn_cnn_3_layer')
     parser.add_option("--rpn_weight_path", dest="rpn_weight_path",
-                      default = './model_rpn.hdf5') # default='/Users/jie/projects/PanelSeg/ExpRcnn/models/model_rpn_3_layer_color-0.0173.hdf5')
+                      default='./model_rpn.hdf5') # default='/Users/jie/projects/PanelSeg/ExpPython/models/model_rpn_3_layer_color-0.0173.hdf5')
     parser.add_option("--classify_model_path", dest="classify_model_path",
-                      default='/Users/jie/projects/PanelSeg/ExpRcnn/models/label50+bg_cnn_3_layer_color-0.9910.h5')
+                      default='/Users/jie/projects/PanelSeg/ExpPython/models/label50+bg_cnn_3_layer_color-0.9910.h5')
     parser.add_option("--result_folder", dest="result_folder",
-                      default='/Users/jie/projects/PanelSeg/ExpRcnn/eval')
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval/rpn-1000')
 
     (options, args) = parser.parse_args()
 
@@ -412,7 +412,11 @@ def test_rpn():
         lines = f.readlines()
 
     for idx, filepath in enumerate(lines):
-        print(filepath)
+        print(str(idx) + ': ' + filepath)
+        # if 'PMC3664797_gkt198f2p' not in filepath:
+        #     continue
+        # if idx < 986:
+        #     continue
         filepath = filepath.strip()
         figure = Figure(filepath)
         figure.load_image()
@@ -427,7 +431,7 @@ def test_rpn():
         # get the feature maps and output from the RPN
         [Y1, Y2, F] = model_rpn.predict(X)
 
-        R = label_rcnn_roi_helpers.rpn_to_roi(Y1, Y2, c, K.image_dim_ordering(), overlap_thresh=0.6)
+        R = label_rcnn_roi_helpers.rpn_to_roi(Y1, Y2, c, K.image_dim_ordering(), overlap_thresh=0.3, max_boxes=1000)
 
         R = R * c.rpn_stride
 
@@ -457,7 +461,34 @@ def test_rpn():
         figure.fg_rois = R[fg_indexes]                     # Find foreground ROIs
         figure.fg_probs = max_probs[fg_indexes]            # Find foreground probs
 
-        # TODO: Remove overlapping candidates with the same label
+        # Remove overlapping candidates with the same label
+        # initialize the list of picked indexes
+        # idxs = np.argsort(figure.fg_probs)
+        # pick = []
+        # while len(idxs) > 0:
+        #     # grab the last index in the indexes list and add the
+        #     # index value to the list of picked indexes
+        #     i = idxs[-1]
+        #     label1 = figure.fg_labels[i]
+        #     roi1 = figure.fg_rois[i]
+        #
+        #     overlap = False
+        #     for idx in pick:
+        #         # check whether have overlapping candidates with the same label
+        #         label2 = figure.fg_labels[idx]
+        #         roi2 = figure.fg_rois[idx]
+        #         if label1 != label2:
+        #             continue
+        #         iou = label_rcnn_data_generators.iou_rect(roi1, roi2)
+        #         if iou > 0:
+        #             overlap = True
+        #
+        #     if not overlap:
+        #         pick.append(i)
+        #     idxs = np.delete(idxs, -1)
+        # figure.fg_labels = figure.fg_labels[pick]
+        # figure.fg_rois = figure.fg_rois[pick]
+        # figure.fg_probs = figure.fg_probs[pick]
 
         print('Elapsed time = {}'.format(time.time() - st))
 
@@ -466,6 +497,6 @@ def test_rpn():
 
 
 if __name__ == "__main__":
-    # train_rpn()
-    test_rpn()
+    train_rpn()
+    # test_rpn()
     pass

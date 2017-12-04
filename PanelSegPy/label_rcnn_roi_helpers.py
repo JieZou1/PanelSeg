@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import copy
-
+from Figure import Figure
 import label_rcnn_data_generators
 
 
@@ -225,7 +225,7 @@ def non_max_suppression_fast(boxes, probs, overlap_thresh=0.9, max_boxes=300):
 import time
 
 
-def rpn_to_roi(rpn_layer, regr_layer, C, dim_ordering, use_regr=True, max_boxes=200, overlap_thresh=0.9):
+def rpn_to_roi(rpn_layer, regr_layer, C, dim_ordering, use_regr=True, max_boxes=300, overlap_thresh=0.9):
 
     regr_layer = regr_layer / C.std_scaling
 
@@ -286,18 +286,19 @@ def rpn_to_roi(rpn_layer, regr_layer, C, dim_ordering, use_regr=True, max_boxes=
     y1 = all_boxes[:, 1]
     x2 = all_boxes[:, 2]
     y2 = all_boxes[:, 3]
+    x_c = (x1 + x2) / 2
+    y_c = (y1 + y2) / 2
 
-    idxs = np.where((x1 - x2 >= 0) | (y1 - y2 >= 0))
-
+    # we remove obviously incorrect boxes
+    idxs = np.where((x1 - x2 >= 0) | (y1 - y2 >= 0)  # negative widths and heights
+                    | (x2 - x1 != y2 - y1)           # non-square boxes
+                    | (x_c < Figure.PADDING / C.rpn_stride)
+                    | (y_c < Figure.PADDING / C.rpn_stride)
+                    | (x_c > cols - Figure.PADDING / C.rpn_stride)
+                    | (y_c > rows - Figure.PADDING / C.rpn_stride)  # boxes which are half located in padding area
+                    )
     all_boxes = np.delete(all_boxes, idxs, 0)
     all_probs = np.delete(all_probs, idxs, 0)
-
-    # we remove non square boxes
-    idxs = np.where(x2-x1 != y2-y1)
-    all_boxes = np.delete(all_boxes, idxs, 0)
-    all_probs = np.delete(all_probs, idxs, 0)
-
-    # TODO: we also remove boxes which are half located in padding area
 
     result = non_max_suppression_fast(all_boxes, all_probs, overlap_thresh=overlap_thresh, max_boxes=max_boxes)[0]
 

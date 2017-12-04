@@ -6,10 +6,11 @@ import Figure
 def save_annotation_xml(annotation_path, rois, labels):
     document_node, shapes_node = create_doc_template()
 
-    for i in range(len(rois)):
-        roi = rois[i]
-        label = labels[i]
-        add_roi(shapes_node, roi, label)
+    if rois is not None:
+        for i in range(len(rois)):
+            roi = rois[i]
+            label = labels[i]
+            add_roi(shapes_node, roi, label)
 
     tree = ET.ElementTree(document_node)
     tree.write(annotation_path)

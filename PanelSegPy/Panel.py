@@ -1,4 +1,8 @@
 
+LABEL_MIN_SIZE = 12
+LABEL_MAX_SIZE = 80
+LABEL_ALL = '123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz'
+
 # Map labels to the folder where the sample patches are stored.
 LABEL_FOLDER_MAPPING = {
     '1': ['[49]'],

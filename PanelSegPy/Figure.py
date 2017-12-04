@@ -5,7 +5,7 @@ import cv2
 import os
 
 import misc
-from Panel import Panel, LABEL_CLASS_MAPPING
+from Panel import LABEL_CLASS_MAPPING, LABEL_ALL, Panel
 from iPhotoDraw import save_annotation_xml
 
 
@@ -24,13 +24,15 @@ class Figure:
 
     def __init__(self, image_path):
         self.image_path = image_path
-        path, file = os.path.split(image_path)
+        path, self.file = os.path.split(image_path)
         path, folder = os.path.split(path)
-        self.id = "{0}-{1}".format(folder, file)
+        self.id = "{0}-{1}".format(folder, self.file)
 
         self.image_orig = None
         self.image = None
         self.image_gray = None
+        self.image_width = 0
+        self.image_height = 0
 
         self.panels = None
 
@@ -40,7 +42,7 @@ class Figure:
         self.label_prediction = None
         self.fg_labels = None
         self.fg_rois = None
-        self.fg_probs = None
+        self.fg_scores = None
 
     def load_image(self):
         """
@@ -51,6 +53,7 @@ class Figure:
         self.image = cv2.copyMakeBorder(
             self.image_orig, self.PADDING, self.PADDING, self.PADDING, self.PADDING, cv2.BORDER_CONSTANT, 0)
         self.image_gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+        self.image_height, self.image_width = self.image.shape[:2]
 
     def crop_patch(self, roi, is_gray=True):
         x, y, w, h = roi[0] + self.PADDING, roi[1] + self.PADDING, roi[2], roi[3]
@@ -276,26 +279,30 @@ class Figure:
         :return:
         """
         # save original image
-        img_path = os.path.join(annotation_folder, self.id)
+        img_path = os.path.join(annotation_folder, self.file)
         cv2.imwrite(img_path, self.image_orig)
 
         # save previews
-        color = (255, 0, 255)
         img = self.image.copy()
         labels = []
-        for i in range(len(self.fg_labels)):
-            label = self.class_label_mapping[self.fg_labels[i]]
-            labels.append('label ' + label)
-            prob = self.fg_probs[i]
-            roi = self.fg_rois[i]
-            pt1 = (roi[0], roi[1])
-            pt2 = (roi[0] + roi[2], roi[1] + roi[3])
-            cv2.rectangle(img, pt1, pt2, color)
-            cv2.putText(img, label + '--{0}'.format(prob, '%.2f'), pt2, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
-        preview_path = os.path.join(annotation_folder, self.id.strip('.jpg') + '-preview.jpg')
+        if self.fg_rois is not None:
+            color = (255, 0, 255)
+            for i in range(len(self.fg_labels)):
+                if self.fg_labels[i] == LABEL_ALL:
+                    label = self.fg_labels[i]
+                else:
+                    label = self.class_label_mapping[self.fg_labels[i]]
+                labels.append('label ' + label)
+                prob = self.fg_scores[i]
+                roi = self.fg_rois[i]
+                pt1 = (roi[0], roi[1])
+                pt2 = (roi[0] + roi[2], roi[1] + roi[3])
+                cv2.rectangle(img, pt1, pt2, color)
+                cv2.putText(img, label + '--{0}'.format(prob, '%.2f'), pt2, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+        preview_path = os.path.join(annotation_folder, self.file.replace('.jpg', '-preview.jpg'))
         cv2.imwrite(preview_path, img)
 
         # save annotation
-        annotation_path = os.path.join(annotation_folder, self.id.strip('.jpg') + '_data.xml')
+        annotation_path = os.path.join(annotation_folder, self.file.replace('.jpg', '_data.xml'))
         save_annotation_xml(annotation_path, self.fg_rois, labels)
 

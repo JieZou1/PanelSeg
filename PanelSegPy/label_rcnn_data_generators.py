@@ -26,6 +26,12 @@ def intersection(ai, bi):
     return w * h
 
 
+def iou_rect(roi1, roi2):
+    a = (roi1[0], roi1[1], roi1[0]+roi1[2], roi1[1] + roi1[3])
+    b = (roi2[0], roi2[1], roi2[0]+roi2[2], roi1[1] + roi1[3])
+    return iou(a, b)
+
+
 def iou(a, b):
     # a and b should be (x1,y1,x2,y2)
 

@@ -291,7 +291,7 @@ class Figure:
                 if self.fg_labels[i] == LABEL_ALL:
                     label = self.fg_labels[i]
                 else:
-                    label = self.class_label_mapping[self.fg_labels[i]]
+                    label = self.class_label_mapping[int(self.fg_labels[i])]
                 labels.append('label ' + label)
                 prob = self.fg_scores[i]
                 roi = self.fg_rois[i]

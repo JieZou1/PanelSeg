@@ -28,9 +28,63 @@ def create_hog():
                   '_nlevels': 64,
                   '_signedGradient': False
                   }
-    hog = cv2.HOGDescriptor(**hog_params)
+    return cv2.HOGDescriptor(**hog_params)
 
+
+def hog_initialize():
+    hog = create_hog()
+    hog.setSVMDetector(np.array(svmModel_19409_17675))
     return hog
+
+
+def hog_detect(figure, hog):
+    # Resize the image.
+    scale = 64.0 / Panel.LABEL_MIN_SIZE  # check statistics.txt to decide this scaling factor.
+    _width = figure.image_width * scale + 0.5
+    _height = figure.image_height * scale + 0.5
+    img_scaled = cv2.resize(figure.image_gray, (int(_width), int(_height)))
+
+    # detect
+    hog_params = {'hitThreshold': 0,
+                  'winStride': (8, 8),
+                  'padding': (32, 32),
+                  'scale': 1.05,
+                  'finalThreshold': 2,
+                  'useMeanshiftGrouping': False}
+    rois, scores = hog.detectMultiScale(img_scaled, **hog_params)
+
+    fg_rois = fg_scores = fg_labels = None
+    if len(rois) > 0:
+        # Scale back to the original size
+        rois = (rois / scale + 0.5).astype(int)
+
+        # remove obviously incorrect rois
+        idxes = []
+        for idx in range(scores.shape[0]):
+            orig_x, orig_y, orig_w, orig_h = rois[idx][0], rois[idx][1], rois[idx][2], rois[idx][3]
+
+            # Size checking. Ignore the size which is too small or too large
+            if orig_w > Panel.LABEL_MAX_SIZE or orig_h > Panel.LABEL_MAX_SIZE:
+                continue
+            if orig_w < Panel.LABEL_MIN_SIZE or orig_h < Panel.LABEL_MIN_SIZE:
+                continue
+
+            # Position check. Ignore the rect, when at least half of it is outside the original image.
+            # noticed that we have padded the figure image.
+            center_x = int(orig_x + orig_w / 2)
+            center_y = int(orig_y + orig_h / 2)
+            if center_x <= Figure.PADDING or center_x >= figure.image_width - Figure.PADDING:
+                continue
+            if center_y <= Figure.PADDING or center_y >= figure.image_height - Figure.PADDING:
+                continue
+
+            idxes.append(idx)
+
+        fg_rois = rois[idxes]
+        fg_scores = scores[idxes]
+        fg_labels = np.full(fg_scores.shape[0], Panel.LABEL_ALL)
+
+    return fg_rois, fg_scores, fg_labels
 
 
 def test_hog():
@@ -48,13 +102,11 @@ def test_hog():
         parser.error('Error: path to test data must be specified. Pass --path to command line')
 
     # read in testing images
-    img_list_path = options.test_path
-    with open(img_list_path) as f:
+    with open(options.test_path) as f:
         lines = f.readlines()
 
     # create HOG
-    hog = create_hog()
-    hog.setSVMDetector(np.array(svmModel_19409_17675))
+    hog = hog_initialize()
 
     for idx, filepath in enumerate(lines):
         print(str(idx) + ': ' + filepath)
@@ -65,53 +117,9 @@ def test_hog():
         filepath = filepath.strip()
         figure = Figure(filepath)
         figure.load_image()
+
         st = time.time()
-
-        # Resize the image.
-        scale = 64.0 / Panel.LABEL_MIN_SIZE  # check statistics.txt to decide this scaling factor.
-        _width = figure.image_width * scale + 0.5
-        _height = figure.image_height * scale + 0.5
-        img_scaled = cv2.resize(figure.image_gray, (int(_width), int(_height)))
-
-        # detect
-        hog_params = {'hitThreshold': 0,
-                      'winStride': (8, 8),
-                      'padding': (32, 32),
-                      'scale': 1.05,
-                      'finalThreshold': 2,
-                      'useMeanshiftGrouping': False}
-        rois, scores = hog.detectMultiScale(img_scaled, **hog_params)
-
-        if len(rois) > 0:
-            # Scale back to the original size
-            rois = (rois/scale+0.5).astype(int)
-
-            # remove obviously incorrect rois
-            idxes = []
-            for idx in range(scores.shape[0]):
-                orig_x, orig_y, orig_w, orig_h = rois[idx][0], rois[idx][1], rois[idx][2], rois[idx][3]
-
-                # Size checking. Ignore the size which is too small or too large
-                if orig_w > Panel.LABEL_MAX_SIZE or orig_h > Panel.LABEL_MAX_SIZE:
-                    continue
-                if orig_w < Panel.LABEL_MIN_SIZE or orig_h < Panel.LABEL_MIN_SIZE:
-                    continue
-
-                # Position check. Ignore the rect, when at least half of it is outside the original image.
-                # noticed that we have padded the figure image.
-                center_x = int(orig_x + orig_w / 2)
-                center_y = int(orig_y + orig_h / 2)
-                if center_x <= Figure.PADDING or center_x >= figure.image_width - Figure.PADDING:
-                    continue
-                if center_y <= Figure.PADDING or center_y >= figure.image_height - Figure.PADDING:
-                    continue
-
-                idxes.append(idx)
-
-            figure.fg_rois = rois[idxes]
-            figure.fg_scores = scores[idxes]
-            figure.fg_labels = np.full(figure.fg_scores.shape[0], Panel.LABEL_ALL)
-
+        figure.fg_rois, figure.fg_scores, figure.fg_labels = hog_detect(figure, hog)
         print('Elapsed time = {}'.format(time.time() - st))
 
         # Save detection results

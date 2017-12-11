@@ -39,7 +39,7 @@ def train_rpn(model_file=None):
     parser.add_option("--output_weight_path", dest="output_weight_path", help="Output path for weights.",
                       default='./model_rpn.hdf5')
     parser.add_option("--input_weight_path", dest="input_weight_path",
-                      default='/Users/jie/projects/PanelSeg/ExpPython/models/label+bg_rpn_3_layer_color-0.0389.hdf5')
+                      default='/Users/jie/projects/PanelSeg/ExpPython/models/label+bg_rpn_3_layer_color-0.0374.hdf5')
 
     (options, args) = parser.parse_args()
 
@@ -269,30 +269,57 @@ def train_rpn(model_file=None):
     print('Training complete, exiting.')
 
 
-def test_rpn():
-    parser = OptionParser()
+def format_img_size(img, C):
+    """ formats the image size based on config """
+    img_min_side = float(C.im_size)
+    (height, width, _) = img.shape
 
-    parser.add_option("-p", "--path", dest="test_path", help="Path to test data.",
-                      default='/Users/jie/projects/PanelSeg/ExpPython/eval.txt')
-    parser.add_option("-n", "--num_rois", type="int", dest="num_rois",
-                      help="Number of ROIs per iteration. Higher means more memory use.", default=32)
-    parser.add_option("--config_filename", dest="config_filename",
-                      help="Location to read the metadata related to the training (generated when training).",
-                      default="config.pickle")
-    parser.add_option("--network", dest="network", help="Base network to use. Supports nn_cnn_3_layer.",
-                      default='nn_cnn_3_layer')
-    parser.add_option("--rpn_weight_path", dest="rpn_weight_path",
-                      default='./model_rpn.hdf5') # default='/Users/jie/projects/PanelSeg/ExpPython/models/model_rpn_3_layer_color-0.0173.hdf5')
-    parser.add_option("--classify_model_path", dest="classify_model_path",
-                      default='/Users/jie/projects/PanelSeg/ExpPython/models/label50+bg_cnn_3_layer_color-0.9910.h5')
-    parser.add_option("--result_folder", dest="result_folder",
-                      default='/Users/jie/projects/PanelSeg/ExpPython/eval/rpn-1000')
+    if width <= height:
+        ratio = img_min_side / width
+        new_height = int(ratio * height)
+        new_width = int(img_min_side)
+    else:
+        ratio = img_min_side / height
+        new_width = int(ratio * width)
+        new_height = int(img_min_side)
 
-    (options, args) = parser.parse_args()
+    img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+    return img, ratio
 
-    if not options.test_path:  # if filename is not given
-        parser.error('Error: path to test data must be specified. Pass --path to command line')
 
+def format_img_channels(img, C):
+    """ formats the image channels based on config """
+    # img = img[:, :, (2, 1, 0)]
+    img = img.astype(np.float32)
+    img[:, :, 0] -= C.img_channel_mean[0]
+    img[:, :, 1] -= C.img_channel_mean[1]
+    img[:, :, 2] -= C.img_channel_mean[2]
+    img /= 255
+
+    # img /= C.img_scaling_factor
+    img = np.transpose(img, (2, 0, 1))
+    img = np.expand_dims(img, axis=0)
+    return img
+
+
+def format_img(img, C):
+    """ formats an image for model prediction based on config """
+    # img, ratio = format_img_size(img, C)
+    img = format_img_channels(img, C)
+    return img, 1.0
+
+
+# Method to transform the coordinates of the bounding box to its original size
+def get_real_coordinates(ratio, x1, y1, x2, y2):
+    real_x1 = int(round(x1 // ratio))
+    real_y1 = int(round(y1 // ratio))
+    real_x2 = int(round(x2 // ratio))
+    real_y2 = int(round(y2 // ratio))
+
+    return (real_x1, real_y1, real_x2, real_y2)
+
+
+def rpn_initialize(options):
     config_output_filename = options.config_filename
 
     with open(config_output_filename, 'rb') as f_in:
@@ -306,52 +333,6 @@ def test_rpn():
     c.rot_90 = False
 
     img_list_path = options.test_path
-
-    def format_img_size(img, C):
-        """ formats the image size based on config """
-        img_min_side = float(C.im_size)
-        (height, width, _) = img.shape
-
-        if width <= height:
-            ratio = img_min_side / width
-            new_height = int(ratio * height)
-            new_width = int(img_min_side)
-        else:
-            ratio = img_min_side / height
-            new_width = int(ratio * width)
-            new_height = int(img_min_side)
-        img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
-        return img, ratio
-
-    def format_img_channels(img, C):
-        """ formats the image channels based on config """
-        # img = img[:, :, (2, 1, 0)]
-        img = img.astype(np.float32)
-        img[:, :, 0] -= C.img_channel_mean[0]
-        img[:, :, 1] -= C.img_channel_mean[1]
-        img[:, :, 2] -= C.img_channel_mean[2]
-        img /= 255
-
-        # img /= C.img_scaling_factor
-        img = np.transpose(img, (2, 0, 1))
-        img = np.expand_dims(img, axis=0)
-        return img
-
-    def format_img(img, C):
-        """ formats an image for model prediction based on config """
-        # img, ratio = format_img_size(img, C)
-        img = format_img_channels(img, C)
-        return img, 1.0
-
-    # Method to transform the coordinates of the bounding box to its original size
-    def get_real_coordinates(ratio, x1, y1, x2, y2):
-
-        real_x1 = int(round(x1 // ratio))
-        real_y1 = int(round(y1 // ratio))
-        real_x2 = int(round(x2 // ratio))
-        real_y2 = int(round(y2 // ratio))
-
-        return (real_x1, real_y1, real_x2, real_y2)
 
     class_mapping = c.class_mapping
 
@@ -408,7 +389,79 @@ def test_rpn():
 
     visualise = True
 
-    with open(img_list_path) as f:
+    return c, model_rpn, model_classifier
+
+
+def rpn_detect(figure, c, model_rpn, model_classifier):
+    X, ratio = format_img(figure.image, c)
+
+    if K.image_dim_ordering() == 'tf':
+        X = np.transpose(X, (0, 2, 3, 1))
+
+    # get the feature maps and output from the RPN
+    [Y1, Y2, F] = model_rpn.predict(X)
+
+    R = label_rcnn_roi_helpers.rpn_to_roi(Y1, Y2, c, K.image_dim_ordering(), overlap_thresh=0.3, max_boxes=1000)
+
+    R = R * c.rpn_stride
+
+    # convert from (x1,y1,x2,y2) to (x,y,w,h)
+    R[:, 2] -= R[:, 0]
+    R[:, 3] -= R[:, 1]
+
+    patches = np.empty([R.shape[0], 28, 28, 3], dtype=int)
+
+    for idx, roi in enumerate(R):
+        x, y, w, h = roi[0], roi[1], roi[2], roi[3]
+        patch = figure.image[y:y + h, x:x + w]
+        patches[idx] = cv2.resize(patch, (28, 28))
+
+    patches = patches.astype('float32')
+    patches[:, :, :, 0] -= c.img_channel_mean[0]
+    patches[:, :, :, 1] -= c.img_channel_mean[1]
+    patches[:, :, :, 2] -= c.img_channel_mean[2]
+    patches /= 255
+
+    figure.label_prediction = prediction = model_classifier.predict(patches)
+
+    max_labels = np.argmax(prediction, 1)  # Find classified labels for each instance
+    max_probs = prediction[range(len(max_labels)), max_labels]  # Find the prob of the max label
+    fg_indexes = np.where(max_labels != len(LABEL_CLASS_MAPPING))  # Find foreground (label) indexes
+
+    fg_labels = max_labels[fg_indexes]  # Find foreground labels
+    fg_rois = R[fg_indexes]  # Find foreground ROIs
+    fg_probs = max_probs[fg_indexes]  # Find foreground probs
+
+    return fg_rois, fg_probs, fg_labels
+
+
+def test_rpn():
+    parser = OptionParser()
+
+    parser.add_option("-p", "--path", dest="test_path", help="Path to test data.",
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval.txt')
+    parser.add_option("-n", "--num_rois", type="int", dest="num_rois",
+                      help="Number of ROIs per iteration. Higher means more memory use.", default=32)
+    parser.add_option("--config_filename", dest="config_filename",
+                      help="Location to read the metadata related to the training (generated when training).",
+                      default="config.pickle")
+    parser.add_option("--network", dest="network", help="Base network to use. Supports nn_cnn_3_layer.",
+                      default='nn_cnn_3_layer')
+    parser.add_option("--rpn_weight_path", dest="rpn_weight_path",
+                      default='./model_rpn.hdf5') # default='/Users/jie/projects/PanelSeg/ExpPython/models/model_rpn_3_layer_color-0.0173.hdf5')
+    parser.add_option("--classify_model_path", dest="classify_model_path",
+                      default='/Users/jie/projects/PanelSeg/ExpPython/models/label50+bg_cnn_3_layer_color-0.9910.h5')
+    parser.add_option("--result_folder", dest="result_folder",
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval/rpn-1000')
+
+    (options, args) = parser.parse_args()
+
+    if not options.test_path:  # if filename is not given
+        parser.error('Error: path to test data must be specified. Pass --path to command line')
+
+    c, model_rpn, model_classifier = rpn_initialize(options)
+
+    with open(options.test_path) as f:
         lines = f.readlines()
 
     for idx, filepath in enumerate(lines):
@@ -420,46 +473,10 @@ def test_rpn():
         filepath = filepath.strip()
         figure = Figure(filepath)
         figure.load_image()
-        img = figure.image
 
         st = time.time()
-        X, ratio = format_img(img, c)
 
-        if K.image_dim_ordering() == 'tf':
-            X = np.transpose(X, (0, 2, 3, 1))
-
-        # get the feature maps and output from the RPN
-        [Y1, Y2, F] = model_rpn.predict(X)
-
-        R = label_rcnn_roi_helpers.rpn_to_roi(Y1, Y2, c, K.image_dim_ordering(), overlap_thresh=0.3, max_boxes=1000)
-
-        R = R * c.rpn_stride
-
-        # convert from (x1,y1,x2,y2) to (x,y,w,h)
-        R[:, 2] -= R[:, 0]
-        R[:, 3] -= R[:, 1]
-
-        patches = np.empty([R.shape[0], 28, 28, 3], dtype=int)
-
-        for idx, roi in enumerate(R):
-            x, y, w, h = roi[0], roi[1], roi[2], roi[3]
-            patch = figure.image[y:y + h, x:x + w]
-            patches[idx] = cv2.resize(patch, (28, 28))
-
-        patches = patches.astype('float32')
-        patches[:, :, :, 0] -= c.img_channel_mean[0]
-        patches[:, :, :, 1] -= c.img_channel_mean[1]
-        patches[:, :, :, 2] -= c.img_channel_mean[2]
-        patches /= 255
-
-        figure.label_prediction = prediction = model_classifier.predict(patches)
-
-        max_labels = np.argmax(prediction, 1)    # Find classified labels for each instance
-        max_probs = prediction[range(len(max_labels)), max_labels]   # Find the prob of the max label
-        fg_indexes = np.where(max_labels != len(LABEL_CLASS_MAPPING))     # Find foreground (label) indexes
-        figure.fg_labels = max_labels[fg_indexes]          # Find foreground labels
-        figure.fg_rois = R[fg_indexes]                     # Find foreground ROIs
-        figure.fg_probs = max_probs[fg_indexes]            # Find foreground probs
+        figure.fg_rois, figure.fg_scores, figure.fg_labels = rpn_detect(figure, c, model_rpn, model_classifier)
 
         # Remove overlapping candidates with the same label
         # initialize the list of picked indexes
@@ -497,6 +514,12 @@ def test_rpn():
 
 
 if __name__ == "__main__":
-    train_rpn()
+    import tensorflow as tf
+    with tf.device('/cpu:0'):
+        print('use CPU 0!')
+        train_rpn()
+        # test_rpn()
+
+    # train_rpn()
     # test_rpn()
     pass

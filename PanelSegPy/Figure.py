@@ -5,7 +5,7 @@ import cv2
 import os
 
 import misc
-from Panel import LABEL_CLASS_MAPPING, LABEL_ALL, Panel
+from Panel import LABEL_CLASS_MAPPING, LABEL_ALL, Panel, CLASS_LABEL_MAPPING
 from iPhotoDraw import save_annotation_xml
 
 
@@ -38,7 +38,8 @@ class Figure:
 
         # label detection results
         self.label_class_mapping = LABEL_CLASS_MAPPING
-        self.class_label_mapping = {v: k for k, v in self.label_class_mapping.items()}
+        # self.class_label_mapping = {v: k for k, v in self.label_class_mapping.items()}
+        self.class_label_mapping = CLASS_LABEL_MAPPING
         self.label_prediction = None
         self.fg_labels = None
         self.fg_rois = None

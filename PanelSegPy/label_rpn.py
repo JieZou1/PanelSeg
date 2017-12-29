@@ -39,7 +39,7 @@ def train_rpn(model_file=None):
     parser.add_option("--output_weight_path", dest="output_weight_path", help="Output path for weights.",
                       default='./model_rpn.hdf5')
     parser.add_option("--input_weight_path", dest="input_weight_path",
-                      default='/Users/jie/projects/PanelSeg/ExpPython/models/label+bg_rpn_3_layer_color-0.0374.hdf5')
+                      default='/Users/jie/projects/PanelSeg/ExpPython/models/label+bg_rpn_3_layer_color-0.135.hdf5')
 
     (options, args) = parser.parse_args()
 
@@ -517,8 +517,8 @@ if __name__ == "__main__":
     import tensorflow as tf
     with tf.device('/cpu:0'):
         print('use CPU 0!')
-        train_rpn()
-        # test_rpn()
+        # train_rpn()
+        test_rpn()
 
     # train_rpn()
     # test_rpn()

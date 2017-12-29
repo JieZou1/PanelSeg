@@ -17,6 +17,25 @@ from Panel import Panel
 from Config import Config
 
 
+def cnn_feature_extraction(figure, rois, model_classifier):
+    # Not working yet
+    patches = np.empty([rois.shape[0], 28, 28, 3], dtype=np.uint8)
+    for idx, roi in enumerate(rois):
+        x, y, w, h = roi[0], roi[1], roi[2], roi[3]
+        patch = figure.image[y:y + h, x:x + w]
+        patches[idx] = cv2.resize(patch, (28, 28))
+
+    patches = patches.astype('float32')
+    patches[:, :, :, 0] -= 128.0  # c.img_channel_mean[0]
+    patches[:, :, :, 1] -= 128.0  # c.img_channel_mean[1]
+    patches[:, :, :, 2] -= 128.0  # c.img_channel_mean[2]
+    patches /= 255
+
+    prediction = model_classifier.predict_proba(patches)
+    x = model_classifier.layers[5].output
+    return x
+
+
 def load_train_validation_data(c):
 
     label_folder = c.labels_normalized_folder

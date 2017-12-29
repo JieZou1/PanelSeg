@@ -1,7 +1,10 @@
 from optparse import OptionParser
 
 import time
+import os
 import numpy as np
+
+import Panel
 from Figure import Figure
 from label_hog import hog_initialize, hog_detect
 from label_rcnn_data_generators import iou_rect
@@ -32,11 +35,11 @@ def rpn_hog_detect(figure, rpn_c, rpn_model_rpn, rpn_model_classifier, hog, meth
         rpn_rois, rpn_scores, rpn_labels = rpn_detect(figure, rpn_c, rpn_model_rpn, rpn_model_classifier)
 
         # Keep all regions detected by both RPN and HOG methods.
-        # rois, scores, labels = rpn_hog_combine_all(hog_rois, hog_scores, hog_labels, rpn_rois, rpn_scores, rpn_labels)
+        rois, scores, labels = rpn_hog_combine_all(hog_rois, hog_scores, hog_labels, rpn_rois, rpn_scores, rpn_labels)
 
         # Keep only regions agreed by both methods. IOU > 25%
-        rois, scores, labels = rpn_hog_combine_agreed(hog_rois, hog_scores, hog_labels,
-                                                      rpn_rois, rpn_scores, rpn_labels, 0.25)
+        # rois, scores, labels = rpn_hog_combine_agreed(hog_rois, hog_scores, hog_labels,
+        #                                               rpn_rois, rpn_scores, rpn_labels, 0.25)
 
     return rois, scores, labels
 
@@ -55,7 +58,7 @@ def rpn_hog_combine_all(hog_rois, hog_scores, hog_labels, rpn_rois, rpn_scores, 
         rois, scores, labels = hog_rois, hog_scores, hog_labels
     else:
         rois = np.concatenate((hog_rois, rpn_rois), axis=0)
-        scores = np.concatenate((hog_scores, rpn_scores.reshape(rpn_scores.shape[0], 1)), axis=0)
+        scores = np.concatenate((hog_scores.reshape(hog_scores.shape[0],), rpn_scores), axis=0)
         labels = np.concatenate((hog_labels, rpn_labels), axis=0)
 
     return rois, scores, labels
@@ -99,6 +102,10 @@ def rpn_hog_combine_agreed(hog_rois, hog_scores, hog_labels, rpn_rois, rpn_score
 
 
 def test_rpn_hog():
+    """
+    HOG+RPN for panel label recognition
+    :return:
+    """
     parser = OptionParser()
 
     parser.add_option("-p", "--path", dest="test_path", help="Path to test data.",
@@ -115,7 +122,7 @@ def test_rpn_hog():
     parser.add_option("--classify_model_path", dest="classify_model_path",
                       default='/Users/jie/projects/PanelSeg/ExpPython/models/label50+bg_cnn_3_layer_color-0.9910.h5')
     parser.add_option("--result_folder", dest="result_folder",
-                      default='/Users/jie/projects/PanelSeg/ExpPython/eval/rpn_hog/rpn_cpu_0.148')
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval/rpn_hog/rpn_cpu_0.116')
 
     (options, args) = parser.parse_args()
 
@@ -149,10 +156,75 @@ def test_rpn_hog():
         figure.save_annotation(options.result_folder)
 
 
-if __name__ == "__main__":
-    # test_rpn_hog()
+def combine_hog_rpn():
+    """
+    Load results from HOG and RPN methods and then combine them
+    :return:
+    """
+    parser = OptionParser()
 
+    parser.add_option("-p", "--path", dest="test_path", help="Path to test data.",
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval.txt')
+    parser.add_option("--hog_folder", dest="hog_folder",
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval/rpn_hog/hog')
+    parser.add_option("--rpn_folder", dest="rpn_folder",
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval/rpn_hog/rpn_cpu_0.0374')
+    parser.add_option("--result_folder", dest="result_folder",
+                      default='/Users/jie/projects/PanelSeg/ExpPython/eval/rpn_hog/hog_rpn')
+
+    (options, args) = parser.parse_args()
+
+    with open(options.test_path) as f:
+        lines = f.readlines()
+
+    for idx, filepath in enumerate(lines):
+        print(str(idx) + ': ' + filepath)
+        # if 'PMC3664797_gkt198f2p' not in filepath:
+        #     continue
+        # if idx < 243:
+        #     continue
+        filepath = filepath.strip()
+        figure = Figure(filepath)
+        figure.load_image()
+
+        # Load HOG result
+        hog_file_path = os.path.join(options.hog_folder, figure.file).replace('.jpg', '_data.xml')
+        figure.load_annotation(hog_file_path)
+        hog_rois = np.empty([len(figure.panels), 4], dtype=int)
+        for i in range(len(figure.panels)):
+            hog_rois[i] = figure.panels[i].label_rect
+        hog_rois[:, 0] += Figure.PADDING
+        hog_rois[:, 1] += Figure.PADDING
+        hog_labels = np.full(hog_rois.shape[0], Panel.LABEL_ALL)
+        hog_scores = np.full(hog_rois.shape[0], 1.0)
+
+        # Load RPN result
+        rpn_file_path = os.path.join(options.rpn_folder, figure.file).replace('.jpg', '_data.xml')
+        figure.load_annotation(rpn_file_path)
+        rpn_rois = np.empty([len(figure.panels), 4], dtype=int)
+        for i in range(len(figure.panels)):
+            rpn_rois[i] = figure.panels[i].label_rect
+        rpn_rois[:, 0] += Figure.PADDING
+        rpn_rois[:, 1] += Figure.PADDING
+        rpn_labels = np.full(rpn_rois.shape[0], Panel.LABEL_ALL)
+        rpn_scores = np.full(rpn_rois.shape[0], 1.0)
+
+        # Keep all regions detected by both RPN and HOG methods.
+        # rois, scores, labels = rpn_hog_combine_all(hog_rois, hog_scores, hog_labels, rpn_rois, rpn_scores, rpn_labels)
+
+        # Keep only regions agreed by both methods. IOU > 25%
+        rois, scores, labels = rpn_hog_combine_agreed(hog_rois, hog_scores, hog_labels,
+                                                      rpn_rois, rpn_scores, rpn_labels, 0.125)
+
+        figure.fg_rois, figure.fg_scores, figure.fg_labels = rois, scores, labels
+
+        # Save detection results
+        figure.save_annotation(options.result_folder)
+
+
+if __name__ == "__main__":
     import tensorflow as tf
     with tf.device('/cpu:0'):
         print('use CPU 0!')
         test_rpn_hog()
+        # combine_hog_rpn()

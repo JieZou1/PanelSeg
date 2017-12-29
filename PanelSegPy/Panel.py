@@ -114,6 +114,35 @@ LABEL_CLASS_MAPPING = {
     't': 49,
 }
 
+CLASS_LABEL_MAPPING = {v: k for k, v in LABEL_CLASS_MAPPING.items()}
+
+
+def case_same_label(c):
+    if c == 'c' or c == 'C':
+        return True
+    elif c == 'k' or c == 'K':
+        return True
+    elif c == 'o' or c == 'O':
+        return True
+    elif c == 'p' or c == 'P':
+        return True
+    elif c == 's' or c == 'S':
+        return True
+    elif c == 'u' or c == 'U':
+        return True
+    elif c == 'v' or c == 'V':
+        return True
+    elif c == 'w' or c == 'W':
+        return True
+    elif c == 'x' or c == 'X':
+        return True
+    elif c == 'y' or c== 'Y':
+        return True
+    elif c == 'z' or c == 'Z':
+        return True
+    else:
+        return False
+
 
 def map_label(c):
     if c == 'c' or c == 'C':

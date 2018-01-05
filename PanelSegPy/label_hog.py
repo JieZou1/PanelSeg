@@ -37,13 +37,10 @@ def hog_initialize():
     return hog
 
 
-def hog_feature_extraction(figure, rois):
-    patches = np.empty([rois.shape[0], 64, 64], dtype=np.uint8)
-    for idx, roi in enumerate(rois):
-        x, y, w, h = roi[0], roi[1], roi[2], roi[3]
-        patch = figure.image_gray[y:y + h, x:x + w]
-        patches[idx] = cv2.resize(patch, (64, 64))
-    return _hog_feature_extraction(patches)
+def hog_feature_extraction(patch):
+    hog = create_hog()
+    f = hog.compute(patch)
+    return f.reshape(len(f))
 
 
 def _hog_feature_extraction(patches):

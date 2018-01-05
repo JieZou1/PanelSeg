@@ -46,6 +46,51 @@ def create_lstm_model(num_features):
     return model
 
 
+def load_ground_truth_annotation(figure):
+    figure.load_gt_annotation(which_annotation='label')
+    gt_rois = np.empty([len(figure.panels), 4], dtype=int)
+    gt_labels = np.full(gt_rois.shape[0], '')
+    for j in range(len(figure.panels)):
+        gt_rois[j] = figure.panels[j].label_rect
+        gt_labels[j] = figure.panels[j].label
+    gt_rois[:, 0] += Figure.PADDING
+    gt_rois[:, 1] += Figure.PADDING
+    return gt_rois, gt_labels
+
+
+def load_auto_annotation(figure, auto_folder):
+    auto_file_path = os.path.join(auto_folder, figure.file).replace('.jpg', '_data.xml')
+    figure.load_annotation(auto_file_path)
+    auto_rois = np.empty([len(figure.panels), 4], dtype=int)
+    for j in range(len(figure.panels)):
+        auto_rois[j] = figure.panels[j].label_rect
+    auto_rois[:, 0] += Figure.PADDING
+    auto_rois[:, 1] += Figure.PADDING
+    return auto_rois
+
+
+def feature_extraction(figure, rois):
+
+    F = []
+
+    patches = np.empty([rois.shape[0], 64, 64], dtype=np.uint8)
+    for idx, roi in enumerate(rois):
+        x, y, w, h = roi[0], roi[1], roi[2], roi[3]
+
+        # extract hog features
+        patch = figure.image_gray[y:y + h, x:x + w]
+        patches[idx] = cv2.resize(patch, (64, 64))
+        hog_f = hog_feature_extraction(patches[idx])
+        # cnn_f = cnn_feature_extraction(figure, roi)
+
+        # extract position and size features
+        pos_f = np.array([x / figure.image_width, y / figure.image_height, w / 100.0])
+
+        f = np.append(hog_f, pos_f)
+        F.append(f)
+    return np.array(F)
+
+
 def read_samples(path, auto_folder, model_classifier, model_svm):
 
     with open(path) as f:
@@ -59,23 +104,10 @@ def read_samples(path, auto_folder, model_classifier, model_svm):
         figure.load_image()
 
         # load ground-truth annotation
-        figure.load_gt_annotation(which_annotation='label')
-        gt_rois = np.empty([len(figure.panels), 4], dtype=int)
-        gt_labels = np.full(gt_rois.shape[0], '')
-        for j in range(len(figure.panels)):
-            gt_rois[j] = figure.panels[j].label_rect
-            gt_labels[j] = figure.panels[j].label
-        gt_rois[:, 0] += Figure.PADDING
-        gt_rois[:, 1] += Figure.PADDING
+        gt_rois, gt_labels = load_ground_truth_annotation(figure)
 
         # load auto annotation
-        auto_file_path = os.path.join(auto_folder, figure.file).replace('.jpg', '_data.xml')
-        figure.load_annotation(auto_file_path)
-        auto_rois = np.empty([len(figure.panels), 4], dtype=int)
-        for j in range(len(figure.panels)):
-            auto_rois[j] = figure.panels[j].label_rect
-        auto_rois[:, 0] += Figure.PADDING
-        auto_rois[:, 1] += Figure.PADDING
+        auto_rois = load_auto_annotation(figure, auto_folder)
 
         # sort auto annotation with respect to distances to left-up corner (0, 0)
         distances = [roi[0] + roi[1] for roi in auto_rois]
@@ -91,9 +123,8 @@ def read_samples(path, auto_folder, model_classifier, model_svm):
                 y[max_index] = LABEL_CLASS_MAPPING[map_label(gt_labels[gt_i])]
         Y.append(y)
 
-        # extract auto roi features
-        x = hog_feature_extraction(figure, auto_rois)
-        # x = cnn_feature_extraction(figure, auto_rois)
+        # extract features
+        x = feature_extraction(figure, auto_rois)
 
         # if len(x) > 0:
         #     p_label, p_acc, p_val = svmutil.svm_predict(y, x.tolist(), model_svm, '-b 1')
@@ -137,19 +168,20 @@ def train_lstm():
     #     pickle.dump((X_eval, Y_eval), file)
     # with open('Eval.pickle', 'rb') as file:
     #     (X_eval, Y_eval) pickle.load(file)
+
     X_train, Y_train = read_samples(options.train_path, options.train_auto_folder, model_classifier, model_svm)
     # with open('Train.pickle', 'wb') as file:
     #     pickle.dump((X_train, Y_train), file)
     # with open('Train.pickle', 'rb') as file:
     #     (X_train, Y_train) pickle.load(file)
 
-    X_train += X_eval[:int(len(X_eval)/4)]
-    Y_train += Y_eval[:int(len(Y_eval)/4)]
+    # X_train += X_eval[:int(len(X_eval)/4)]
+    # Y_train += Y_eval[:int(len(Y_eval)/4)]
 
-    model = create_lstm_model(X_train[0].shape[1])
+    model = create_lstm_model(X_eval[0].shape[1])
 
     # Because of variable length of the sequence, we train with batch_size = 1
-    n_epoch = 5
+    n_epoch = 10
     for i in range(n_epoch):
         print('epoch {0}:'.format(i))
         for j, (x, y) in enumerate(zip(X_train, Y_train)):
@@ -170,7 +202,7 @@ def train_lstm():
     #     y_hat = model.predict(_x)
     #     y_max = [np.argmax(y_t) for y_t in y_hat[0]]
 
-    model.save('lstm_model_epoch_{0}_train_0.25.h5'.format(i))
+    model.save('lstm_model_epoch_{0}_train_0.25_1.h5'.format(i))
 
 
 def load_samples(path):
@@ -179,28 +211,6 @@ def load_samples(path):
     # Remove whitespace characters, and then construct the figures
     figures = [Figure(line.strip()) for line in lines]
     return figures
-
-
-def feature_extraction(figure, auto_folder):
-    figure.load_image()
-
-    # load auto annotation
-    auto_file_path = os.path.join(auto_folder, figure.file).replace('.jpg', '_data.xml')
-    figure.load_annotation(auto_file_path)
-    auto_rois = np.empty([len(figure.panels), 4], dtype=int)
-    for j in range(len(figure.panels)):
-        auto_rois[j] = figure.panels[j].label_rect
-    auto_rois[:, 0] += Figure.PADDING
-    auto_rois[:, 1] += Figure.PADDING
-
-    # sort auto annotation with respect to distances to left-up corner (0, 0)
-    distances = [roi[0] + roi[1] for roi in auto_rois]
-    indexes = np.argsort(distances)
-    auto_rois = auto_rois[indexes]
-
-    # extract auto roi features
-    x = hog_feature_extraction(figure, auto_rois)
-    return auto_rois, x
 
 
 def max_y_hat(rois, y_hats):
@@ -449,10 +459,12 @@ def test_lstm():
         #     continue
         filepath = filepath.strip()
         figure = Figure(filepath)
-
+        figure.load_image()
         st = time.time()
 
-        rois, x = feature_extraction(figure, options.eval_auto_folder)
+        # load detection results by RPN
+        rois = load_auto_annotation(figure, options.eval_auto_folder)
+        x = feature_extraction(figure, rois)
 
         if rois.size == 0:
             figure.fg_rois, figure.fg_scores, figure.fg_labels = None, None, None

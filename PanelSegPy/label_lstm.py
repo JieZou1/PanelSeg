@@ -86,8 +86,9 @@ def feature_extraction(figure, rois):
         # extract position and size features
         pos_f = np.array([x / figure.image_width, y / figure.image_height, w / 100.0])
 
-        f = np.append(hog_f, pos_f)
-        F.append(f)
+        # f = np.append(hog_f, pos_f)
+        # F.append(f)
+        F.append(hog_f)
     return np.array(F)
 
 
@@ -202,7 +203,7 @@ def train_lstm():
     #     y_hat = model.predict(_x)
     #     y_max = [np.argmax(y_t) for y_t in y_hat[0]]
 
-    model.save('lstm_model_epoch_{0}_train_0.25_1.h5'.format(i))
+    model.save('lstm_model_epoch_{0}_train_0.25.h5'.format(i))
 
 
 def load_samples(path):
@@ -464,6 +465,12 @@ def test_lstm():
 
         # load detection results by RPN
         rois = load_auto_annotation(figure, options.eval_auto_folder)
+
+        # sort auto annotation with respect to distances to left-up corner (0, 0)
+        distances = [roi[0] + roi[1] for roi in rois]
+        indexes = np.argsort(distances)
+        rois = rois[indexes]
+
         x = feature_extraction(figure, rois)
 
         if rois.size == 0:
@@ -478,7 +485,7 @@ def test_lstm():
             y_hat = model_lstm.predict(_x)
 
             # figure.fg_rois, figure.fg_scores, figure.fg_labels = max_y_hat(rois, y_hat[0])
-            figure.fg_rois, figure.fg_scores, figure.fg_labels = beam_search_with_neg(rois, y_hat[0], 10)
+            figure.fg_rois, figure.fg_scores, figure.fg_labels = beam_search_with_neg(rois, y_hat[0], 5)
 
         print('Elapsed time = {}'.format(time.time() - st))
 
@@ -488,7 +495,7 @@ def test_lstm():
 
 if __name__ == "__main__":
     import tensorflow as tf
-    with tf.device('/cpu:0'):
-        print('use CPU 0!')
+    with tf.device('/gpu:0'):
+        print('use GPU 0!')
         # train_lstm()
         test_lstm()

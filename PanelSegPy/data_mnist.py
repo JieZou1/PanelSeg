@@ -1,3 +1,4 @@
+import argparse
 import gzip
 import os
 from six.moves import urllib
@@ -6,7 +7,9 @@ import shutil
 import tensorflow as tf
 import numpy as np
 
-DIRECTORY = 'Z:/datasets/MNIST/'
+DATA_DIRECTORY = 'Z:\\datasets\\MNIST'
+MODEL_DIRECTORY = 'z:\\models\\MNIST'
+
 
 def read32(bytestream):
     """Read 4 bytes from bytestream as an unsigned 32-bit integer."""
@@ -77,46 +80,149 @@ def dataset(directory, images_file, labels_file):
     return tf.data.Dataset.zip((images, labels))
 
 
-def train(directory):
+def train_input_fn(batch_size=32, buffer_size=50000, train_epochs=40):
     """tf.data.Dataset object for MNIST training data."""
-    return dataset(directory, 'train-images-idx3-ubyte', 'train-labels-idx1-ubyte')
-
-
-def test(directory):
-    """tf.data.Dataset object for MNIST test data."""
-    return dataset(directory, 't10k-images-idx3-ubyte', 't10k-labels-idx1-ubyte')
-
-
-def train_input_fn(batch_size=32):
-    train_set = train(DIRECTORY)
-    train_set = train_set.batch(batch_size)  # Batch size to use
-    iterator = train_set.make_one_shot_iterator()
-    train_images, train_labels = iterator.get_next()
-    return train_images, train_labels
+    train_set = dataset(DATA_DIRECTORY, 'train-images-idx3-ubyte', 'train-labels-idx1-ubyte')
+    train_set.cache().shuffle(buffer_size=buffer_size).batch(batch_size).repeat(train_epochs)
+    return train_set
 
 
 def test_input_fn(batch_size=32):
-    test_set = test(DIRECTORY)
+    """tf.data.Dataset object for MNIST test data."""
+    test_set = dataset(DATA_DIRECTORY, 't10k-images-idx3-ubyte', 't10k-labels-idx1-ubyte')
     test_set = test_set.batch(batch_size)  # Batch size to use
+    return test_set
+
+
+def test_input():
+    train_set = train_input_fn(32)
+    iterator = train_set.make_one_shot_iterator()
+
+    with tf.Session() as sess:
+        first_batch = sess.run(iterator.get_next())
+    print(first_batch)
+
+    test_set = test_input_fn(32)
     iterator = test_set.make_one_shot_iterator()
-    test_images, test_labels = iterator.get_next()
-    return test_images, test_labels
+    with tf.Session() as sess:
+        first_batch = sess.run(iterator.get_next())
+    print(first_batch)
 
 
-def model_fn():
-    pass
+def model_fn(features, labels, mode, params):
+    data_format = params['data_format']
+
+    image = features
+    if isinstance(image, dict):
+        image = features['image']
+
+    if data_format == 'channels_first':
+        input_shape = [-1, 1, 28, 28]
+    else:
+        assert data_format == 'channels_last'
+        input_shape = [-1, 28, 28, 1]
+
+    training = True
+    if mode == tf.estimator.ModeKeys.PREDICT:
+        training = False
+    elif mode == tf.estimator.ModeKeys.EVAL:
+        training = False
+
+    y = tf.reshape(image, input_shape)
+    y = tf.layers.Conv2D(32, 5, padding='same', data_format=data_format, activation=tf.nn.relu)(y)
+    y = tf.layers.MaxPooling2D((2, 2), (2, 2), padding='same', data_format=data_format)(y)
+    y = tf.layers.Conv2D(64, 5, padding='same', data_format=data_format, activation=tf.nn.relu)(y)
+    y = tf.layers.MaxPooling2D((2, 2), (2, 2), padding='same', data_format=data_format)(y)
+    y = tf.layers.flatten(y)
+    y = tf.layers.Dense(1024, activation=tf.nn.relu)(y)
+    y = tf.layers.Dropout(0.4)(y, training=training)
+    y = tf.layers.Dense(10)(y)
+
+    if mode == tf.estimator.ModeKeys.PREDICT:
+        logits = y
+        predictions = {
+            'classes': tf.argmax(logits, axis=1),
+            'probabilities': tf.nn.softmax(logits),
+        }
+        return tf.estimator.EstimatorSpec(
+            mode=tf.estimator.ModeKeys.PREDICT,
+            predictions=predictions,
+            export_outputs={
+                'classify': tf.estimator.export.PredictOutput(predictions)
+            })
+
+    if mode == tf.estimator.ModeKeys.TRAIN:
+        optimizer = tf.train.AdamOptimizer(learning_rate=1e-4)
+
+        # If we are running multi-GPU, we need to wrap the optimizer.
+        if params.get('multi_gpu'):
+            optimizer = tf.contrib.estimator.TowerOptimizer(optimizer)
+
+        logits = y
+        loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
+        accuracy = tf.metrics.accuracy(labels=labels, predictions=tf.argmax(logits, axis=1))
+        # Name the accuracy tensor 'train_accuracy' to demonstrate the LoggingTensorHook.
+        tf.identity(accuracy[1], name='train_accuracy')
+        tf.summary.scalar('train_accuracy', accuracy[1])
+        return tf.estimator.EstimatorSpec(
+            mode=tf.estimator.ModeKeys.TRAIN,
+            loss=loss,
+            train_op=optimizer.minimize(loss, tf.train.get_or_create_global_step()))
+
+    if mode == tf.estimator.ModeKeys.EVAL:
+        logits = y
+        loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
+        return tf.estimator.EstimatorSpec(
+            mode=tf.estimator.ModeKeys.EVAL,
+            loss=loss,
+            eval_metric_ops={'accuracy': tf.metrics.accuracy(labels=labels, predictions=tf.argmax(logits, axis=1)), })
+
+
+def test_classification(argv):
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--batch_size', default=100, type=int,
+                        help='batch size')
+    parser.add_argument('--train_steps', default=10000, type=int,
+                        help='number of training steps')
+    parser.add_argument('--train_epochs', type=int, default=40,
+                        help='Number of epochs to train.')
+    parser.add_argument('--data_format', type=str, default='channels_last', choices=['channels_first', 'channels_last'],
+                        help='A flag to override the data format used in the model. '
+                        'channels_first provides a performance boost on GPU but is not always '
+                        'compatible with CPU.')
+    parser.add_argument('--export_dir', type=str, default=MODEL_DIRECTORY,
+                        help='The directory where the exported SavedModel will be stored.')
+    args = parser.parse_args(argv[1:])
+
+    mnist_classifier = tf.estimator.Estimator(
+        model_fn=model_fn,
+        model_dir=MODEL_DIRECTORY,
+        params={
+            'data_format': args.data_format,
+            'batch_size': args.batch_size,
+            'train_epochs': args.train_epochs,
+        })
+
+    tensors_to_log = {'train_accuracy': 'train_accuracy'}
+    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=100)
+    mnist_classifier.train(input_fn=lambda: train_input_fn(), hooks=[logging_hook])
+
+    eval_results = mnist_classifier.evaluate(input_fn=test_input_fn)
+    print()
+    print('Evaluation results:\n\t%s' % eval_results)
+
+    # Export the model
+    if args.export_dir is not None:
+        image = tf.placeholder(tf.float32, [None, 28, 28])
+        input_fn = tf.estimator.export.build_raw_serving_input_receiver_fn({'image': image, })
+        mnist_classifier.export_savedmodel(args.export_dir, input_fn)
 
 
 def main(argv):
-    train_next_batch = train_input_fn(32)
-    with tf.Session() as sess:
-        first_batch = sess.run(train_next_batch)
-    print(first_batch)
-
-    test_next_batch = test_input_fn(32)
-    with tf.Session() as sess:
-        first_batch = sess.run(test_next_batch)
-    print(first_batch)
+    # test_input()
+    test_classification(argv)
+    pass
 
 
 if __name__ == '__main__':

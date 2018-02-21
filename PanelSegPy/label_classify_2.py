@@ -211,27 +211,27 @@ if __name__ == "__main__":
     parser.add_argument('--list_file',
                         help='the list file of the figure images',
                         type=str,
-                        default='/Users/jie/projects/PanelSeg/ExpRcnn/all.txt')
+                        default='/Users/jie/projects/PanelSeg/ExpPython/all.txt')
     parser.add_argument('--src_folder',
                         help='the source folder to load data from',
                         type=str,
-                        default='/Users/jie/projects/PanelSeg/ExpRcnn/Labels')
+                        default='/Users/jie/projects/PanelSeg/ExpPython/Labels')
     parser.add_argument('--target_folder',
                         help='the target folder to save results',
                         type=str,
-                        default='/Users/jie/projects/PanelSeg/ExpRcnn/Labels')
+                        default='/Users/jie/projects/PanelSeg/ExpPython/Labels')
     parser.add_argument('--label_folder',
                         help='the label folder for training the network',
                         type=str,
-                        default='/Users/jie/projects/PanelSeg/ExpRcnn/Labels-28')
+                        default='/Users/jie/projects/PanelSeg/ExpPython/Labels-28')
     parser.add_argument('--non_label_folder',
                         help='the non-label folder for training the network',
                         type=str,
-                        default='/Users/jie/projects/PanelSeg/ExpRcnn/NonLabels-28')
+                        default='/Users/jie/projects/PanelSeg/ExpPython/NonLabels-28')
     parser.add_argument('--model_file',
                         help='the network model file to load from',
                         type=str,
-                        default='/Users/jie/projects/PanelSeg/ExpRcnn/models/label_non_label_2_cnn_model.h5')
+                        default='/Users/jie/projects/PanelSeg/ExpPython/models/label_non_label_2_cnn_model.h5')
 
     args = parser.parse_args()
 

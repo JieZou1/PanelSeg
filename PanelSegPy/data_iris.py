@@ -97,7 +97,7 @@ def csv_input_fn(csv_path, batch_size):
     return dataset
 
 
-def test_testline_input_fn(argv):
+def test_textline_input_fn(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch_size', default=100, type=int, help='batch size')
 
@@ -260,7 +260,7 @@ def test_custom_estimator(argv):
 
 
 def main(argv):
-    test_testline_input_fn(argv)
+    test_textline_input_fn(argv)
     # test_premade_estimator(argv)
     # test_custom_estimator(argv)
 

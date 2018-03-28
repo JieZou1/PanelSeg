@@ -22,11 +22,14 @@ class Figure:
 
     PADDING = 50
 
-    def __init__(self, image_path):
+    def __init__(self, image_path, padding=50):
+
         self.image_path = image_path
         path, self.file = os.path.split(image_path)
         path, folder = os.path.split(path)
         self.id = "{0}-{1}".format(folder, self.file)
+
+        Figure.PADDING = padding
 
         self.image_orig = None
         self.image = None
@@ -45,14 +48,21 @@ class Figure:
         self.fg_rois = None
         self.fg_scores = None
 
+        # panel splitting results
+        self.panel_boxes = None  # boxes[0, 1, 2, 3] is y_min, x_min, y_max, x_max
+        self.panel_scores = None
+
     def load_image(self):
         """
         Load the original image, and then padding the image and convert to gray scale
         :return:
         """
         self.image_orig = cv2.imread(self.image_path, cv2.IMREAD_COLOR)
-        self.image = cv2.copyMakeBorder(
-            self.image_orig, self.PADDING, self.PADDING, self.PADDING, self.PADDING, cv2.BORDER_CONSTANT, 0)
+        if Figure.PADDING > 0:
+            self.image = cv2.copyMakeBorder(
+                self.image_orig, self.PADDING, self.PADDING, self.PADDING, self.PADDING, cv2.BORDER_CONSTANT, 0)
+        else:
+            self.image = self.image_orig
         self.image_gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         self.image_height, self.image_width = self.image.shape[:2]
 
@@ -129,6 +139,12 @@ class Figure:
             else:
                 raise Exception(file_type + ' is unknown!')
 
+        elif which_annotation == 'panel':
+            if file_type == 'iphotodraw':
+                self._load_annotation_panel_iphotodraw(annotation_file_path)
+            else:
+                raise Exception(file_type + ' is unknown!')
+
         elif which_annotation == 'panel_and_label':
             if file_type == 'iphotodraw':
                 self._load_annotation_panel_and_label_iphotodraw(annotation_file_path)
@@ -177,6 +193,45 @@ class Figure:
             label_rect = [round(float(x)), round(float(y)), round(float(width)), round(float(height))]
 
             panel = Panel(label, None, label_rect)
+            panels.append(panel)
+
+        self.panels = panels
+
+    def _load_annotation_panel_iphotodraw(self, iphotodraw_path):
+        """
+        Load panel annotation from iphotodraw formatted file
+        :param iphotodraw_path:
+        :return:
+        """
+        # create element tree object
+        tree = ET.parse(iphotodraw_path)
+        # get root element
+        root = tree.getroot()
+
+        shape_items = root.findall('./Layers/Layer/Shapes/Shape')
+
+        # Read All Label Items
+        panel_items = []
+        for shape_item in shape_items:
+            text_item = shape_item.find('./BlockText/Text')
+            text = text_item.text.lower()
+            if text.startswith('panel'):
+                panel_items.append(shape_item)
+
+        # Form individual panels
+        panels = []
+        for panel_item in panel_items:
+            text_item = panel_item.find('./BlockText/Text')
+            label = text_item.text
+
+            extent_item = panel_item.find('./Data/Extent')
+            height = extent_item.get('Height')
+            width = extent_item.get('Width')
+            x = extent_item.get('X')
+            y = extent_item.get('Y')
+            panel_rect = [round(float(x)), round(float(y)), round(float(width)), round(float(height))]
+
+            panel = Panel(label, panel_rect, None)
             panels.append(panel)
 
         self.panels = panels
@@ -264,6 +319,12 @@ class Figure:
             else:
                 raise Exception(file_type + ' is unknown!')
 
+        elif which_annotation == 'panel':
+            if file_type == 'iphotodraw':
+                self._save_annotation_panel_iphotodraw(annotation_folder)
+            else:
+                raise Exception(file_type + ' is unknown!')
+
         elif which_annotation == 'panel_and_label':
             if file_type == 'iphotodraw':
                 # self._save_annotation_panel_and_label_iphotodraw(annotation_folder)
@@ -307,3 +368,29 @@ class Figure:
         annotation_path = os.path.join(annotation_folder, self.file.replace('.jpg', '_data.xml'))
         save_annotation_xml(annotation_path, self.fg_rois, labels)
 
+    def _save_annotation_panel_iphotodraw(self, annotation_folder):
+        """
+        save panel annotation in iphotodraw formatted file
+        :return:
+        """
+        # save original image
+        img_path = os.path.join(annotation_folder, self.file)
+        cv2.imwrite(img_path, self.image)
+
+        # save previews
+        img = self.image.copy()
+        if self.panel_boxes is not None:
+            color = (255, 0, 255)
+            for i in range(len(self.panel_boxes)):
+                prob = self.panel_scores[i]
+                roi = self.panel_boxes[i]
+                pt1 = (roi[0], roi[1])
+                pt2 = (roi[0] + roi[2], roi[1] + roi[3])
+                cv2.rectangle(img, pt1, pt2, color)
+                cv2.putText(img, 'Panel--{0}'.format(prob, '%.2f'), (roi[0], roi[1] + roi[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+        preview_path = os.path.join(annotation_folder, self.file.replace('.jpg', '-preview.jpg'))
+        cv2.imwrite(preview_path, img)
+
+        # save annotation
+        annotation_path = os.path.join(annotation_folder, self.file.replace('.jpg', '_data.xml'))
+        save_annotation_xml(annotation_path, self.panel_boxes, ['Panel']*len(self.panel_boxes))

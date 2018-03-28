@@ -91,10 +91,18 @@ def dict_to_tf_example(data, label_map_dict, img_path):
         ymin = y
         ymax = y + h
 
-        xmins.append(xmin / width)
-        ymins.append(ymin / height)
-        xmaxs.append(xmax / width)
-        ymaxs.append(ymax / height)
+        xmin /= width
+        ymin /= height
+        xmax /= width
+        ymax /= height
+
+        if xmin < 0 or ymin < 0 or xmax > 1.01 or ymax > 1.01:
+            print(img_path)
+
+        xmins.append(xmin)
+        ymins.append(ymin)
+        xmaxs.append(xmax)
+        ymaxs.append(ymax)
 
         class_name = 'Panel'
         classes_text.append(class_name.encode('utf8'))

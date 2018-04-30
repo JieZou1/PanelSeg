@@ -7,6 +7,7 @@ import PIL.Image
 import logging
 
 import misc
+import core
 
 
 flags = tf.app.flags
@@ -14,14 +15,7 @@ flags.DEFINE_string('data_dir', 'Z:\\Users\\jie\\projects\\PanelSeg\\ExpPython',
                     'Root directory to raw panel dataset.')
 flags.DEFINE_string('output_dir', 'Z:\\Users\\jie\\projects\\PanelSeg\\ExpPython',
                     'Path to directory to output TFRecords.')
-flags.DEFINE_string('label_map_path', 'Z:\\Users\\jie\\projects\\PanelSeg\\ExpPython\\panel_label_map.pbtxt',
-                    'Path to label map proto')
 FLAGS = flags.FLAGS
-
-# global variables
-image_path = ""
-
-
 
 
 def recursive_parse_xml_to_dict(xml):
@@ -176,14 +170,17 @@ def create_tf_records(train_list_path, train_output_path):
 
 
 def main(_):
-    eval_list_path = os.path.join(FLAGS.data_dir, 'eval.txt')
+    eval_list_path = os.path.join(FLAGS.data_dir, 'all.txt')
     eval_output_path = os.path.join(FLAGS.output_dir, 'tf_eval.record')
-    create_tf_records(eval_list_path, eval_output_path)
+    figure_set = core.FigureSet(eval_list_path)
+
+    figure_set.validate_annotation()
+    # figure_set.save_in_tfrecord(eval_output_path)
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    tf.logging.set_verbosity(tf.logging.INFO)
+    logging.basicConfig(level=logging.WARNING)
+    # tf.logging.set_verbosity(tf.logging.INFO)
     # tf.enable_eager_execution()
     # print("TensorFlow version: {}".format(tf.VERSION))
     # print("Eager execution: {}".format(tf.executing_eagerly()))

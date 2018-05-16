@@ -100,18 +100,18 @@ def dict_to_tf_example(data, img_path):
 
     feature_dict = {
         'image/height': dataset_util.int64_feature(height),
-        'image/width': dataset.int64_feature(width),
-        'image/filename': dataset.bytes_feature(img_path.encode('utf8')),
-        'image/source_id': dataset.bytes_feature(img_path.encode('utf8')),
-        'image/key/sha256': dataset.bytes_feature(key.encode('utf8')),
-        'image/encoded': dataset.bytes_feature(encoded_jpg),
-        'image/format': dataset.bytes_feature('jpeg'.encode('utf8')),
-        'image/object/bbox/xmin': dataset.float_list_feature(xmins),
-        'image/object/bbox/xmax': dataset.float_list_feature(xmaxs),
-        'image/object/bbox/ymin': dataset.float_list_feature(ymins),
-        'image/object/bbox/ymax': dataset.float_list_feature(ymaxs),
-        'image/object/class/text': dataset.bytes_list_feature(classes_text),
-        'image/object/class/label': dataset.int64_list_feature(classes),
+        'image/width': dataset_util.int64_feature(width),
+        'image/filename': dataset_util.bytes_feature(img_path.encode('utf8')),
+        'image/source_id': dataset_util.bytes_feature(img_path.encode('utf8')),
+        'image/key/sha256': dataset_util.bytes_feature(key.encode('utf8')),
+        'image/encoded': dataset_util.bytes_feature(encoded_jpg),
+        'image/format': dataset_util.bytes_feature('jpeg'.encode('utf8')),
+        'image/object/bbox/xmin': dataset_util.float_list_feature(xmins),
+        'image/object/bbox/xmax': dataset_util.float_list_feature(xmaxs),
+        'image/object/bbox/ymin': dataset_util.float_list_feature(ymins),
+        'image/object/bbox/ymax': dataset_util.float_list_feature(ymaxs),
+        'image/object/class/text': dataset_util.bytes_list_feature(classes_text),
+        'image/object/class/label': dataset_util.int64_list_feature(classes),
     }
 
     example = tf.train.Example(features=tf.train.Features(feature=feature_dict))

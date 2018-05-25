@@ -1,3 +1,4 @@
+import csv
 import os
 import cv2
 import logging
@@ -135,6 +136,17 @@ class Figure:
                 panel.panel_rect = misc.union(panel.label_rect, panel.panel_rect)
 
         self.panels = panels
+
+    def load_annotation_csv(self, annotation_file_path):
+        panels = []
+        with open(annotation_file_path, newline='') as csvfile:
+            csv_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+            for row in csv_reader:
+                panel_rect = [int(row[1]), int(row[2]), int(row[3]), int(row[4])]
+                panel = Panel('', panel_rect, None)
+                panels.append(panel)
+        self.panels = panels
+
 
     def save_preview(self, folder):
         """

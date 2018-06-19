@@ -16,7 +16,7 @@ target/
 *.pydevproject
 .project
 .metadata
-bin/
+#bin/
 target/
 tmp/
 *.tmp
@@ -66,7 +66,7 @@ evaluation.txt
 [Rr]elease/
 x64/
 build/
-[Bb]in/
+#[Bb]in/
 [Oo]bj/
 packages/
 

@@ -10,10 +10,6 @@ import tensorflow as tf
 import cv2
 import xml.etree.cElementTree as ET
 
-from figure import misc
-from figure.figure import Figure
-from figure.figure_set import FigureSet
-
 # Allow relative imports when being executed as script.
 if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))

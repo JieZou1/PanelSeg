@@ -15,21 +15,25 @@ limitations under the License.
 """
 
 import keras
-from keras.applications.mobilenet import MobileNet, BASE_WEIGHT_PATH, get_file, relu6, DepthwiseConv2D
+from keras.applications.mobilenet import mobilenet
+from keras.utils import get_file
 
 from . import retinanet
 from . import Backbone
 
 
 class MobileNetBackbone(Backbone):
+    """ Describes backbone information and provides utility functions.
+    """
+
     allowed_backbones = ['mobilenet128', 'mobilenet160', 'mobilenet192', 'mobilenet224']
 
     def __init__(self, backbone):
         super(MobileNetBackbone, self).__init__(backbone)
 
         self.custom_objects.update({
-            'relu6': relu6,
-            'DepthwiseConv2D': DepthwiseConv2D
+            'relu6': mobilenet.relu6,
+            'DepthwiseConv2D': keras.layers.DepthwiseConv2D
         })
 
     def retinanet(self, *args, **kwargs):
@@ -61,7 +65,7 @@ class MobileNetBackbone(Backbone):
             alpha_text = '2_5'
 
         model_name = 'mobilenet_{}_{}_tf_no_top.h5'.format(alpha_text, rows)
-        weights_url = BASE_WEIGHT_PATH + model_name
+        weights_url = mobilenet.BASE_WEIGHT_PATH + model_name
         weights_path = get_file(model_name, weights_url, cache_subdir='models')
 
         return weights_path
@@ -76,21 +80,32 @@ class MobileNetBackbone(Backbone):
 
 
 def mobilenet_retinanet(num_classes, backbone='mobilenet224_1.0', inputs=None, modifier=None, **kwargs):
+    """ Constructs a retinanet model using a mobilenet backbone.
+
+    Args
+        num_classes: Number of classes to predict.
+        backbone: Which backbone to use (one of ('mobilenet128', 'mobilenet160', 'mobilenet192', 'mobilenet224')).
+        inputs: The inputs to the network (defaults to a Tensor of shape (None, None, 3)).
+        modifier: A function handler which can modify the backbone before using it in retinanet (this can be used to freeze backbone layers for example).
+
+    Returns
+        RetinaNet model with a MobileNet backbone.
+    """
     alpha = float(backbone.split('_')[1])
 
     # choose default input
     if inputs is None:
         inputs = keras.layers.Input((None, None, 3))
 
-    mobilenet = MobileNet(input_tensor=inputs, alpha=alpha, include_top=False, pooling=None, weights=None)
+    backbone = mobilenet.MobileNet(input_tensor=inputs, alpha=alpha, include_top=False, pooling=None, weights=None)
 
     # create the full model
     layer_names = ['conv_pw_5_relu', 'conv_pw_11_relu', 'conv_pw_13_relu']
-    layer_outputs = [mobilenet.get_layer(name).output for name in layer_names]
-    mobilenet = keras.models.Model(inputs=inputs, outputs=layer_outputs, name=mobilenet.name)
+    layer_outputs = [backbone.get_layer(name).output for name in layer_names]
+    backbone = keras.models.Model(inputs=inputs, outputs=layer_outputs, name=backbone.name)
 
     # invoke modifier if given
     if modifier:
-        mobilenet = modifier(mobilenet)
+        backbone = modifier(backbone)
 
-    return retinanet.retinanet(inputs=inputs, num_classes=num_classes, backbone_layers=mobilenet.outputs, **kwargs)
+    return retinanet.retinanet(inputs=inputs, num_classes=num_classes, backbone_layers=backbone.outputs, **kwargs)

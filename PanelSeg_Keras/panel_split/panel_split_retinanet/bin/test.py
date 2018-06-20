@@ -10,14 +10,20 @@ import tensorflow as tf
 import cv2
 import xml.etree.cElementTree as ET
 
-from keras_retinanet import models
-from keras_retinanet.utils.colors import label_color
-from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
-from keras_retinanet.utils.visualization import draw_box
-
 from figure import misc
 from figure.figure import Figure
 from figure.figure_set import FigureSet
+
+# Allow relative imports when being executed as script.
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+    import panel_split_retinanet.bin
+    __package__ = "panel_split_retinanet.bin"
+
+from .. import models
+from ..utils.colors import label_color
+from ..utils.image import read_image_bgr, preprocess_image, resize_image
+from ..utils.visualization import draw_box
 
 
 def get_session():

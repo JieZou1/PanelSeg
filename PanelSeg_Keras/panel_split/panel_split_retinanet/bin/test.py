@@ -111,7 +111,10 @@ def main(args=None):
 
     # Load figure set
     print('Evaluation list file is {0}'.format(args.eval_list))
-    figure_files = misc.read_sample_list(args.eval_list)
+    # figure_files = misc.read_sample_list(args.eval_list)
+    with tf.gfile.GFile(args.eval_list) as fid:
+        lines = fid.readlines()
+    figure_files = [line.strip().split(' ')[0] for line in lines]
 
     # Load model
     print('Load model from {0}'.format(args.model))

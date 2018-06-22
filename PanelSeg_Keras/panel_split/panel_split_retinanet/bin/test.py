@@ -36,7 +36,7 @@ def parse_args(args):
                         )
     parser.add_argument('--model', help='Path to the trained model file.',
                         # default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/snapshots/vgg16_csv_03.h5'
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/rentinanet/train-with-clef2016/snapshots-ResNet152/resnet152_csv_08.h5'
+                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/retinanet/clef2016/ResNet50/snapshots/resnet50_csv_08.h5'
                         # default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/rentinanet/train-with-ours/snapshots/resnet50_csv_40.h5'
                         )
     parser.add_argument('--eval_list', help='Path to the evaluation list file.',
@@ -67,6 +67,14 @@ def predict(model, image):
     boxes /= scale
 
     boxes, scores, labels = boxes[0], scores[0], labels[0]
+
+    idxs = list()
+    for idx, score in enumerate(scores):
+        if score > 0.5:
+            idxs.append(idx)
+        else:
+            break   # scores are sorted so we can break
+    boxes, scores, labels = boxes[idxs], scores[idxs], labels[idxs]
 
     # # Post processing to remove false positives
     # # 1. We keep only scores greater than 0.05

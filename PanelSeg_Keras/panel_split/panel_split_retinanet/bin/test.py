@@ -68,39 +68,38 @@ def predict(model, image):
 
     boxes, scores, labels = boxes[0], scores[0], labels[0]
 
+    # idxs = list()
+    # for idx, score in enumerate(scores):
+    #     if score > 0.5:
+    #         idxs.append(idx)
+    #     else:
+    #         break   # scores are sorted so we can break
+    # boxes, scores, labels = boxes[idxs], scores[idxs], labels[idxs]
+
+    # Post processing to remove false positives
+    # 1. We keep only scores greater than 0.05
     idxs = list()
     for idx, score in enumerate(scores):
-        if score > 0.5:
+        if score > 0.05:
             idxs.append(idx)
         else:
             break   # scores are sorted so we can break
     boxes, scores, labels = boxes[idxs], scores[idxs], labels[idxs]
 
-    # # Post processing to remove false positives
-    # # 1. We keep only scores greater than 0.05
-    # idxs = list()
-    # for idx, score in enumerate(scores):
-    #     if score > 0.05:
-    #         idxs.append(idx)
-    #     else:
-    #         break   # scores are sorted so we can break
-    # boxes, scores, labels = boxes[idxs], scores[idxs], labels[idxs]
-    #
-    # # 2. We remove boxes which overlaps with other high score boxes
-    # idxs = list()
-    # height, width, depth = image.shape
-    # mask = np.zeros((height, width))
-    # for idx, box in enumerate(boxes):
-    #     box_i = box.astype(int)
-    #     if overlap_with_mask(box_i, mask) < 0.66:
-    #         idxs.append(idx)
-    #         update_mask(box_i, mask)
-    #
-    # boxes, scores, labels = boxes[idxs], scores[idxs], labels[idxs]
-    #
-    # # 3. We keep only at  most 30 panels
-    # if len(boxes) > 30:
-    #     boxes, scores, labels = boxes[:30], scores[:30], labels[:30]
+    # 2. We remove boxes which overlaps with other high score boxes
+    idxs = list()
+    height, width, depth = image.shape
+    mask = np.zeros((height, width))
+    for idx, box in enumerate(boxes):
+        box_i = box.astype(int)
+        if overlap_with_mask(box_i, mask) < 0.66:
+            idxs.append(idx)
+            update_mask(box_i, mask)
+    boxes, scores, labels = boxes[idxs], scores[idxs], labels[idxs]
+
+    # 3. We keep only at  most 30 panels
+    if len(boxes) > 30:
+        boxes, scores, labels = boxes[:30], scores[:30], labels[:30]
 
     return boxes, scores, labels
 

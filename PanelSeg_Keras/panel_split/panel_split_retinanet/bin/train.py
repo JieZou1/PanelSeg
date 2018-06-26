@@ -45,11 +45,15 @@ def parse_args(args):
     parser.add_argument('--dataset_type', help='We always use CSV only',
                         default='csv')
     parser.add_argument('--annotations', help='Path to CSV file containing annotations for training.',
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/clef_train.csv')
+                        # default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/clef_train.csv'
+                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/train.csv'
+                        )
     parser.add_argument('--classes', help='Path to a CSV file containing class label mapping.',
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/mapping.csv')
+                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/mapping.csv'
+                        )
     parser.add_argument('--val-annotations', help='Path to CSV file containing annotations for validation (optional).',
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/clef_eval.csv'
+                        # default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/clef_eval.csv'
+                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/eval.csv'
                         )
 
     group = parser.add_mutually_exclusive_group()

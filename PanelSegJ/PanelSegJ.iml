@@ -204,10 +204,10 @@
     <orderEntry type="library" name="Maven: org.mapdb:mapdb:3.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-runtime:1.0.2" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.collections:eclipse-collections-api:7.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.collections:eclipse-collections-api:7.1.2" level="project" />
     <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.collections:eclipse-collections:7.1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.collections:eclipse-collections-forkjoin:7.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.collections:eclipse-collections:7.1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.collections:eclipse-collections-forkjoin:7.1.2" level="project" />
     <orderEntry type="library" name="Maven: org.mapdb:elsa:3.0.0-M5" level="project" />
     <orderEntry type="library" name="Maven: org.xerial:sqlite-jdbc:3.15.1" level="project" />
     <orderEntry type="library" name="Maven: org.deeplearning4j:deeplearning4j-ui-resources:0.8.0" level="project" />
@@ -223,15 +223,6 @@
     <orderEntry type="library" name="Maven: tw.edu.ntu.csie:libsvm:3.17" level="project" />
     <orderEntry type="library" name="Maven: gov.nih.nlm.iti.panelSegmentation.regular.segmentation:panelSegmentationModule:1.0" level="project" />
     <orderEntry type="library" name="Maven: net.imagej:ij:1.48c" level="project" />
-    <orderEntry type="module-library">
-      <library name="Maven: com.sun:tools:1.4.2">
-        <CLASSES>
-          <root url="jar://C:/Program Files/Java/jdk1.8.0_162/lib/tools.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" name="Maven: com.jhlabs:filters:2.0.235-1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.spark:spark-core_2.11:2.1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.avro:avro-mapred:hadoop2:1.7.7" level="project" />

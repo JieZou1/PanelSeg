@@ -82,12 +82,13 @@ def model_with_weights(model, weights, skip_mismatch):
     return model
 
 
-def create_models(backbone_retinanet, num_classes, weights, multi_gpu=0, freeze_backbone=False):
+def create_models(backbone_retinanet, num_classes, l_num_classes, weights, multi_gpu=0, freeze_backbone=False):
     """ Creates three models (model, training_model, prediction_model).
 
     Args
         backbone_retinanet : A function to call to create a retinanet model with a given backbone.
         num_classes        : The number of classes to train.
+        l_num_classes      : The number of label classes to train.
         weights            : The weights to load into the model.
         multi_gpu          : The number of GPUs to use for training.
         freeze_backbone    : If True, disables learning for the backbone.
@@ -106,7 +107,7 @@ def create_models(backbone_retinanet, num_classes, weights, multi_gpu=0, freeze_
             model = model_with_weights(backbone_retinanet(num_classes, modifier=modifier), weights=weights, skip_mismatch=True)
         training_model = multi_gpu_model(model, gpus=multi_gpu)
     else:
-        model          = model_with_weights(backbone_retinanet(num_classes, modifier=modifier), weights=weights, skip_mismatch=True)
+        model          = model_with_weights(backbone_retinanet(num_classes, l_num_classes, modifier=modifier), weights=weights, skip_mismatch=True)
         training_model = model
 
     # make prediction model
@@ -116,7 +117,9 @@ def create_models(backbone_retinanet, num_classes, weights, multi_gpu=0, freeze_
     training_model.compile(
         loss={
             'regression'    : losses.smooth_l1(),
-            'classification': losses.focal()
+            'classification': losses.focal(),
+            'l_regression': losses.smooth_l1(),
+            'l_classification': losses.focal()
         },
         optimizer=keras.optimizers.adam(lr=1e-5, clipnorm=0.001)
     )
@@ -415,8 +418,8 @@ def parse_args(args):
     parser.add_argument('--no-evaluation',   help='Disable per epoch evaluation.', dest='evaluation', action='store_false')
     parser.add_argument('--freeze-backbone', help='Freeze training of backbone layers.', action='store_true')
     parser.add_argument('--random-transform', help='Randomly transform image and annotations.', action='store_true')
-    parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=800)
-    parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=1333)
+    parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=400)
+    parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=600)
 
     return parser.parse_args(args)
 
@@ -457,6 +460,7 @@ def main(args=None):
         model, training_model, prediction_model = create_models(
             backbone_retinanet=backbone.retinanet,
             num_classes=train_generator.num_classes(),
+            l_num_classes=train_generator.l_num_classes(),
             weights=weights,
             multi_gpu=args.multi_gpu,
             freeze_backbone=args.freeze_backbone

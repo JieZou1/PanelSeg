@@ -99,6 +99,20 @@ class UpsampleLike(keras.layers.Layer):
         return (input_shape[0][0],) + input_shape[1][1:3] + (input_shape[0][-1],)
 
 
+class MergePanelLabel(keras.layers.Layer):
+    """ Keras layer for merging Panel Detection and Label Detection
+        We pick the largest label candidate for each panel candidate
+    """
+
+    def call(self, inputs, **kwargs):
+        panel_regression, panel_classification, label_regression, label_classification = inputs
+        return inputs
+
+    def compute_output_shape(self, input_shape):
+        panel_regression, panel_classification, label_regression, label_classification = input_shape
+        return input_shape
+
+
 class RegressBoxes(keras.layers.Layer):
     """ Keras layer for applying regression values to boxes.
     """

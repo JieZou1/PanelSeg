@@ -184,7 +184,8 @@ class Generator(object):
         image, image_scale = self.resize_image(image)
 
         # apply resizing to annotations too
-        annotations[:, :4] *= image_scale
+        annotations[:, :4] *= image_scale   # scale panel annotation
+        annotations[:, 5:9] *= image_scale  # scale label annotation
 
         return image, annotations
 
@@ -240,11 +241,18 @@ class Generator(object):
         regression_group = [None] * self.batch_size
         for index, (image, annotations) in enumerate(zip(image_group, annotations_group)):
             # compute regression targets
+            pyramid_levels = [3, 4, 5, 6, 7]
+            annotations = annotations[:, :5]
             labels_group[index], annotations, anchors = self.compute_anchor_targets(
                 max_shape,
                 annotations,
                 self.num_classes(),
                 mask_shape=image.shape,
+                pyramid_levels=pyramid_levels,
+                ratios=np.array([0.5, 1, 2]),
+                scales=np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)]),
+                strides=[2 ** x for x in pyramid_levels],
+                sizes=[2 ** (x + 2) for x in pyramid_levels]
             )
             regression_group[index] = bbox_transform(anchors, annotations)
 
@@ -260,7 +268,41 @@ class Generator(object):
             labels_batch[index, ...]     = labels
             regression_batch[index, ...] = regression
 
-        return [regression_batch, labels_batch]
+
+
+        # compute label labels and label regression targets
+        l_labels_group     = [None] * self.batch_size
+        l_regression_group = [None] * self.batch_size
+        for index, (image, annotations) in enumerate(zip(image_group, annotations_group)):
+            # compute label regression targets
+            pyramid_levels = [1, 2, 3, 4]
+            annotations = annotations[:, 5:]
+            l_labels_group[index], annotations, anchors = self.compute_anchor_targets(
+                max_shape,
+                annotations,
+                self.l_num_classes(),
+                mask_shape=image.shape,
+                pyramid_levels=pyramid_levels,
+                ratios=np.array([0.5, 1, 2]),
+                scales=np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)]),
+                strides=[2 ** x for x in pyramid_levels],
+                sizes=[2 ** (x + 2) for x in pyramid_levels]
+            )
+            l_regression_group[index] = bbox_transform(anchors, annotations)
+
+            # append anchor states to regression targets (necessary for filtering 'ignore', 'positive' and 'negative' anchors)
+            anchor_states           = np.max(l_labels_group[index], axis=1, keepdims=True)
+            l_regression_group[index] = np.append(l_regression_group[index], anchor_states, axis=1)
+
+        l_labels_batch     = np.zeros((self.batch_size,) + l_labels_group[0].shape, dtype=keras.backend.floatx())
+        l_regression_batch = np.zeros((self.batch_size,) + l_regression_group[0].shape, dtype=keras.backend.floatx())
+
+        # copy all labels and regression values to the batch blob
+        for index, (labels, regression) in enumerate(zip(l_labels_group, l_regression_group)):
+            l_labels_batch[index, ...]     = labels
+            l_regression_batch[index, ...] = regression
+
+        return [regression_batch, labels_batch, l_regression_batch, l_labels_batch]
 
     def compute_input_output(self, group):
         """ Compute inputs and target outputs for the network.

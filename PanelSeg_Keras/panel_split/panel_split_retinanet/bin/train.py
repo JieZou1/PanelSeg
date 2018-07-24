@@ -92,7 +92,8 @@ def create_generators(args):
         transform_generator=transform_generator,
         batch_size=args.batch_size,
         image_min_side=args.image_min_side,
-        image_max_side=args.image_max_side
+        image_max_side=args.image_max_side,
+        group_method='none'
     )
 
     validation_generator = None
@@ -103,7 +104,8 @@ def create_generators(args):
             args.classes,
             batch_size=args.batch_size,
             image_min_side=args.image_min_side,
-            image_max_side=args.image_max_side
+            image_max_side=args.image_max_side,
+            group_method='none'
         )
 
     return train_generator, validation_generator

@@ -17,7 +17,8 @@ limitations under the License.
 import keras
 from keras.utils import get_file
 import keras_resnet
-import keras_resnet.models
+# import keras_resnet.models
+from . import resnet_2d
 from . import retinanet
 from . import Backbone
 
@@ -68,7 +69,7 @@ class ResNetBackbone(Backbone):
             raise ValueError('Backbone (\'{}\') not in allowed backbones ({}).'.format(backbone, allowed_backbones))
 
 
-def resnet_retinanet(num_classes, backbone='resnet50', inputs=None, modifier=None, **kwargs):
+def resnet_retinanet(num_classes, l_num_classes, backbone='resnet50', inputs=None, modifier=None, **kwargs):
     """ Constructs a retinanet model using a resnet backbone.
 
     Args
@@ -86,11 +87,11 @@ def resnet_retinanet(num_classes, backbone='resnet50', inputs=None, modifier=Non
 
     # create the resnet backbone
     if backbone == 'resnet50':
-        resnet = keras_resnet.models.ResNet50(inputs, include_top=False, freeze_bn=True)
+        resnet = resnet_2d.ResNet50(inputs, include_top=False, freeze_bn=True)
     elif backbone == 'resnet101':
-        resnet = keras_resnet.models.ResNet101(inputs, include_top=False, freeze_bn=True)
+        resnet = resnet_2d.ResNet101(inputs, include_top=False, freeze_bn=True)
     elif backbone == 'resnet152':
-        resnet = keras_resnet.models.ResNet152(inputs, include_top=False, freeze_bn=True)
+        resnet = resnet_2d.ResNet152(inputs, include_top=False, freeze_bn=True)
     else:
         raise ValueError('Backbone (\'{}\') is invalid.'.format(backbone))
 
@@ -99,7 +100,7 @@ def resnet_retinanet(num_classes, backbone='resnet50', inputs=None, modifier=Non
         resnet = modifier(resnet)
 
     # create the full model
-    return retinanet.retinanet(inputs=inputs, num_classes=num_classes, backbone_layers=resnet.outputs[1:], **kwargs)
+    return retinanet.retinanet(inputs=inputs, num_classes=num_classes, l_num_classes=l_num_classes, backbone_layers=resnet.outputs[:], **kwargs)
 
 
 def resnet50_retinanet(num_classes, inputs=None, **kwargs):

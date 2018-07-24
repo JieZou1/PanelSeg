@@ -203,6 +203,11 @@ class CSVGenerator(Generator):
         """
         return max(self.classes.values()) + 1
 
+    def l_num_classes(self):
+        """ Number of label classes in the dataset.
+        """
+        return max(self.l_classes.values()) + 1
+
     def name_to_label(self, name):
         """ Map name to label.
         """
@@ -212,6 +217,16 @@ class CSVGenerator(Generator):
         """ Map label to name.
         """
         return self.labels[label]
+
+    def l_name_to_label(self, name):
+        """ Map name to label.
+        """
+        return self.l_classes[name]
+
+    def l_label_to_name(self, label):
+        """ Map label to name.
+        """
+        return self.l_labels[label]
 
     def image_path(self, image_index):
         """ Returns the image path for image_index.
@@ -235,8 +250,8 @@ class CSVGenerator(Generator):
         """
         path   = self.image_names[image_index]
         annots = self.image_data[path]
-        boxes  = np.zeros((len(annots), 5))
 
+        boxes  = np.zeros((len(annots), 5 * 2))
         for idx, annot in enumerate(annots):
             class_name = annot['class']
             boxes[idx, 0] = float(annot['x1'])
@@ -244,5 +259,15 @@ class CSVGenerator(Generator):
             boxes[idx, 2] = float(annot['x2'])
             boxes[idx, 3] = float(annot['y2'])
             boxes[idx, 4] = self.name_to_label(class_name)
+
+            l_class_name = annot['l_class']
+            boxes[idx, 5] = float(annot['l_x1'])
+            boxes[idx, 6] = float(annot['l_y1'])
+            boxes[idx, 7] = float(annot['l_x2'])
+            boxes[idx, 8] = float(annot['l_y2'])
+            if l_class_name == -1:
+                boxes[idx, 9] = l_class_name
+            else:
+                boxes[idx, 9] = self.l_name_to_label(l_class_name)
 
         return boxes

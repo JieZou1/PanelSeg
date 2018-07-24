@@ -8,6 +8,7 @@ class Backbone(object):
         from .. import initializers
         self.custom_objects = {
             'UpsampleLike'     : layers.UpsampleLike,
+            'MergePanelLabel'  : layers.MergePanelLabel,
             'PriorProbability' : initializers.PriorProbability,
             'RegressBoxes'     : layers.RegressBoxes,
             'FilterDetections' : layers.FilterDetections,

@@ -76,22 +76,117 @@ def filter_detections(boxes, classification, other=[], nms=True, score_threshold
     labels              = keras.backend.gather(labels, top_indices)
     other_              = [keras.backend.gather(o, indices) for o in other]
 
-    # zero pad the outputs
-    pad_size = keras.backend.maximum(0, max_detections - keras.backend.shape(scores)[0])
-    boxes    = backend.pad(boxes, [[0, pad_size], [0, 0]], constant_values=-1)
-    scores   = backend.pad(scores, [[0, pad_size]], constant_values=-1)
-    labels   = backend.pad(labels, [[0, pad_size]], constant_values=-1)
     labels   = keras.backend.cast(labels, 'int32')
-    other_   = [backend.pad(o, [[0, pad_size]] + [[0, 0] for _ in range(1, len(o.shape))], constant_values=-1) for o in other_]
 
-    # set shapes, since we know what they are
-    boxes.set_shape([max_detections, 4])
-    scores.set_shape([max_detections])
-    labels.set_shape([max_detections])
-    for o, s in zip(other_, [list(keras.backend.int_shape(o)) for o in other]):
-        o.set_shape([max_detections] + s[1:])
+    # # zero pad the outputs
+    # pad_size = keras.backend.maximum(0, max_detections - keras.backend.shape(scores)[0])
+    # boxes    = backend.pad(boxes, [[0, pad_size], [0, 0]], constant_values=-1)
+    # scores   = backend.pad(scores, [[0, pad_size]], constant_values=-1)
+    # labels   = backend.pad(labels, [[0, pad_size]], constant_values=-1)
+    # labels   = keras.backend.cast(labels, 'int32')
+    # other_   = [backend.pad(o, [[0, pad_size]] + [[0, 0] for _ in range(1, len(o.shape))], constant_values=-1) for o in other_]
+    #
+    # # set shapes, since we know what they are
+    # boxes.set_shape([max_detections, 4])
+    # scores.set_shape([max_detections])
+    # labels.set_shape([max_detections])
+    # for o, s in zip(other_, [list(keras.backend.int_shape(o)) for o in other]):
+    #     o.set_shape([max_detections] + s[1:])
 
     return [boxes, scores, labels] + other_
+
+
+def merge_panel_label(p_boxes, p_scores, p_labels, l_boxes, l_scores, l_labels, max_detections):
+    """ Merge Panel and Label result.
+    We pick the label candidate having largest score in the p_boxes
+
+    Args
+        p_boxes           : Tensor of shape (num_boxes, 4) containing the panel boxes in (x1, y1, x2, y2) format.
+        p_scores          : Tensor of shape (num_boxes, num_classes) containing the panel classification scores.
+        p_classification  : Tensor of shape (num_boxes, num_classes) containing the panel classification labels.
+        l_boxes         : Tensor of shape (num_boxes, 4) containing the label boxes in (x1, y1, x2, y2) format.
+        l_scores        : Tensor of shape (num_boxes, num_classes) containing the label classification scores.
+        classification: Tensor of shape (num_boxes, num_classes) containing the label classification labels.
+        max_detections  : Maximum number of detections to keep.
+
+    Returns
+
+        A list of [boxes, scores, labels, l_boxes, l_scores, l_labels].
+        p_boxes is shaped (max_detections, 4) and contains the (x1, y1, x2, y2) of the non-suppressed panel boxes.
+        p_scores is shaped (max_detections,) and contains the scores of the predicted panel class.
+        p_labels is shaped (max_detections,) and contains the predicted panel label.
+        l_boxes is shaped (max_detections, 4) and contains the (x1, y1, x2, y2) of the non-suppressed label boxes.
+        l_scores is shaped (max_detections,) and contains the scores of the predicted label class.
+        l_labels is shaped (max_detections,) and contains the predicted label label.
+
+        In case there are less than max_detections detections, the tensors are padded with -1's.
+        In case there is no label candidates for p_boxes, the label tensors are padded with -1's.
+    """
+
+    def _merge_panel_label(p_box):
+        p_x1 = p_box[0]
+        p_y1 = p_box[1]
+        p_x2 = p_box[2]
+        p_y2 = p_box[3]
+
+        l_x1 = l_boxes[:, 0]
+        l_y1 = l_boxes[:, 1]
+        l_x2 = l_boxes[:, 2]
+        l_y2 = l_boxes[:, 3]
+
+        condition1 = keras.backend.greater_equal(l_x1, p_x1)  # l_x1 >= p_x1
+        condition2 = keras.backend.greater(l_x2, p_x1)        # l_x2 >= p_x1
+        condition3 = keras.backend.greater_equal(l_y1, p_y1)  # l_y1 >= p_y1
+        condition4 = keras.backend.greater(l_y2, p_y1)        # l_y2 >= p_y1
+        condition5 = keras.backend.less(l_x1, p_x2)           # l_x1 <= p_x2
+        condition6 = keras.backend.less_equal(l_x2, p_x2)     # l_x2 <= p_x2
+        condition7 = keras.backend.less(l_y1, p_y2)           # l_y1 <= p_y2
+        condition8 = keras.backend.less_equal(l_y2, p_y2)     # l_y2 <= p_y2
+
+        inside_flag = condition1
+        inside_flag = backend.logical_and(inside_flag, condition2)
+        inside_flag = backend.logical_and(inside_flag, condition3)
+        inside_flag = backend.logical_and(inside_flag, condition4)
+        inside_flag = backend.logical_and(inside_flag, condition5)
+        inside_flag = backend.logical_and(inside_flag, condition6)
+        inside_flag = backend.logical_and(inside_flag, condition7)
+        inside_flag = backend.logical_and(inside_flag, condition8)
+
+        indices = backend.where(inside_flag)
+
+        return indices  # we just pick the top one
+
+    inside_indices = backend.map_fn(
+        _merge_panel_label,
+        elems=p_boxes,
+        dtype='int64'
+    )
+
+    # collect label candidate based on indices
+    l_boxes = keras.backend.gather(l_boxes, inside_indices[:, 0, 0])
+    l_scores = keras.backend.gather(l_scores, inside_indices[:, 0, 0])
+    l_labels = keras.backend.gather(l_labels, inside_indices[:, 0, 0])
+
+    # zero pad the outputs
+    pad_size = keras.backend.maximum(0, max_detections - keras.backend.shape(p_scores)[0])
+    p_boxes    = backend.pad(p_boxes, [[0, pad_size], [0, 0]], constant_values=-1)
+    p_scores   = backend.pad(p_scores, [[0, pad_size]], constant_values=-1)
+    p_labels   = backend.pad(p_labels, [[0, pad_size]], constant_values=-1)
+    p_labels   = keras.backend.cast(p_labels, 'int32')
+    l_boxes    = backend.pad(l_boxes, [[0, pad_size], [0, 0]], constant_values=-1)
+    l_scores   = backend.pad(l_scores, [[0, pad_size]], constant_values=-1)
+    l_labels   = backend.pad(l_labels, [[0, pad_size]], constant_values=-1)
+    l_labels   = keras.backend.cast(l_labels, 'int32')
+
+    # set shapes, since we know what they are
+    p_boxes.set_shape([max_detections, 4])
+    p_scores.set_shape([max_detections])
+    p_labels.set_shape([max_detections])
+    l_boxes.set_shape([max_detections, 4])
+    l_scores.set_shape([max_detections])
+    l_labels.set_shape([max_detections])
+
+    return [p_boxes, p_scores, p_labels, l_boxes, l_scores, l_labels]
 
 
 class FilterDetections(keras.layers.Layer):
@@ -104,6 +199,11 @@ class FilterDetections(keras.layers.Layer):
         nms_threshold       = 0.5,
         score_threshold     = 0.05,
         max_detections      = 300,
+        l_nms               = True,
+        l_nms_threshold     = 0.5,
+        l_score_threshold   = 0.05,
+        l_max_detections    = 300,
+        merge_max_detections= 30,
         parallel_iterations = 32,
         **kwargs
     ):
@@ -120,6 +220,11 @@ class FilterDetections(keras.layers.Layer):
         self.nms_threshold       = nms_threshold
         self.score_threshold     = score_threshold
         self.max_detections      = max_detections
+        self.l_nms               = l_nms
+        self.l_nms_threshold     = l_nms_threshold
+        self.l_score_threshold   = l_score_threshold
+        self.l_max_detections    = l_max_detections
+        self.merge_max_detections= merge_max_detections
         self.parallel_iterations = parallel_iterations
         super(FilterDetections, self).__init__(**kwargs)
 
@@ -131,7 +236,9 @@ class FilterDetections(keras.layers.Layer):
         """
         boxes          = inputs[0]
         classification = inputs[1]
-        other          = inputs[2:]
+        l_boxes          = inputs[2]
+        l_classification = inputs[3]
+        other          = inputs[4:]
 
         # wrap nms with our parameters
         def _filter_detections(args):
@@ -149,11 +256,33 @@ class FilterDetections(keras.layers.Layer):
                 nms_threshold=self.nms_threshold,
             )
 
+        def _merge_panel_label(args):
+            p_boxes = args[0]
+            p_scores = args[1]
+            p_labels = args[2]
+            l_boxes = args[3]
+            l_scores = args[4]
+            l_labels = args[5]
+            return merge_panel_label(p_boxes, p_scores, p_labels, l_boxes, l_scores, l_labels, self.merge_max_detections)
+
         # call filter_detections on each batch
-        outputs = backend.map_fn(
+        p_outputs = backend.map_fn(
             _filter_detections,
             elems=[boxes, classification, other],
             dtype=[keras.backend.floatx(), keras.backend.floatx(), 'int32'] + [o.dtype for o in other],
+            parallel_iterations=self.parallel_iterations
+        )
+        l_outputs = backend.map_fn(
+            _filter_detections,
+            elems=[l_boxes, l_classification, other],
+            dtype=[keras.backend.floatx(), keras.backend.floatx(), 'int32'] + [o.dtype for o in other],
+            parallel_iterations=self.parallel_iterations
+        )
+
+        outputs = backend.map_fn(
+            _merge_panel_label,
+            elems=p_outputs + l_outputs,
+            dtype=[keras.backend.floatx(), keras.backend.floatx(), 'int32'] + [keras.backend.floatx(), keras.backend.floatx(), 'int32'],
             parallel_iterations=self.parallel_iterations
         )
 
@@ -170,17 +299,27 @@ class FilterDetections(keras.layers.Layer):
             [filtered_boxes.shape, filtered_scores.shape, filtered_labels.shape, filtered_other[0].shape, filtered_other[1].shape, ...]
         """
         return [
-            (input_shape[0][0], self.max_detections, 4),
-            (input_shape[1][0], self.max_detections),
-            (input_shape[1][0], self.max_detections),
+            (input_shape[0][0], self.merge_max_detections, 4),
+            (input_shape[1][0], self.merge_max_detections),
+            (input_shape[1][0], self.merge_max_detections),
         ] + [
-            tuple([input_shape[i][0], self.max_detections] + list(input_shape[i][2:])) for i in range(2, len(input_shape))
+            (input_shape[0][0], self.merge_max_detections, 4),
+            (input_shape[1][0], self.merge_max_detections),
+            (input_shape[1][0], self.merge_max_detections),
         ]
+        # return [
+        #     (input_shape[0][0], self.max_detections, 4),
+        #     (input_shape[1][0], self.max_detections),
+        #     (input_shape[1][0], self.max_detections),
+        # ] + [
+        #     tuple([input_shape[i][0], self.max_detections] + list(input_shape[i][2:])) for i in range(2, len(input_shape))
+        # ]
 
     def compute_mask(self, inputs, mask=None):
         """ This is required in Keras when there is more than 1 output.
         """
-        return (len(inputs) + 1) * [None]
+        # return (len(inputs) + 1) * [None]
+        return (len(inputs) + 2) * [None]
 
     def get_config(self):
         """ Gets the configuration of this layer.
@@ -194,6 +333,11 @@ class FilterDetections(keras.layers.Layer):
             'nms_threshold'       : self.nms_threshold,
             'score_threshold'     : self.score_threshold,
             'max_detections'      : self.max_detections,
+            'l_nms'                 : self.l_nms,
+            'l_nms_threshold'       : self.l_nms_threshold,
+            'l_score_threshold'     : self.l_score_threshold,
+            'l_max_detections'      : self.l_max_detections,
+            'merge_max_detections'      : self.merge_max_detections,
             'parallel_iterations' : self.parallel_iterations,
         })
 

@@ -302,7 +302,8 @@ class Generator(object):
             l_labels_batch[index, ...]     = labels
             l_regression_batch[index, ...] = regression
 
-        return [regression_batch, labels_batch, l_regression_batch, l_labels_batch]
+        # return [regression_batch, labels_batch, l_regression_batch, l_labels_batch]
+        return [regression_batch, labels_batch, l_labels_batch]
 
     def compute_input_output(self, group):
         """ Compute inputs and target outputs for the network.

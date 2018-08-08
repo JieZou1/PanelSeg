@@ -98,3 +98,23 @@ def logical_and(*args, **kwargs):
 
 def unstack(*args, **kwargs):
     return tensorflow.unstack(*args, **kwargs)
+
+
+def reduce_max(*args, **kwargs):
+    return tensorflow.reduce_max(*args, **kwargs)
+
+
+def while_loop(*args, **kwargs):
+    return tensorflow.while_loop(*args, **kwargs)
+
+
+def add(*args, **kwargs):
+    return tensorflow.add(*args, **kwargs)
+
+
+def get_variable(*args, **kwargs):
+    return tensorflow.get_variable(*args, **kwargs)
+
+
+def create_tensorarray(dtype, size):
+    return tensorflow.TensorArray(dtype=dtype, size=size)

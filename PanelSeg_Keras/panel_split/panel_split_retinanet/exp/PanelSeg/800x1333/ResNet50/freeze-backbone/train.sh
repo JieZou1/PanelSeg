@@ -18,6 +18,6 @@ python /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/panel_split/panel_sp
     --annotations /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/PanelSeg/train_slurm.csv\
     --val-annotations /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/PanelSeg/eval_slurm.csv\
     --epoch 50\
-    --backbone resnet50
-    --image-min-side 800
+    --backbone resnet50\
+    --image-min-side 800\
     --image-max-side 1333

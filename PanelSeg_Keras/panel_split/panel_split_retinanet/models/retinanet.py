@@ -47,7 +47,10 @@ def default_classification_model(
         'padding'     : 'same',
     }
 
-    inputs  = keras.layers.Input(shape=(None, None, pyramid_feature_size))
+    if keras.backend.image_data_format() == 'channels_first':
+        inputs  = keras.layers.Input(shape=(pyramid_feature_size, None, None))
+    else:
+        inputs  = keras.layers.Input(shape=(None, None, pyramid_feature_size))
     outputs = inputs
     for i in range(4):
         outputs = keras.layers.Conv2D(
@@ -68,6 +71,8 @@ def default_classification_model(
     )(outputs)
 
     # reshape output and apply sigmoid
+    if keras.backend.image_data_format() == 'channels_first':
+        outputs = keras.layers.Permute((2, 3, 1), name='pyramid_classification_permute')(outputs)
     outputs = keras.layers.Reshape((-1, num_classes), name='pyramid_classification_reshape')(outputs)
     outputs = keras.layers.Activation('sigmoid', name='pyramid_classification_sigmoid')(outputs)
 
@@ -97,7 +102,10 @@ def default_regression_model(num_anchors, pyramid_feature_size=256, regression_f
         'bias_initializer'   : 'zeros'
     }
 
-    inputs  = keras.layers.Input(shape=(None, None, pyramid_feature_size))
+    if keras.backend.image_data_format() == 'channels_first':
+        inputs  = keras.layers.Input(shape=(pyramid_feature_size, None, None))
+    else:
+        inputs  = keras.layers.Input(shape=(None, None, pyramid_feature_size))
     outputs = inputs
     for i in range(4):
         outputs = keras.layers.Conv2D(
@@ -108,6 +116,8 @@ def default_regression_model(num_anchors, pyramid_feature_size=256, regression_f
         )(outputs)
 
     outputs = keras.layers.Conv2D(num_anchors * 4, name='pyramid_regression', **options)(outputs)
+    if keras.backend.image_data_format() == 'channels_first':
+        outputs = keras.layers.Permute((2, 3, 1), name='pyramid_regression_permute')(outputs)
     outputs = keras.layers.Reshape((-1, 4), name='pyramid_regression_reshape')(outputs)
 
     return keras.models.Model(inputs=inputs, outputs=outputs, name=name)
@@ -300,10 +310,11 @@ def retinanet(
 
 
 def retinanet_bbox(
-    model             = None,
-    anchor_parameters = AnchorParameters.default,
-    nms               = True,
-    name              = 'retinanet-bbox',
+    model                 = None,
+    anchor_parameters     = AnchorParameters.default,
+    nms                   = True,
+    class_specific_filter = True,
+    name                  = 'retinanet-bbox',
     **kwargs
 ):
     """ Construct a RetinaNet model on top of a backbone and adds convenience functions to output boxes directly.
@@ -312,10 +323,12 @@ def retinanet_bbox(
     These layers include applying the regression values to the anchors and performing NMS.
 
     Args
-        model             : RetinaNet model to append bbox layers to. If None, it will create a RetinaNet model using **kwargs.
-        anchor_parameters : Struct containing configuration for anchor generation (sizes, strides, ratios, scales).
-        name              : Name of the model.
-        *kwargs           : Additional kwargs to pass to the minimal retinanet model.
+        model                 : RetinaNet model to append bbox layers to. If None, it will create a RetinaNet model using **kwargs.
+        anchor_parameters     : Struct containing configuration for anchor generation (sizes, strides, ratios, scales).
+        nms                   : Whether to use non-maximum suppression for the filtering step.
+        class_specific_filter : Whether to use class specific filtering or filter for the best scoring class only.
+        name                  : Name of the model.
+        *kwargs               : Additional kwargs to pass to the minimal retinanet model.
 
     Returns
         A keras.models.Model which takes an image as input and outputs the detections on the image.
@@ -346,7 +359,11 @@ def retinanet_bbox(
     boxes = layers.ClipBoxes(name='clipped_boxes')([model.inputs[0], boxes])
 
     # filter detections (apply NMS / score threshold / select top-k)
-    detections = layers.FilterDetections(nms=nms, name='filtered_detections')([boxes, classification] + other)
+    detections = layers.FilterDetections(
+        nms                   = nms,
+        class_specific_filter = class_specific_filter,
+        name                  = 'filtered_detections'
+    )([boxes, classification] + other)
 
     outputs = detections
 

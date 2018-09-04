@@ -11,11 +11,11 @@ def parse_args(args):
     parser = argparse.ArgumentParser(description='Convert PanelSeg data set to CSV format.')
     parser.add_argument('--list_path',
                         help='The path to the list file.',
-                        default='\\Users\\jie\\projects\\PanelSeg\\programs\\PanelSeg_Keras\\exp\\all.txt',
+                        default='\\Users\\jie\\projects\\PanelSeg\\programs\\PanelSeg_Keras\\exp\\eval.txt',
                         type=str)
     parser.add_argument('--annotation_path',
                         help='The output annotation CSV file.',
-                        default='\\Users\\jie\\projects\\PanelSeg\\programs\\PanelSeg_Keras\\exp\\all.csv',
+                        default='\\Users\\jie\\projects\\PanelSeg\\programs\\PanelSeg_Keras\\exp\\eval.csv',
                         type=str)
     # parser.add_argument('mapping_path',
     #                     help='The output class to ID mapping CSV file.',
@@ -45,30 +45,32 @@ def main(args=None):
 
             # write to CSV file
             # The format is:
-            # image_path,panel_x1,panel_y1,panel_x2,panel_y2,label_x1,label_y1,label_x2,label_y2,label
+            # image_path,label_x1,label_y1,label_x2,label_y2,label
             # if there is no label, the format becomes:
-            # image_path,panel_x1,panel_y1,panel_x2,panel_y2,,,,,
+            # image_path,,,,,
+            has_label = False
             for panel in figure.panels:
+                if panel.label_rect is not None:
+                    label = map_label(panel.label)
+                    if len(label) == 1:  # We care for single letter label for now
+                        row = list()
+                        row.append(figure.image_path)  # add image_path
+                        row.append(str(panel.label_rect[0]))
+                        row.append(str(panel.label_rect[1]))
+                        row.append(str(panel.label_rect[2]))
+                        row.append(str(panel.label_rect[3]))
+                        row.append(label)
+                        csv_writer.writerow(row)
+                        has_label = True
+
+            if not has_label:
                 row = list()
                 row.append(figure.image_path)  # add image_path
-                row.append(str(panel.panel_rect[0]))
-                row.append(str(panel.panel_rect[1]))
-                row.append(str(panel.panel_rect[2]))
-                row.append(str(panel.panel_rect[3]))
-                row.append('panel')
-                if panel.label_rect is None:
-                    row.append('')
-                    row.append('')
-                    row.append('')
-                    row.append('')
-                    row.append('')
-                else:
-                    label = map_label(panel.label)
-                    row.append(str(panel.label_rect[0]))
-                    row.append(str(panel.label_rect[1]))
-                    row.append(str(panel.label_rect[2]))
-                    row.append(str(panel.label_rect[3]))
-                    row.append(label)
+                row.append('')
+                row.append('')
+                row.append('')
+                row.append('')
+                row.append('')
                 csv_writer.writerow(row)
 
 

@@ -126,7 +126,7 @@ class Figure:
         # assign labels to panels
         for label_char in char_set:
             if len(panel_dict[label_char]) != len(label_dict[label_char]):
-                logging.error('{0}: panel {1} dont have same matching labels!'.format(annotation_file_path, label_char))
+                logging.error('{0}: panel {1} does not have same matching labels!'.format(annotation_file_path, label_char))
                 continue
             misc.assign_labels_to_panels(panel_dict[label_char], label_dict[label_char])
 

@@ -28,8 +28,11 @@ import tensorflow as tf
 # Allow relative imports when being executed as script.
 if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
-    import panel_split_retinanet.bin  # noqa: F401
-    __package__ = "panel_split_retinanet.bin"
+    import label_recog_retinanet.bin  # noqa: F401
+    __package__ = "label_recog_retinanet.bin"
+
+# import pyximport
+# pyximport.install()
 
 # Change these to absolute imports if you copy this script outside the keras_retinanet package.
 from .. import layers  # noqa: F401
@@ -208,6 +211,7 @@ def create_generators(args, preprocess_image):
         'image_min_side'   : args.image_min_side,
         'image_max_side'   : args.image_max_side,
         'preprocess_image' : preprocess_image,
+        'group_method'     : 'none'
     }
 
     # create random transform generator for augmenting training data
@@ -283,20 +287,20 @@ def check_args(parsed_args):
 def parse_args(args):
     """ Parse the arguments.
     """
-    parser     = argparse.ArgumentParser(description='Training script for Panel Split with RetinaNet.')
+    parser     = argparse.ArgumentParser(description='Training script for Panel Label Recognition with RetinaNet.')
 
     parser.add_argument('--dataset_type', help='We always use CSV only',
                         default='csv')
     parser.add_argument('--annotations', help='Path to CSV file containing annotations for training.',
-                        # default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/PanelSeg/train_slurm.csv'
-                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/PanelSeg/train.csv'
+                        # default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/label_recog/label_recog_retinanet/exp/PanelSeg/train_slurm.csv'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/label_recog/label_recog_retinanet/exp/PanelSeg/train.csv'
                         )
     parser.add_argument('--classes', help='Path to a CSV file containing class label mapping.',
-                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/PanelSeg/mapping.csv'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/label_recog/label_recog_retinanet/exp/PanelSeg/label_mapping.csv'
                         )
     parser.add_argument('--val-annotations', help='Path to CSV file containing annotations for validation (optional).',
-                        # default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/PanelSeg/eval_slurm.csv'
-                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/PanelSeg/eval.csv'
+                        # default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/label_recog/label_recog_retinanet/exp/PanelSeg/eval_slurm.csv'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/label_recog/label_recog_retinanet/exp/PanelSeg/eval.csv'
                         )
 
     group = parser.add_mutually_exclusive_group()

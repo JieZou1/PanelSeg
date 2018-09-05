@@ -14,7 +14,7 @@ export LD_LIBRARY_PATH=/slurm_storage/public/cuda9.0/lib64
 which python
 python /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/label_recog/label_recog_retinanet/bin/train.py\
     --dataset_type csv\
-    --classes /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/label_recog/label_recog_retinanet/exp/PanelSeg/mapping.csv\
+    --classes /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/label_recog/label_recog_retinanet/exp/PanelSeg/label_mapping.csv\
     --annotations /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/label_recog/label_recog_retinanet/exp/PanelSeg/train_slurm.csv\
     --val-annotations /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/label_recog/label_recog_retinanet/exp/PanelSeg/eval_slurm.csv\
     --epoch 50\

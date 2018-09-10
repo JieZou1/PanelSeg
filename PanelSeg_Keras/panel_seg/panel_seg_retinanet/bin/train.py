@@ -17,14 +17,12 @@ limitations under the License.
 """
 
 import argparse
-import functools
 import os
 import sys
 import warnings
 
 import keras
 import keras.preprocessing.image
-from keras.utils import multi_gpu_model
 import tensorflow as tf
 
 # Allow relative imports when being executed as script.
@@ -33,7 +31,7 @@ if __name__ == "__main__" and __package__ is None:
     import panel_seg_retinanet.bin  # noqa: F401
     __package__ = "panel_seg_retinanet.bin"
 
-# Change these to absolute imports if you copy this script outside the panel_seg_retinanet package.
+# Change these to absolute imports if you copy this script outside the keras_retinanet package.
 from .. import layers  # noqa: F401
 from .. import losses
 from .. import models
@@ -44,7 +42,7 @@ from ..preprocessing.csv_generator import CSVGenerator
 from ..preprocessing.kitti import KittiGenerator
 from ..preprocessing.open_images import OpenImagesGenerator
 from ..preprocessing.pascal_voc import PascalVocGenerator
-from ..utils.anchors import make_shapes_callback, anchor_targets_bbox
+from ..utils.anchors import make_shapes_callback
 from ..utils.keras_version import check_keras_version
 from ..utils.model import freeze as freeze_model
 from ..utils.transform import random_transform_generator
@@ -103,6 +101,7 @@ def create_models(backbone_retinanet, num_classes, l_num_classes, weights, multi
     # Keras recommends initialising a multi-gpu model on the CPU to ease weight sharing, and to prevent OOM errors.
     # optionally wrap in a parallel model
     if multi_gpu > 1:
+        from keras.utils import multi_gpu_model
         with tf.device('/cpu:0'):
             model = model_with_weights(backbone_retinanet(num_classes, modifier=modifier), weights=weights, skip_mismatch=True)
         training_model = multi_gpu_model(model, gpus=multi_gpu)
@@ -116,10 +115,10 @@ def create_models(backbone_retinanet, num_classes, l_num_classes, weights, multi
     # compile model
     training_model.compile(
         loss={
-            'p_regression'      : losses.smooth_l1(),
-            'p_classification'  : losses.focal(),
-            # 'l_regression'      : losses.smooth_l1(),
-            'l_classification'  : losses.focal()
+            'regression'    : losses.smooth_l1(),
+            'classification': losses.focal(),
+            'l_regression'      : losses.smooth_l1(),
+            'l_classification': losses.focal()
         },
         optimizer=keras.optimizers.adam(lr=1e-5, clipnorm=0.001)
     )
@@ -200,9 +199,21 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
     return callbacks
 
 
-def create_generators(args):
+def create_generators(args, preprocess_image):
     """ Create generators for training and validation.
+
+    Args
+        args             : parseargs object containing configuration for generators.
+        preprocess_image : Function that preprocesses an image for the network.
     """
+    common_args = {
+        'batch_size'       : args.batch_size,
+        'image_min_side'   : args.image_min_side,
+        'image_max_side'   : args.image_max_side,
+        'preprocess_image' : preprocess_image,
+        'group_method'     : 'none'
+    }
+
     # create random transform generator for augmenting training data
     # We do not augment data by create random transform generator.
     transform_generator = None
@@ -227,126 +238,18 @@ def create_generators(args):
         args.classes,
         args.l_classes,
         transform_generator=transform_generator,
-        batch_size=args.batch_size,
-        image_min_side=args.image_min_side,
-        image_max_side=args.image_max_side,
-        group_method='none'
+        **common_args
     )
-
-    validation_generator = None
 
     if args.val_annotations:
         validation_generator = CSVGenerator(
             args.val_annotations,
             args.classes,
             args.l_classes,
-            batch_size=args.batch_size,
-            image_min_side=args.image_min_side,
-            image_max_side=args.image_max_side,
-            group_method='none'
+            **common_args
         )
-
-    # if args.dataset_type == 'coco':
-    #     # import here to prevent unnecessary dependency on cocoapi
-    #     from ..preprocessing.coco import CocoGenerator
-    #
-    #     train_generator = CocoGenerator(
-    #         args.coco_path,
-    #         'train2017',
-    #         transform_generator=transform_generator,
-    #         batch_size=args.batch_size,
-    #         image_min_side=args.image_min_side,
-    #         image_max_side=args.image_max_side
-    #     )
-    #
-    #     validation_generator = CocoGenerator(
-    #         args.coco_path,
-    #         'val2017',
-    #         batch_size=args.batch_size,
-    #         image_min_side=args.image_min_side,
-    #         image_max_side=args.image_max_side
-    #     )
-    # elif args.dataset_type == 'pascal':
-    #     train_generator = PascalVocGenerator(
-    #         args.pascal_path,
-    #         'trainval',
-    #         transform_generator=transform_generator,
-    #         batch_size=args.batch_size,
-    #         image_min_side=args.image_min_side,
-    #         image_max_side=args.image_max_side
-    #     )
-    #
-    #     validation_generator = PascalVocGenerator(
-    #         args.pascal_path,
-    #         'test',
-    #         batch_size=args.batch_size,
-    #         image_min_side=args.image_min_side,
-    #         image_max_side=args.image_max_side
-    #     )
-    # elif args.dataset_type == 'csv':
-    #     train_generator = CSVGenerator(
-    #         args.annotations,
-    #         args.classes,
-    #         transform_generator=transform_generator,
-    #         batch_size=args.batch_size,
-    #         image_min_side=args.image_min_side,
-    #         image_max_side=args.image_max_side
-    #     )
-    #
-    #     if args.val_annotations:
-    #         validation_generator = CSVGenerator(
-    #             args.val_annotations,
-    #             args.classes,
-    #             batch_size=args.batch_size,
-    #             image_min_side=args.image_min_side,
-    #             image_max_side=args.image_max_side
-    #         )
-    #     else:
-    #         validation_generator = None
-    # elif args.dataset_type == 'oid':
-    #     train_generator = OpenImagesGenerator(
-    #         args.main_dir,
-    #         subset='train',
-    #         version=args.version,
-    #         labels_filter=args.labels_filter,
-    #         annotation_cache_dir=args.annotation_cache_dir,
-    #         fixed_labels=args.fixed_labels,
-    #         transform_generator=transform_generator,
-    #         batch_size=args.batch_size,
-    #         image_min_side=args.image_min_side,
-    #         image_max_side=args.image_max_side
-    #     )
-    #
-    #     validation_generator = OpenImagesGenerator(
-    #         args.main_dir,
-    #         subset='validation',
-    #         version=args.version,
-    #         labels_filter=args.labels_filter,
-    #         annotation_cache_dir=args.annotation_cache_dir,
-    #         fixed_labels=args.fixed_labels,
-    #         batch_size=args.batch_size,
-    #         image_min_side=args.image_min_side,
-    #         image_max_side=args.image_max_side
-    #     )
-    # elif args.dataset_type == 'kitti':
-    #     train_generator = KittiGenerator(
-    #         args.kitti_path,
-    #         subset='train',
-    #         transform_generator=transform_generator,
-    #         batch_size=args.batch_size,
-    #         image_min_side=args.image_min_side,
-    #         image_max_side=args.image_max_side
-    #     )
-    #
-    #     validation_generator = KittiGenerator(
-    #         args.kitti_path,
-    #         subset='val',
-    #         batch_size=args.batch_size,
-    #         image_min_side=args.image_min_side,
-    #         image_max_side=args.image_max_side
-    #     )
-    # else:
-    #     raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
+    else:
+        validation_generator = None
 
     return train_generator, validation_generator
 
@@ -390,13 +293,13 @@ def parse_args(args):
     parser.add_argument('--dataset_type', help='We always use CSV only',
                         default='csv')
     parser.add_argument('--annotations', help='Path to CSV file containing annotations for training.',
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_seg/train.csv')
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/train.csv')
     parser.add_argument('--classes', help='Path to a CSV file containing panel class mapping.',
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_seg/mapping.csv')
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/mapping.csv')
     parser.add_argument('--l_classes', help='Path to a CSV file containing label class mapping.',
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_seg/label_mapping.csv')
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/label_mapping.csv')
     parser.add_argument('--val-annotations', help='Path to CSV file containing annotations for validation (optional).',
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_seg/eval.csv'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/eval.csv'
                         )
 
     group = parser.add_mutually_exclusive_group()
@@ -411,17 +314,17 @@ def parse_args(args):
     parser.add_argument('--multi-gpu',       help='Number of GPUs to use for parallel processing.', type=int, default=0)
     parser.add_argument('--multi-gpu-force', help='Extra flag needed to enable (experimental) multi-gpu support.', action='store_true')
     parser.add_argument('--epochs',          help='Number of epochs to train.', type=int, default=50)
-    parser.add_argument('--steps',           help='Number of steps per epoch.', type=int, default=100)
+    parser.add_argument('--steps',           help='Number of steps per epoch.', type=int, default=10000)
     parser.add_argument('--snapshot-path',   help='Path to store snapshots of models during training (defaults to \'./snapshots\')', default='./snapshots')
     parser.add_argument('--tensorboard-dir', help='Log directory for Tensorboard output', default='./logs')
     parser.add_argument('--no-snapshots',    help='Disable saving snapshots.', dest='snapshots', action='store_false')
     parser.add_argument('--no-evaluation',   help='Disable per epoch evaluation.', dest='evaluation', action='store_false')
     parser.add_argument('--freeze-backbone', help='Freeze training of backbone layers.', action='store_true')
     parser.add_argument('--random-transform', help='Randomly transform image and annotations.', action='store_true')
-    parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=400)
-    parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=600)
+    parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=800)
+    parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=1333)
 
-    return parser.parse_args(args)
+    return check_args(parser.parse_args(args))
 
 
 def main(args=None):
@@ -442,7 +345,7 @@ def main(args=None):
     keras.backend.tensorflow_backend.set_session(get_session())
 
     # create the generators
-    train_generator, validation_generator = create_generators(args)
+    train_generator, validation_generator = create_generators(args, backbone.preprocess_image)
 
     # create the model
     if args.snapshot is not None:
@@ -471,10 +374,9 @@ def main(args=None):
 
     # this lets the generator compute backbone layer shapes using the actual backbone model
     if 'vgg' in args.backbone or 'densenet' in args.backbone:
-        compute_anchor_targets = functools.partial(anchor_targets_bbox, shapes_callback=make_shapes_callback(model))
-        train_generator.compute_anchor_targets = compute_anchor_targets
-        if validation_generator is not None:
-            validation_generator.compute_anchor_targets = compute_anchor_targets
+        train_generator.compute_shapes = make_shapes_callback(model)
+        if validation_generator:
+            validation_generator.compute_shapes = train_generator.compute_shapes
 
     # create the callbacks
     callbacks = create_callbacks(

@@ -20,7 +20,6 @@ import argparse
 import os
 import sys
 import cv2
-import numpy as np
 
 # Allow relative imports when being executed as script.
 if __name__ == "__main__" and __package__ is None:
@@ -35,6 +34,7 @@ from ..preprocessing.kitti import KittiGenerator
 from ..preprocessing.open_images import OpenImagesGenerator
 from ..utils.transform import random_transform_generator
 from ..utils.visualization import draw_annotations, draw_boxes
+from ..utils.anchors import anchors_for_shape
 
 
 def create_generator(args):
@@ -64,19 +64,25 @@ def create_generator(args):
         generator = CocoGenerator(
             args.coco_path,
             args.coco_set,
-            transform_generator=transform_generator
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side
         )
     elif args.dataset_type == 'pascal':
         generator = PascalVocGenerator(
             args.pascal_path,
             args.pascal_set,
-            transform_generator=transform_generator
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side
         )
     elif args.dataset_type == 'csv':
         generator = CSVGenerator(
             args.annotations,
             args.classes,
-            transform_generator=transform_generator
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side
         )
     elif args.dataset_type == 'oid':
         generator = OpenImagesGenerator(
@@ -84,15 +90,19 @@ def create_generator(args):
             subset=args.subset,
             version=args.version,
             labels_filter=args.labels_filter,
-            fixed_labels=args.fixed_labels,
+            parent_label=args.parent_label,
             annotation_cache_dir=args.annotation_cache_dir,
-            transform_generator=transform_generator
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side
         )
     elif args.dataset_type == 'kitti':
         generator = KittiGenerator(
             args.kitti_path,
             subset=args.subset,
-            transform_generator=transform_generator
+            transform_generator=transform_generator,
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side
         )
     else:
         raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
@@ -128,7 +138,7 @@ def parse_args(args):
     oid_parser.add_argument('--version',  help='The current dataset version is v4.', default='v4')
     oid_parser.add_argument('--labels-filter',  help='A list of labels to filter.', type=csv_list, default=None)
     oid_parser.add_argument('--annotation-cache-dir', help='Path to store annotation cache.', default='.')
-    oid_parser.add_argument('--fixed-labels', help='Use the exact specified labels.', default=False)
+    oid_parser.add_argument('--parent-label', help='Use the hierarchy children of this label.', default=None)
 
     csv_parser = subparsers.add_parser('csv')
     csv_parser.add_argument('annotations', help='Path to CSV file containing annotations for evaluation.')
@@ -139,6 +149,8 @@ def parse_args(args):
     parser.add_argument('--anchors', help='Show positive anchors on the image.', action='store_true')
     parser.add_argument('--annotations', help='Show annotations on the image. Green annotations have anchors, red annotations don\'t and therefore don\'t contribute to training.', action='store_true')
     parser.add_argument('--random-transform', help='Randomly transform image and annotations.', action='store_true')
+    parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=800)
+    parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=1333)
 
     return parser.parse_args(args)
 
@@ -165,10 +177,14 @@ def run(generator, args):
             image, image_scale = generator.resize_image(image)
             annotations[:, :4] *= image_scale
 
+        anchors = anchors_for_shape(image.shape)
+
+        labels_batch, regression_batch, boxes_batch = generator.compute_anchor_targets(anchors, [image], [annotations], generator.num_classes())
+        anchor_states                               = labels_batch[0, :, -1]
+
         # draw anchors on the image
         if args.anchors:
-            labels, _, anchors = generator.compute_anchor_targets(image.shape, annotations, generator.num_classes())
-            draw_boxes(image, anchors[np.max(labels, axis=1) == 1], (255, 255, 0), thickness=1)
+            draw_boxes(image, anchors[anchor_states == 1], (255, 255, 0), thickness=1)
 
         # draw annotations on the image
         if args.annotations:
@@ -177,8 +193,7 @@ def run(generator, args):
 
             # draw regressed anchors in green to override most red annotations
             # result is that annotations without anchors are red, with anchors are green
-            labels, boxes, _ = generator.compute_anchor_targets(image.shape, annotations, generator.num_classes())
-            draw_boxes(image, boxes[np.max(labels, axis=1) == 1], (0, 255, 0))
+            draw_boxes(image, boxes_batch[0, anchor_states == 1, :], (0, 255, 0))
 
         cv2.imshow('Image', image)
         if cv2.waitKey() == ord('q'):

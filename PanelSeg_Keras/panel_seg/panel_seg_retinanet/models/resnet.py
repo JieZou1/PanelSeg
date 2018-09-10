@@ -17,10 +17,11 @@ limitations under the License.
 import keras
 from keras.utils import get_file
 import keras_resnet
-# import keras_resnet.models
-from . import resnet_2d
+import keras_resnet.models
+
 from . import retinanet
 from . import Backbone
+from ..utils.image import preprocess_image
 
 
 class ResNetBackbone(Backbone):
@@ -68,6 +69,11 @@ class ResNetBackbone(Backbone):
         if backbone not in allowed_backbones:
             raise ValueError('Backbone (\'{}\') not in allowed backbones ({}).'.format(backbone, allowed_backbones))
 
+    def preprocess_image(self, inputs):
+        """ Takes as input an image and prepares it for being passed through the network.
+        """
+        return preprocess_image(inputs, mode='caffe')
+
 
 def resnet_retinanet(num_classes, l_num_classes, backbone='resnet50', inputs=None, modifier=None, **kwargs):
     """ Constructs a retinanet model using a resnet backbone.
@@ -83,15 +89,18 @@ def resnet_retinanet(num_classes, l_num_classes, backbone='resnet50', inputs=Non
     """
     # choose default input
     if inputs is None:
-        inputs = keras.layers.Input(shape=(None, None, 3))
+        if keras.backend.image_data_format() == 'channels_first':
+            inputs = keras.layers.Input(shape=(3, None, None))
+        else:
+            inputs = keras.layers.Input(shape=(None, None, 3))
 
     # create the resnet backbone
     if backbone == 'resnet50':
-        resnet = resnet_2d.ResNet50(inputs, include_top=False, freeze_bn=True)
+        resnet = keras_resnet.models.ResNet50(inputs, include_top=False, freeze_bn=True)
     elif backbone == 'resnet101':
-        resnet = resnet_2d.ResNet101(inputs, include_top=False, freeze_bn=True)
+        resnet = keras_resnet.models.ResNet101(inputs, include_top=False, freeze_bn=True)
     elif backbone == 'resnet152':
-        resnet = resnet_2d.ResNet152(inputs, include_top=False, freeze_bn=True)
+        resnet = keras_resnet.models.ResNet152(inputs, include_top=False, freeze_bn=True)
     else:
         raise ValueError('Backbone (\'{}\') is invalid.'.format(backbone))
 

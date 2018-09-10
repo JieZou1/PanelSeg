@@ -17,6 +17,12 @@ limitations under the License.
 import tensorflow
 
 
+def transpose(*args, **kwargs):
+    """ See https://www.tensorflow.org/versions/master/api_docs/python/tf/transpose .
+    """
+    return tensorflow.transpose(*args, **kwargs)
+
+
 def map_fn(*args, **kwargs):
     """ See https://www.tensorflow.org/versions/master/api_docs/python/tf/map_fn .
     """
@@ -90,31 +96,3 @@ def where(*args, **kwargs):
     """ See https://www.tensorflow.org/versions/master/api_docs/python/tf/where .
     """
     return tensorflow.where(*args, **kwargs)
-
-
-def logical_and(*args, **kwargs):
-    return tensorflow.logical_and(*args, **kwargs)
-
-
-def unstack(*args, **kwargs):
-    return tensorflow.unstack(*args, **kwargs)
-
-
-def reduce_max(*args, **kwargs):
-    return tensorflow.reduce_max(*args, **kwargs)
-
-
-def while_loop(*args, **kwargs):
-    return tensorflow.while_loop(*args, **kwargs)
-
-
-def add(*args, **kwargs):
-    return tensorflow.add(*args, **kwargs)
-
-
-def get_variable(*args, **kwargs):
-    return tensorflow.get_variable(*args, **kwargs)
-
-
-def create_tensorarray(dtype, size):
-    return tensorflow.TensorArray(dtype=dtype, size=size)

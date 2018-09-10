@@ -21,7 +21,12 @@ import warnings
 
 import keras
 
-from ..utils.anchors import anchor_targets_bbox, bbox_transform
+# from panel_seg.panel_seg_retinanet.models.retinanet import PanelAnchorParameters
+from ..utils.anchors import (
+    anchor_targets_bbox,
+    anchors_for_shape,
+    guess_shapes
+)
 from ..utils.image import (
     TransformParameters,
     adjust_transform_for_image,
@@ -46,6 +51,8 @@ class Generator(object):
         image_max_side=1333,
         transform_parameters=None,
         compute_anchor_targets=anchor_targets_bbox,
+        compute_shapes=guess_shapes,
+        preprocess_image=preprocess_image,
     ):
         """ Initialize Generator object.
 
@@ -58,6 +65,8 @@ class Generator(object):
             image_max_side         : If after resizing the maximum side is larger than image_max_side, scales down further so that the max side is equal to image_max_side.
             transform_parameters   : The transform parameters used for data augmentation.
             compute_anchor_targets : Function handler for computing the targets of anchors for an image and its annotations.
+            compute_shapes         : Function handler for computing the shapes of the pyramid for a given input.
+            preprocess_image       : Function handler for preprocessing an image (scaling / normalizing) for passing through a network.
         """
         self.transform_generator    = transform_generator
         self.batch_size             = int(batch_size)
@@ -67,6 +76,8 @@ class Generator(object):
         self.image_max_side         = image_max_side
         self.transform_parameters   = transform_parameters or TransformParameters()
         self.compute_anchor_targets = compute_anchor_targets
+        self.compute_shapes         = compute_shapes
+        self.preprocess_image       = preprocess_image
 
         self.group_index = 0
         self.lock        = threading.Lock()
@@ -79,6 +90,11 @@ class Generator(object):
         raise NotImplementedError('size method not implemented')
 
     def num_classes(self):
+        """ Number of classes in the dataset.
+        """
+        raise NotImplementedError('num_classes method not implemented')
+
+    def l_num_classes(self):
         """ Number of classes in the dataset.
         """
         raise NotImplementedError('num_classes method not implemented')
@@ -166,11 +182,6 @@ class Generator(object):
         """
         return resize_image(image, min_side=self.image_min_side, max_side=self.image_max_side)
 
-    def preprocess_image(self, image):
-        """ Preprocess an image (e.g. subtracts ImageNet mean).
-        """
-        return preprocess_image(image)
-
     def preprocess_group_entry(self, image, annotations):
         """ Preprocess image and its annotations.
         """
@@ -184,8 +195,7 @@ class Generator(object):
         image, image_scale = self.resize_image(image)
 
         # apply resizing to annotations too
-        annotations[:, :4] *= image_scale   # scale panel annotation
-        annotations[:, 5:9] *= image_scale  # scale label annotation
+        annotations[:, :4] *= image_scale
 
         return image, annotations
 
@@ -228,82 +238,69 @@ class Generator(object):
         for image_index, image in enumerate(image_group):
             image_batch[image_index, :image.shape[0], :image.shape[1], :image.shape[2]] = image
 
+        if keras.backend.image_data_format() == 'channels_first':
+            image_batch = image_batch.transpose((0, 3, 1, 2))
+
         return image_batch
+
+    def generate_anchors(self, image_shape):
+        anchors = anchors_for_shape(image_shape,
+                                    pyramid_levels=[3, 4, 5, 6, 7],
+                                    strides=[8, 16, 32, 64, 128],
+                                    sizes=[32, 64, 128, 256, 512],
+                                    ratios=np.array([0.5, 1, 2], keras.backend.floatx()),
+                                    scales=np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)], keras.backend.floatx()),
+                                    shapes_callback=self.compute_shapes)
+
+        l_anchors = anchors_for_shape(image_shape,
+                                      pyramid_levels=[2, 3, 4],
+                                      strides=[4, 8, 16],
+                                      sizes=[16, 32, 64],
+                                      ratios=np.array([1], keras.backend.floatx()),
+                                      scales=np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)], keras.backend.floatx()),
+                                      shapes_callback=self.compute_shapes)
+
+        return anchors, l_anchors
 
     def compute_targets(self, image_group, annotations_group):
         """ Compute target outputs for the network using images and their annotations.
         """
         # get the max image shape
         max_shape = tuple(max(image.shape[x] for image in image_group) for x in range(3))
+        anchors, l_anchors   = self.generate_anchors(max_shape)
 
-        # compute labels and regression targets
-        labels_group     = [None] * self.batch_size
-        regression_group = [None] * self.batch_size
-        for index, (image, annotations) in enumerate(zip(image_group, annotations_group)):
-            # compute regression targets
-            pyramid_levels = [3, 4, 5, 6, 7]
-            annotations = annotations[:, :5]
-            labels_group[index], annotations, anchors = self.compute_anchor_targets(
-                max_shape,
-                annotations,
-                self.num_classes(),
-                mask_shape=image.shape,
-                pyramid_levels=pyramid_levels,
-                ratios=np.array([0.5, 1, 2]),
-                scales=np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)]),
-                strides=[2 ** x for x in pyramid_levels],
-                sizes=[2 ** (x + 2) for x in pyramid_levels]
-            )
-            regression_group[index] = bbox_transform(anchors, annotations)
+        # break annotation group into panel annotation_group and label annotation group
+        panel_annotation_group = []
+        label_annotation_group = []
+        for annotation in annotations_group:
+            panel_annotations = annotation[:, :5]
+            panel_annotation_group.append(panel_annotations)
 
-            # append anchor states to regression targets (necessary for filtering 'ignore', 'positive' and 'negative' anchors)
-            anchor_states           = np.max(labels_group[index], axis=1, keepdims=True)
-            regression_group[index] = np.append(regression_group[index], anchor_states, axis=1)
+            # remove (-1, -1, -1, -1, -1) items from label_annotation_group
+            label_annotations = annotation[:, 5:]
+            filtered_label_annotations = []
+            for label_annotation in label_annotations:
+                if label_annotation[4] != -1:
+                    filtered_label_annotations.append(label_annotation)
+            if len(filtered_label_annotations) == 0:
+                filtered_label_annotations.append([-1, -1, -1, -1, -1])
+            label_annotation_group.append(np.array(filtered_label_annotations))
 
-        labels_batch     = np.zeros((self.batch_size,) + labels_group[0].shape, dtype=keras.backend.floatx())
-        regression_batch = np.zeros((self.batch_size,) + regression_group[0].shape, dtype=keras.backend.floatx())
+        labels_batch, regression_batch, _ = self.compute_anchor_targets(
+            anchors,
+            image_group,
+            panel_annotation_group,
+            self.num_classes(),
+        )
 
-        # copy all labels and regression values to the batch blob
-        for index, (labels, regression) in enumerate(zip(labels_group, regression_group)):
-            labels_batch[index, ...]     = labels
-            regression_batch[index, ...] = regression
+        l_labels_batch, l_regression_batch, _ = self.compute_anchor_targets(
+            l_anchors,
+            image_group,
+            label_annotation_group,
+            self.l_num_classes(),
+        )
 
-
-
-        # compute label labels and label regression targets
-        l_labels_group     = [None] * self.batch_size
-        l_regression_group = [None] * self.batch_size
-        for index, (image, annotations) in enumerate(zip(image_group, annotations_group)):
-            # compute label regression targets
-            pyramid_levels = [1, 2, 3, 4]
-            annotations = annotations[:, 5:]
-            l_labels_group[index], annotations, anchors = self.compute_anchor_targets(
-                max_shape,
-                annotations,
-                self.l_num_classes(),
-                mask_shape=image.shape,
-                pyramid_levels=pyramid_levels,
-                ratios=np.array([0.5, 1, 2]),
-                scales=np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)]),
-                strides=[2 ** x for x in pyramid_levels],
-                sizes=[2 ** (x + 2) for x in pyramid_levels]
-            )
-            l_regression_group[index] = bbox_transform(anchors, annotations)
-
-            # append anchor states to regression targets (necessary for filtering 'ignore', 'positive' and 'negative' anchors)
-            anchor_states           = np.max(l_labels_group[index], axis=1, keepdims=True)
-            l_regression_group[index] = np.append(l_regression_group[index], anchor_states, axis=1)
-
-        l_labels_batch     = np.zeros((self.batch_size,) + l_labels_group[0].shape, dtype=keras.backend.floatx())
-        l_regression_batch = np.zeros((self.batch_size,) + l_regression_group[0].shape, dtype=keras.backend.floatx())
-
-        # copy all labels and regression values to the batch blob
-        for index, (labels, regression) in enumerate(zip(l_labels_group, l_regression_group)):
-            l_labels_batch[index, ...]     = labels
-            l_regression_batch[index, ...] = regression
-
-        # return [regression_batch, labels_batch, l_regression_batch, l_labels_batch]
-        return [regression_batch, labels_batch, l_labels_batch]
+        return [regression_batch, labels_batch, l_regression_batch, l_labels_batch]
 
     def compute_input_output(self, group):
         """ Compute inputs and target outputs for the network.

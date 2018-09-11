@@ -48,7 +48,7 @@ class Evaluate(keras.callbacks.Callback):
         logs = logs or {}
 
         # run evaluation
-        average_precisions = evaluate(
+        average_precisions, average_l_precisions = evaluate(
             self.generator,
             self.model,
             iou_threshold=self.iou_threshold,
@@ -57,10 +57,10 @@ class Evaluate(keras.callbacks.Callback):
             save_path=self.save_path
         )
 
-        # compute per class average precision
+        # compute per panel class average precision
         present_classes = 0
         precision = 0
-        for label, (average_precision, num_annotations ) in average_precisions.items():
+        for label, (average_precision, num_annotations) in average_precisions.items():
             if self.verbose == 1:
                 print('{:.0f} instances of class'.format(num_annotations),
                       self.generator.label_to_name(label), 'with average precision: {:.4f}'.format(average_precision))
@@ -74,10 +74,35 @@ class Evaluate(keras.callbacks.Callback):
             summary = tf.Summary()
             summary_value = summary.value.add()
             summary_value.simple_value = self.mean_ap
-            summary_value.tag = "mAP"
+            summary_value.tag = "Panel mAP"
             self.tensorboard.writer.add_summary(summary, epoch)
 
-        logs['mAP'] = self.mean_ap
+        logs['Panel mAP'] = self.mean_ap
 
         if self.verbose == 1:
-            print('mAP: {:.4f}'.format(self.mean_ap))
+            print('Panel mAP: {:.4f}'.format(self.mean_ap))
+
+        # compute per label class average precision
+        present_classes = 0
+        precision = 0
+        for label, (average_precision, num_annotations) in average_l_precisions.items():
+            if self.verbose == 1:
+                print('{:.0f} instances of class'.format(num_annotations),
+                      self.generator.l_label_to_name(label), 'with average precision: {:.4f}'.format(average_precision))
+            if num_annotations > 0:
+                present_classes += 1
+                precision       += average_precision
+        self.l_mean_ap = precision / present_classes
+
+        if self.tensorboard is not None and self.tensorboard.writer is not None:
+            import tensorflow as tf
+            summary = tf.Summary()
+            summary_value = summary.value.add()
+            summary_value.simple_value = self.l_mean_ap
+            summary_value.tag = "Label mAP"
+            self.tensorboard.writer.add_summary(summary, epoch)
+
+        logs['Label mAP'] = self.l_mean_ap
+
+        if self.verbose == 1:
+            print('Label mAP: {:.4f}'.format(self.l_mean_ap))

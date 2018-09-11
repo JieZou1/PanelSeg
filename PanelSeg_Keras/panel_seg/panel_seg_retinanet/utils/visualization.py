@@ -82,7 +82,7 @@ def draw_detections(image, boxes, scores, labels, color=None, label_to_name=None
         draw_caption(image, boxes[i, :], caption)
 
 
-def draw_annotations(image, annotations, color=(0, 255, 0), label_to_name=None):
+def draw_annotations(image, annotations, color=(0, 255, 0), label_to_name=None, l_label_to_name=None):
     """ Draws annotations in an image.
 
     # Arguments
@@ -92,9 +92,16 @@ def draw_annotations(image, annotations, color=(0, 255, 0), label_to_name=None):
         label_to_name : (optional) Functor for mapping a label to a name.
     """
     for a in annotations:
-        label   = a[4]
         c       = color if color is not None else label_color(label)
+
+        label   = a[4]
         caption = '{}'.format(label_to_name(label) if label_to_name else label)
         draw_caption(image, a, caption)
+        draw_box(image, a[0:4], color=c)
 
-        draw_box(image, a, color=c)
+        l_label   = a[9]
+        if l_label != -1.0:
+            caption = '{}'.format(l_label_to_name(l_label) if l_label_to_name else l_label)
+            draw_caption(image, a, caption)
+            draw_box(image, a[5:9], color=c)
+

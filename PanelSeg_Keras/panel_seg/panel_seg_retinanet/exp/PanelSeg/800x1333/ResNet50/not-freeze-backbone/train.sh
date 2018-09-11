@@ -18,7 +18,7 @@ python /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/panel_seg/panel_seg_
     --l_classes /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/label_mapping.csv\
     --annotations /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/train_slurm.csv\
     --val-annotations /slurm_storage/jzou/programs/PanelSeg/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/eval_slurm.csv\
-    --epoch 50\
+    --epoch 150\
     --backbone resnet50\
     --image-min-side 800\
     --image-max-side 1333

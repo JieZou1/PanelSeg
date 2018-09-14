@@ -196,6 +196,7 @@ class Generator(object):
 
         # apply resizing to annotations too
         annotations[:, :4] *= image_scale
+        annotations[:, 5:9] *= image_scale
 
         return image, annotations
 

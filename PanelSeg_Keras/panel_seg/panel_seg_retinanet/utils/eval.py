@@ -55,7 +55,36 @@ def _compute_ap(recall, precision):
     return ap
 
 
-def _get_detections(generator, model, score_threshold=0.05, max_detections=100, save_path=None):
+def _merge_panel_label_detections(image_detections, image_boxes, image_scores, image_labels,
+                                  image_l_detections, image_l_boxes, image_l_scores, image_l_labels):
+
+    # remove duplicates of labels
+    # indexes = list()
+    # values = set()
+    # for index, l in enumerate(image_l_labels):
+    #     len0 = len(values)
+    #     values.add(l)
+    #     len1 = len(values)
+    #     if len1 > len0:
+    #         indexes.append(index)
+    # image_l_detections = image_l_detections[indexes]
+    # image_l_boxes = image_l_boxes[indexes]
+    # image_l_scores = image_l_scores[indexes]
+    # image_l_labels = image_l_labels[indexes]
+    return image_detections, \
+           image_boxes, \
+           image_scores, \
+           image_labels, \
+           image_l_detections, \
+           image_l_boxes, \
+           image_l_scores, \
+           image_l_labels
+
+
+def _get_detections(generator, model,
+                    score_threshold=0.05, max_detections=100,
+                    l_score_threshold=0.05, l_max_detections=100,
+                    save_path=None):
     """ Get the detections from the model using the generator.
 
     The result is a list of lists such that the size is:
@@ -81,19 +110,28 @@ def _get_detections(generator, model, score_threshold=0.05, max_detections=100, 
         if keras.backend.image_data_format() == 'channels_first':
             image = image.transpose((2, 0, 1))
 
-        # run network
-        # boxes, scores, labels = model.predict_on_batch(np.expand_dims(image, axis=0))[:3]
+        # run network to predict
         boxes, scores, labels, l_boxes, l_scores, l_labels = model.predict_on_batch(np.expand_dims(image, axis=0))[:6]
 
+        # remove low score detections and sort all detections acoording th their scores.
         image_detections, image_boxes, image_scores, image_labels = _get_all_detections(
             boxes, scores, labels, scale, score_threshold, max_detections)
         image_l_detections, image_l_boxes, image_l_scores, image_l_labels = _get_all_detections(
-            l_boxes, l_scores, l_labels, scale, score_threshold, max_detections)
+            l_boxes, l_scores, l_labels, scale, l_score_threshold, l_max_detections)
+
+        # merge panel and label detection
+        image_detections, image_boxes, image_scores, image_labels, \
+        image_l_detections, image_l_boxes, image_l_scores, image_l_labels = _merge_panel_label_detections(
+            image_detections, image_boxes, image_scores, image_labels,
+            image_l_detections, image_l_boxes, image_l_scores, image_l_labels)
 
         if save_path is not None:
-            draw_annotations(raw_image, generator.load_annotations(i), label_to_name=generator.label_to_name, l_label_to_name=generator.l_label_to_name)
-            draw_detections(raw_image, image_boxes, image_scores, image_labels, label_to_name=generator.label_to_name)
-            draw_detections(raw_image, image_l_boxes, image_l_scores, image_l_labels, label_to_name=generator.l_label_to_name)
+            # draw_annotations(raw_image, generator.load_annotations(i),
+            #                  label_to_name=generator.label_to_name, l_label_to_name=generator.l_label_to_name)
+            draw_detections(raw_image, image_boxes, image_scores, image_labels,
+                            label_to_name=generator.label_to_name, score_threshold=0.5)
+            draw_detections(raw_image, image_l_boxes, image_l_scores, image_l_labels,
+                            label_to_name=generator.l_label_to_name, score_threshold=0.5)
 
             cv2.imwrite(os.path.join(save_path, '{}.png'.format(i)), raw_image)
 
@@ -166,6 +204,9 @@ def evaluate(
     iou_threshold=0.5,
     score_threshold=0.05,
     max_detections=100,
+    l_iou_threshold=0.5,
+    l_score_threshold=0.05,
+    l_max_detections=100,
     save_path=None
 ):
     """ Evaluate a given dataset using a given model.
@@ -181,7 +222,10 @@ def evaluate(
         A dict mapping class names to mAP scores.
     """
     # gather all detections and annotations
-    all_detections, all_l_detections     = _get_detections(generator, model, score_threshold=score_threshold, max_detections=max_detections, save_path=save_path)
+    all_detections, all_l_detections     = _get_detections(generator, model,
+                                                           score_threshold=score_threshold, max_detections=max_detections,
+                                                           l_score_threshold=l_score_threshold, l_max_detections=l_max_detections,
+                                                           save_path=save_path)
     all_annotations, all_l_annotations    = _get_annotations(generator)
 
     # all_detections = pickle.load(open('all_detections.pkl', 'rb'))
@@ -189,9 +233,64 @@ def evaluate(
     # pickle.dump(all_detections, open('all_detections.pkl', 'wb'))
     # pickle.dump(all_annotations, open('all_annotations.pkl', 'wb'))
 
+    # mAP evaluation
     average_precisions = eval_average_precisions(generator, generator.num_classes(), all_detections, all_annotations, iou_threshold)
-    average_l_precisions = eval_average_precisions(generator, generator.l_num_classes(), all_l_detections, all_l_annotations, iou_threshold)
-    return average_precisions, average_l_precisions
+    average_l_precisions = eval_average_precisions(generator, generator.l_num_classes(), all_l_detections, all_l_annotations, l_iou_threshold)
+
+    # clef accuracy evaluation
+    clef_accuracies_precisions_recalls = eval_clef_accuracy(generator, generator.num_classes(), all_detections, all_annotations, 0.66)
+    l_clef_accuracies_precisions_recalls = eval_clef_accuracy(generator, generator.l_num_classes(), all_l_detections, all_l_annotations, 0.66)
+
+    return average_precisions, clef_accuracies_precisions_recalls, average_l_precisions, l_clef_accuracies_precisions_recalls
+
+
+def eval_clef_accuracy(generator, num_classes, all_detections, all_annotations, iou_threshold):
+    clef_accuracies_precisions_recalls = {}
+    # process detections and annotations
+    for label in range(num_classes):
+        false_positives = np.zeros((0,))
+        true_positives  = np.zeros((0,))
+        scores          = np.zeros((0,))
+        num_annotations = 0.0
+
+        for i in range(generator.size()):
+            detections           = all_detections[i][label]
+            annotations          = all_annotations[i][label]
+            num_annotations     += annotations.shape[0]
+            detected_annotations = []
+
+            for d in detections:
+                scores = np.append(scores, d[4])
+
+                if annotations.shape[0] == 0:
+                    false_positives = np.append(false_positives, 1)
+                    true_positives  = np.append(true_positives, 0)
+                    continue
+
+                overlaps            = compute_overlap(np.expand_dims(d, axis=0), annotations)
+                assigned_annotation = np.argmax(overlaps, axis=1)
+                max_overlap         = overlaps[0, assigned_annotation]
+
+                if max_overlap >= iou_threshold and assigned_annotation not in detected_annotations:
+                    false_positives = np.append(false_positives, 0)
+                    true_positives  = np.append(true_positives, 1)
+                    detected_annotations.append(assigned_annotation)
+                else:
+                    false_positives = np.append(false_positives, 1)
+                    true_positives  = np.append(true_positives, 0)
+
+        # no annotations -> AP for this class is 0 (is this correct?)
+        if num_annotations == 0:
+            clef_accuracies_precisions_recalls[label] = 0, 0, 0, 0
+            continue
+
+        correct = true_positives.sum()
+        clef_accuracies_precisions_recalls[label] = correct / max(true_positives.shape[0], num_annotations), \
+                                                    correct / true_positives.shape[0], \
+                                                    correct / num_annotations, \
+                                                    num_annotations
+
+    return clef_accuracies_precisions_recalls
 
 
 def eval_average_precisions(generator, num_classes, all_detections, all_annotations, iou_threshold):

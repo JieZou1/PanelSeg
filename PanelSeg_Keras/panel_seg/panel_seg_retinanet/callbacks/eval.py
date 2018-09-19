@@ -22,7 +22,10 @@ class Evaluate(keras.callbacks.Callback):
     """ Evaluation callback for arbitrary datasets.
     """
 
-    def __init__(self, generator, iou_threshold=0.5, score_threshold=0.05, max_detections=100, save_path=None, tensorboard=None, verbose=1):
+    def __init__(self, generator,
+                 iou_threshold=0.5, score_threshold=0.05, max_detections=100,
+                 l_iou_threshold=0.2, l_score_threshold=0.005, l_max_detections=500,
+                 save_path=None, tensorboard=None, verbose=1):
         """ Evaluate a given dataset using a given model at the end of every epoch during training.
 
         # Arguments
@@ -38,6 +41,9 @@ class Evaluate(keras.callbacks.Callback):
         self.iou_threshold   = iou_threshold
         self.score_threshold = score_threshold
         self.max_detections  = max_detections
+        self.l_iou_threshold = l_iou_threshold
+        self.l_score_threshold = l_score_threshold
+        self.l_max_detections  = l_max_detections
         self.save_path       = save_path
         self.tensorboard     = tensorboard
         self.verbose         = verbose
@@ -54,6 +60,9 @@ class Evaluate(keras.callbacks.Callback):
             iou_threshold=self.iou_threshold,
             score_threshold=self.score_threshold,
             max_detections=self.max_detections,
+            l_iou_threshold=self.l_iou_threshold,
+            l_score_threshold=self.l_score_threshold,
+            l_max_detections=self.l_max_detections,
             save_path=self.save_path
         )
 

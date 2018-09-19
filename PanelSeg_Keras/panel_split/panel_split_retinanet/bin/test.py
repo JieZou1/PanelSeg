@@ -32,16 +32,14 @@ def get_session():
 def parse_args(args):
     parser = argparse.ArgumentParser(description='RetinaNet for panel splitting.')
     parser.add_argument('--backbone', help='The Backbone Model',
-                        default='resnet152'
+                        default='resnet50'
                         )
     parser.add_argument('--model', help='Path to the trained model file.',
-                        # default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/snapshots/vgg16_csv_03.h5'
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/retinanet/clef2016/ResNet50/snapshots/resnet50_csv_08.h5'
-                        # default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/rentinanet/train-with-ours/snapshots/resnet50_csv_40.h5'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/ResNet50/snapshots/resnet50_csv_08.h5'
                         )
     parser.add_argument('--eval_list', help='Path to the evaluation list file.',
                         # default='/Users/jie/projects/PanelSeg/ExpKeras/eval.txt'
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/clef_eval.txt'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/clef_eval.txt'
                         )
 
     return parser.parse_args(args)

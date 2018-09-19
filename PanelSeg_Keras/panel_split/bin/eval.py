@@ -11,13 +11,10 @@ def parse_args(args):
     parser = argparse.ArgumentParser(description='Evaluate Panel Split.')
 
     parser.add_argument('--eval_list', help='Path to the eval list file.',
-                        # default='/Users/jie/projects/PanelSeg/ExpKeras/clef_eval.txt'
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/eval.txt'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/clef_eval.txt'
                         )
     parser.add_argument('--auto_dir', help='The folder to the splitting result.',
-                        default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/retinanet/panelseg/VGG19/results'
-                        # default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/rentinanet/train-with-clef2016/results-imageclef2016-resnet152_csv_8-0.05-0.44-0.66.h5'
-                        # default='/Users/jie/projects/PanelSeg/ExpKeras/panel_split/rentinanet/train-with-ours/results-ours-resnet50_csv_50.h5'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/bin/results'
                         )
     parser.add_argument('--eval_file', help='The evaluation result file.',
                         default='eval.txt')
@@ -59,7 +56,7 @@ def eval_ImageCLEF(args):
                     max_overlapping = overlapping
                     max_auto_idx = auto_idx
             if max_overlapping > 0.66:
-            # if max_overlapping > 0.44:
+            # if max_overlapping > 0.5:
                 correct += 1
                 picked_auto_idx[max_auto_idx] = True
 

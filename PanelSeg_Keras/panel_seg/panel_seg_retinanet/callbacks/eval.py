@@ -57,12 +57,12 @@ class Evaluate(keras.callbacks.Callback):
         average_precisions, average_l_precisions = evaluate(
             self.generator,
             self.model,
-            iou_threshold=self.iou_threshold,
-            score_threshold=self.score_threshold,
-            max_detections=self.max_detections,
-            l_iou_threshold=self.l_iou_threshold,
-            l_score_threshold=self.l_score_threshold,
-            l_max_detections=self.l_max_detections,
+            panel_iou_threshold=self.iou_threshold,
+            panel_score_threshold=self.score_threshold,
+            panel_max_detections=self.max_detections,
+            label_iou_threshold=self.l_iou_threshold,
+            label_score_threshold=self.l_score_threshold,
+            label_max_detections=self.l_max_detections,
             save_path=self.save_path
         )
 

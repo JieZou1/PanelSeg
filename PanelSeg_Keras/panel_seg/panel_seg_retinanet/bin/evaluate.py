@@ -66,7 +66,7 @@ def parse_args(args):
                         default='csv')
 
     parser.add_argument('--annotations', help='Path to CSV file containing annotations for evaluation.',
-                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/eval_test.csv')
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/eval.csv')
     parser.add_argument('--classes', help='Path to a CSV file containing panel class mapping.',
                         default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_seg/panel_seg_retinanet/exp/PanelSeg/mapping.csv')
     parser.add_argument('--l_classes', help='Path to a CSV file containing label class mapping.',
@@ -78,10 +78,10 @@ def parse_args(args):
     parser.add_argument('--convert-model',   help='Convert the model to an inference model (ie. the input is a training model).', action='store_true')
     parser.add_argument('--backbone',        help='The backbone of the model.', default='resnet50')
     parser.add_argument('--gpu',             help='Id of the GPU to use (as reported by nvidia-smi).')
-    parser.add_argument('--score-threshold', help='Threshold on score to filter detections with (defaults to 0.05).', default=0.05, type=float)
+    parser.add_argument('--score-threshold', help='Threshold on score to filter detections with (defaults to 0.05).', default=0.3, type=float)
     parser.add_argument('--iou-threshold',   help='IoU Threshold to count for a positive detection (defaults to 0.5).', default=0.5, type=float)
     parser.add_argument('--max-detections',  help='Max Detections per image (defaults to 100).', default=100, type=int)
-    parser.add_argument('--l_score-threshold', help='Threshold on score to filter detections with (defaults to 0.05).', default=0.05, type=float)
+    parser.add_argument('--l_score-threshold', help='Threshold on score to filter detections with (defaults to 0.05).', default=0.1, type=float)
     parser.add_argument('--l_iou-threshold',   help='IoU Threshold to count for a positive detection (defaults to 0.5).', default=0.5, type=float)
     parser.add_argument('--l_max-detections',  help='Max Detections per image (defaults to 100).', default=100, type=int)
     parser.add_argument('--save-path',       help='Path for saving images with detections (doesn\'t work for COCO).',
@@ -96,55 +96,60 @@ def eval(generator, model, args):
     print('score_threshold: {:.4f}'.format(args.score_threshold))
     print('l_score_threshold: {:.4f}'.format(args.l_score_threshold))
 
-    average_precisions, clef_accuracies_precisions_recalls, average_l_precisions, l_clef_accuracies_precisions_recalls = evaluate(
+    panel_aps, panel_prs, label_aps, label_prs, merge_aps, merge_prs = evaluate(
         generator,
         model,
-        iou_threshold=args.iou_threshold,
-        score_threshold=args.score_threshold,
-        max_detections=args.max_detections,
-        l_iou_threshold=args.l_iou_threshold,
-        l_score_threshold=args.l_score_threshold,
-        l_max_detections=args.l_max_detections,
+        panel_iou_threshold=args.iou_threshold,
+        panel_score_threshold=args.score_threshold,
+        panel_max_detections=args.max_detections,
+        label_iou_threshold=args.l_iou_threshold,
+        label_score_threshold=args.l_score_threshold,
+        label_max_detections=args.l_max_detections,
         save_path=args.save_path
     )
 
+    def merge_panel_to_name(label):
+        if label == generator.l_num_classes():
+            return 'Panel'
+        else:
+            return 'Panel ' + generator.l_label_to_name(label)
+
     # print panel evaluation
-    present_classes = 0
-    sum_average_precision = 0
-    for label, (average_precision, num_annotations) in average_precisions.items():
-        print('{:.0f} instances of class'.format(num_annotations),
-              generator.label_to_name(label), 'with average precision: {:.4f}'.format(average_precision))
-        if num_annotations > 0:
-            present_classes += 1
-            sum_average_precision += average_precision
-    print('mAP: {:.4f}'.format(sum_average_precision / present_classes))
-
-    present_classes = 0
-    sum_clef_accuracy = 0
-    sum_precsion = 0
-    sum_recall = 0
-    for label, (clef_accuracy, precision, recall, num_annotations) in clef_accuracies_precisions_recalls.items():
-        print('{:.0f} instances of class'.format(num_annotations),
-              generator.label_to_name(label), 'with clef_accuracy: {:.4f}, precision: {:.4f}, recall: {:.4f}'.format(clef_accuracy, precision, recall))
-        if num_annotations > 0:
-            present_classes += 1
-            sum_clef_accuracy += clef_accuracy
-            sum_precsion += precision
-            sum_recall += recall
-    print('CLEF Accuracy: {:.4f}'.format(sum_clef_accuracy / present_classes))
-    print('Precision: {:.4f}'.format(sum_precsion / present_classes))
-    print('Recall: {:.4f}'.format(sum_recall / present_classes))
-
+    print_eval_results(panel_aps, panel_prs, generator.label_to_name)
     # print label evaluation
+    print_eval_results(label_aps, label_prs, generator.l_label_to_name)
+    # print merge evaluation
+    print_eval_results(merge_aps, merge_prs, merge_panel_to_name)
+
+
+def print_eval_results(ap, pr, label_to_name):
     present_classes = 0
     sum_average_precision = 0
-    for label, (average_precision, num_annotations) in average_l_precisions.items():
+    for label, (average_precision, num_annotations) in ap.items():
         print('{:.0f} instances of class'.format(num_annotations),
-              generator.l_label_to_name(label), 'with average precision: {:.4f}'.format(average_precision))
-        if num_annotations > 0:
+              label_to_name(label), 'with average precision: {:.4f}'.format(average_precision))
+        if num_annotations > 20:
             present_classes += 1
             sum_average_precision += average_precision
     print('mAP: {:.4f}'.format(sum_average_precision / present_classes))
+
+    total_correct = 0
+    total_detections = 0
+    total_annotations = 0
+    for label, (correct, num_detections, num_annotations) in pr.items():
+        if num_annotations == 0:
+            precision, recall = 0, 0
+        elif num_detections == 0:
+            precision, recall = 0, 0
+        else:
+            precision, recall = correct / num_detections, correct / num_annotations
+        print('{:.0f} instances of class'.format(num_annotations),
+              label_to_name(label), 'with precision: {:.4f}, recall: {:.4f}'.format(precision, recall))
+        total_correct += correct
+        total_detections += num_detections
+        total_annotations += num_annotations
+    print('Precision: {:.4f}'.format(total_correct / total_detections))
+    print('Recall: {:.4f}'.format(total_correct / total_annotations))
 
 
 def main(args=None):

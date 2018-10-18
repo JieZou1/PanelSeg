@@ -14,7 +14,8 @@ def parse_args(args):
                         default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/clef_eval.txt'
                         )
     parser.add_argument('--auto_dir', help='The folder to the splitting result.',
-                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/bin/results'
+                        # default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/bin/results'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/ResNet50/results-06-post'
                         )
     parser.add_argument('--eval_file', help='The evaluation result file.',
                         default='eval.txt')
@@ -55,8 +56,8 @@ def eval_ImageCLEF(args):
                 if overlapping > max_overlapping:
                     max_overlapping = overlapping
                     max_auto_idx = auto_idx
-            if max_overlapping > 0.66:
-            # if max_overlapping > 0.5:
+            # if max_overlapping > 0.66:
+            if max_overlapping > 0.5:
                 correct += 1
                 picked_auto_idx[max_auto_idx] = True
 
@@ -157,8 +158,6 @@ def eval_mAP(args):
             all_scores.append(scores[0])
             all_num.append(num[0])
             figures.append(figure)
-
-    # TODO: mAP evaluation
 
 
 def main(args=None):

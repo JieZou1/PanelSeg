@@ -35,7 +35,7 @@ def parse_args(args):
                         default='resnet50'
                         )
     parser.add_argument('--model', help='Path to the trained model file.',
-                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/ResNet50/snapshots/resnet50_csv_08.h5'
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/ResNet50/snapshots/resnet50_csv_06.h5'
                         )
     parser.add_argument('--eval_list', help='Path to the evaluation list file.',
                         # default='/Users/jie/projects/PanelSeg/ExpKeras/eval.txt'

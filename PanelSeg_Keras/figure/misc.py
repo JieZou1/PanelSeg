@@ -237,6 +237,7 @@ def union_area(au, bu, area_intersection):
 
 
 def intersection_area(ai, bi):
+    # a and b should be (x1,y1,x2,y2)
     x = max(ai[0], bi[0])
     y = max(ai[1], bi[1])
     w = min(ai[2], bi[2]) - x

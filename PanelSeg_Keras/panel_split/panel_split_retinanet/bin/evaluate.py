@@ -24,8 +24,8 @@ import tensorflow as tf
 # Allow relative imports when being executed as script.
 if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
-    import keras_retinanet.bin  # noqa: F401
-    __package__ = "keras_retinanet.bin"
+    import panel_split_retinanet.bin  # noqa: F401
+    __package__ = "panel_split_retinanet.bin"
 
 # Change these to absolute imports if you copy this script outside the keras_retinanet package.
 from .. import models
@@ -46,32 +46,12 @@ def get_session():
 def create_generator(args):
     """ Create generators for evaluation.
     """
-    if args.dataset_type == 'coco':
-        # import here to prevent unnecessary dependency on cocoapi
-        from ..preprocessing.coco import CocoGenerator
-
-        validation_generator = CocoGenerator(
-            args.coco_path,
-            'val2017',
-            image_min_side=args.image_min_side,
-            image_max_side=args.image_max_side
-        )
-    elif args.dataset_type == 'pascal':
-        validation_generator = PascalVocGenerator(
-            args.pascal_path,
-            'test',
-            image_min_side=args.image_min_side,
-            image_max_side=args.image_max_side
-        )
-    elif args.dataset_type == 'csv':
-        validation_generator = CSVGenerator(
-            args.annotations,
-            args.classes,
-            image_min_side=args.image_min_side,
-            image_max_side=args.image_max_side
-        )
-    else:
-        raise ValueError('Invalid data type received: {}'.format(args.dataset_type))
+    validation_generator = CSVGenerator(
+        args.annotations,
+        args.classes,
+        image_min_side=args.image_min_side,
+        image_max_side=args.image_max_side
+    )
 
     return validation_generator
 
@@ -79,28 +59,24 @@ def create_generator(args):
 def parse_args(args):
     """ Parse the arguments.
     """
-    parser     = argparse.ArgumentParser(description='Evaluation script for a RetinaNet network.')
-    subparsers = parser.add_subparsers(help='Arguments for specific dataset types.', dest='dataset_type')
-    subparsers.required = True
+    parser     = argparse.ArgumentParser(description='Evaluation script for Panel Splitting.')
+    parser.add_argument('--dataset_type', help='We always use CSV only',
+                        default='csv')
 
-    coco_parser = subparsers.add_parser('coco')
-    coco_parser.add_argument('coco_path', help='Path to dataset directory (ie. /tmp/COCO).')
+    parser.add_argument('--annotations', help='Path to CSV file containing annotations for evaluation.',
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/clef_eval.csv')
+    parser.add_argument('--classes', help='Path to a CSV file containing panel class mapping.',
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/mapping.csv')
+    parser.add_argument('--model',             help='Path to RetinaNet model.',
+                        default='/Users/jie/projects/PanelSeg/programs/PanelSeg_Keras/panel_split/panel_split_retinanet/exp/clef2016/ResNet50/snapshots/resnet50_csv_06.h5')
 
-    pascal_parser = subparsers.add_parser('pascal')
-    pascal_parser.add_argument('pascal_path', help='Path to dataset directory (ie. /tmp/VOCdevkit).')
-
-    csv_parser = subparsers.add_parser('csv')
-    csv_parser.add_argument('annotations', help='Path to CSV file containing annotations for evaluation.')
-    csv_parser.add_argument('classes', help='Path to a CSV file containing class label mapping.')
-
-    parser.add_argument('model',             help='Path to RetinaNet model.')
     parser.add_argument('--convert-model',   help='Convert the model to an inference model (ie. the input is a training model).', action='store_true')
     parser.add_argument('--backbone',        help='The backbone of the model.', default='resnet50')
     parser.add_argument('--gpu',             help='Id of the GPU to use (as reported by nvidia-smi).')
     parser.add_argument('--score-threshold', help='Threshold on score to filter detections with (defaults to 0.05).', default=0.05, type=float)
     parser.add_argument('--iou-threshold',   help='IoU Threshold to count for a positive detection (defaults to 0.5).', default=0.5, type=float)
     parser.add_argument('--max-detections',  help='Max Detections per image (defaults to 100).', default=100, type=int)
-    parser.add_argument('--save-path',       help='Path for saving images with detections (doesn\'t work for COCO).')
+    parser.add_argument('--save-path',       help='Path for saving images with detections (doesn\'t work for COCO).', default='./previews')
     parser.add_argument('--image-min-side',  help='Rescale the image so the smallest side is min_side.', type=int, default=800)
     parser.add_argument('--image-max-side',  help='Rescale the image if the largest side is larger than max_side.', type=int, default=1333)
 
@@ -140,7 +116,7 @@ def main(args=None):
         from ..utils.coco_eval import evaluate_coco
         evaluate_coco(generator, model, args.score_threshold)
     else:
-        average_precisions = evaluate(
+        aps, prs = evaluate(
             generator,
             model,
             iou_threshold=args.iou_threshold,
@@ -150,15 +126,37 @@ def main(args=None):
         )
 
         # print evaluation
-        present_classes = 0
-        precision = 0
-        for label, (average_precision, num_annotations) in average_precisions.items():
-            print('{:.0f} instances of class'.format(num_annotations),
-                  generator.label_to_name(label), 'with average precision: {:.4f}'.format(average_precision))
-            if num_annotations > 0:
-                present_classes += 1
-                precision       += average_precision
-        print('mAP: {:.4f}'.format(precision / present_classes))
+        print_eval_results(aps, prs, generator.label_to_name)
+
+
+def print_eval_results(ap, pr, label_to_name):
+    present_classes = 0
+    sum_average_precision = 0
+    for label, (average_precision, num_annotations) in ap.items():
+        print('{:.0f} instances of class'.format(num_annotations),
+              label_to_name(label), 'with average precision: {:.4f}'.format(average_precision))
+        if num_annotations > 20:
+            present_classes += 1
+            sum_average_precision += average_precision
+    print('mAP: {:.4f}'.format(sum_average_precision / present_classes))
+
+    total_correct = 0
+    total_detections = 0
+    total_annotations = 0
+    for label, (correct, num_detections, num_annotations) in pr.items():
+        if num_annotations == 0:
+            precision, recall = 0, 0
+        elif num_detections == 0:
+            precision, recall = 0, 0
+        else:
+            precision, recall = correct / num_detections, correct / num_annotations
+        print('{:.0f} instances of class'.format(num_annotations),
+              label_to_name(label), 'with precision: {:.4f}, recall: {:.4f}'.format(precision, recall))
+        total_correct += correct
+        total_detections += num_detections
+        total_annotations += num_annotations
+    print('Precision: {:.4f}'.format(total_correct / total_detections))
+    print('Recall: {:.4f}'.format(total_correct / total_annotations))
 
 
 if __name__ == '__main__':
